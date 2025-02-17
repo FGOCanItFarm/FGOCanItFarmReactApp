@@ -1,0 +1,116 @@
+/* Add this CSS to your stylesheet */
+.group-box {
+  margin: 0.5rem;
+  padding: 0.375rem;
+  border-radius: 0.25rem;
+  display: inline-block;
+}
+
+.group-box button {
+  margin: 0 0.375rem;
+}
+
+.red-bg {
+  background-color: #9a3269;
+}
+
+.blue-bg {
+  background-color: #184FA1;
+}
+
+.orange-bg {
+  background-color: #E26769;
+}
+
+.green-bg {
+  background-color: #DADD98;
+}
+
+/* Add new CSS for smaller text and alignment */
+.command-text {
+  font-size: 12px;
+  line-height: 1.2;
+}
+
+.skill-container {
+  margin-bottom: 1rem;
+}
+
+
+
+.servant-1 {
+  background-color: hsl(0, 80%, 50%);
+}
+
+.servant-2 {
+  background-color: hsl(36, 80%, 50%);
+}
+
+.servant-3 {
+  background-color: hsl(72, 80%, 50%);
+}
+
+.skill-text {
+  font-size: 2rem;
+  padding-top: 1rem;
+}
+
+.skill-buttons {
+  display: flex;
+  margin-left: 0.5rem;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+
+.skill-buttons .servant-1 {
+  color: white;
+  background-color: #9a3269;
+  border-radius: 0.25rem;
+  outline: 1px solid black; /* Add this line to apply an outline */
+  font-size: 0.75rem;
+}
+
+.skill-buttons .servant-2 {
+  color: white;
+  background-color: #184FA1;
+  border-radius: 0.25rem;
+  outline: 1px solid black; /* Add this line to apply an outline */
+  font-size: 0.75rem;
+}
+
+.skill-buttons .servant-3 {
+  color: white;
+  background-color: #E26769;
+  border-radius: 0.25rem;
+  outline: 1px solid black; /* Add this line to apply an outline */
+  font-size: 0.75rem;
+}
+
+.choice-skill-buttons .servant-1 {
+  color: white;
+  background-color: #9a3269;
+  border-radius: 0.25rem;
+  outline: 1px solid black; /* Add this line to apply an outline */
+  font-size: 0.75rem;
+}
+
+.choice-skill-buttons .servant-2 {
+  color: white;
+  background-color: #184FA1;
+  border-radius: 0.25rem;
+  outline: 1px solid black; /* Add this line to apply an outline */
+  font-size: 0.75rem;
+}
+
+.choice-skill-buttons .servant-3 {
+  color: white;
+  background-color: #E26769;
+  border-radius: 0.25rem;
+  outline: 1px solid black; /* Add this line to apply an outline */
+  font-size: 0.75rem;
+}
+
+.margin-left-grid {
+  margin-left:1rem !important;
+}
