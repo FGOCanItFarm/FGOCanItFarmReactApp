@@ -7,7 +7,7 @@ on:
       - development
 
 env:
-    REACT_APP_API_URL: 
+  CI: false
 
 jobs:
   build-and-deploy:
@@ -28,11 +28,20 @@ jobs:
       - name: Build the React app
         env:
           REACT_APP_API_URL: ${{ secrets.REACT_APP_API_URL }}
-          CI: false
         run: npm run build
 
-      - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v3
+      - name: Upload build artifacts
+        uses: actions/upload-pages-artifact@v3
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./build
+          path: ./build
+
+  deploy:
+    needs: build-and-deploy
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+
+    steps:
+      - name: Deploy to GitHub Pages
+        uses: actions/deploy-pages@v4
