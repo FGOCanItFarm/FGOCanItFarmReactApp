@@ -11,6 +11,7 @@ import MysticCodeSelection from './MysticCodeSelection';
 
 // Set the base URL for axios
 axios.defaults.baseURL = process.env.REACT_APP_API_URL;
+console.log('Axios base URL:', axios.defaults.baseURL);
 
 const TeamSelection = () => {
   const [team, setTeam] = useState(Array(6).fill(''));
