@@ -4,6 +4,7 @@ import { Grid, Typography } from '@mui/material';
 import ServantAvatar from './ServantAvatar';
 
 const supportsList = [316, 284, 314, 357, 215];
+const API_BASE_URL = process.env.REACT_APP_API_URL;
 
 const CommonServantsGrid = ({ handleServantClick }) => {
   const [servants, setServants] = useState([]);
@@ -14,7 +15,7 @@ const CommonServantsGrid = ({ handleServantClick }) => {
       try {
         const fetchedServants = await Promise.all(
           supportsList.map(async (collectionNo) => {
-            const response = await axios.get(`/api/servants/${collectionNo}`);
+            const response = await axios.get(`${API_BASE_URL}/api/servants/${collectionNo}`);
             return response.data;
           })
         );

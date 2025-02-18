@@ -10,8 +10,8 @@ import QuestSelection from './QuestSelection';
 import MysticCodeSelection from './MysticCodeSelection';
 
 // Set the base URL for axios
-axios.defaults.baseURL = process.env.REACT_APP_API_URL || 'https://fgocanitfarm-flask-e8fha5djejc3ewgy.canadacentral-01.azurewebsites.net';
-console.log('Axios base URL:', axios.defaults.baseURL);
+const API_BASE_URL = process.env.REACT_APP_API_URL;
+// console.log('Axios base URL:', axios.defaults.baseURL);
 
 const TeamSelection = () => {
   const [team, setTeam] = useState(Array(6).fill(''));
@@ -58,7 +58,7 @@ const TeamSelection = () => {
 
   const fetchServants = useCallback(async () => {
     try {
-      const response = await axios.get('/api/servants');
+      const response = await axios.get(`${API_BASE_URL}/api/servants`);
       console.log('API Response:', response.data); // Log the API response
       setServants(response.data);
       setFilteredServants(response.data);

@@ -1,13 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Typography } from '@mui/material';
+const API_BASE_URL = process.env.REACT_APP_API_URL;
 
 function ResultsTable() {
   const [results, setResults] = useState([]);
 
   useEffect(() => {
-    axios.get('/api/data')
-      .then(response => {
+    axios.get(`${API_BASE_URL}/api/data}`)
+    .then(response => {
         setResults(response.data.results);
       })
       .catch(error => {
