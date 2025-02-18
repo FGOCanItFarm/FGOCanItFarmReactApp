@@ -6,13 +6,8 @@ on:
       - main
       - development
 
-
-      
 env:
-    REACT_APP_API_URL: ${{ secrets.REACT_APP_API_URL }}
-    CI: false
-
-
+    REACT_APP_API_URL: 
 
 jobs:
   build-and-deploy:
@@ -31,6 +26,9 @@ jobs:
         run: npm install
 
       - name: Build the React app
+        env:
+          REACT_APP_API_URL: ${{ secrets.REACT_APP_API_URL }}
+          CI: false
         run: npm run build
 
       - name: Deploy to GitHub Pages
