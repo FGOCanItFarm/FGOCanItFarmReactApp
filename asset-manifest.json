@@ -1,18 +1,18 @@
 {
   "files": {
     "main.css": "/FGOCanItFarmReactApp/static/css/main.50cd7be5.css",
-    "main.js": "/FGOCanItFarmReactApp/static/js/main.002db0f8.js",
+    "main.js": "/FGOCanItFarmReactApp/static/js/main.c6b6b463.js",
     "static/js/488.6e696c41.chunk.js": "/FGOCanItFarmReactApp/static/js/488.6e696c41.chunk.js",
-    "static/media/Support.svg": "/FGOCanItFarmReactApp/static/media/Support.fdfde9f5cd45c4fb764125f9859ce27a.svg",
-    "static/media/AoE.svg": "/FGOCanItFarmReactApp/static/media/AoE.415199c61e549567f1e97a3f6d54a046.svg",
+    "static/media/Support.svg": "/FGOCanItFarmReactApp/static/media/Support.0e85d24a4a0ac9083690d87c8bdeeff2.svg",
+    "static/media/AoE.svg": "/FGOCanItFarmReactApp/static/media/AoE.6e510be017a3be863f65a4b15616617e.svg",
     "index.html": "/FGOCanItFarmReactApp/index.html",
-    "static/media/SingleTarget.svg": "/FGOCanItFarmReactApp/static/media/SingleTarget.556e910089446150a92b6f3e7292143b.svg",
+    "static/media/SingleTarget.svg": "/FGOCanItFarmReactApp/static/media/SingleTarget.030a2b95b01fa42c5e0de77d132d77f5.svg",
     "main.50cd7be5.css.map": "/FGOCanItFarmReactApp/static/css/main.50cd7be5.css.map",
-    "main.002db0f8.js.map": "/FGOCanItFarmReactApp/static/js/main.002db0f8.js.map",
+    "main.c6b6b463.js.map": "/FGOCanItFarmReactApp/static/js/main.c6b6b463.js.map",
     "488.6e696c41.chunk.js.map": "/FGOCanItFarmReactApp/static/js/488.6e696c41.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.50cd7be5.css",
-    "static/js/main.002db0f8.js"
+    "static/js/main.c6b6b463.js"
   ]
 }
