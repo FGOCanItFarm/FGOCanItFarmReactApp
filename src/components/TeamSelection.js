@@ -10,7 +10,7 @@ import QuestSelection from './QuestSelection';
 import MysticCodeSelection from './MysticCodeSelection';
 
 // Set the base URL for axios
-const API_BASE_URL = process.env.REACT_APP_API_URL;
+axios.defaults.baseURL = process.env.REACT_APP_API_URL;
 // console.log('Axios base URL:', axios.defaults.baseURL);
 
 const TeamSelection = () => {
@@ -58,7 +58,7 @@ const TeamSelection = () => {
 
   const fetchServants = useCallback(async () => {
     try {
-      const response = await axios.get(`${API_BASE_URL}/api/servants`);
+      const response = await axios.get(`/api/servants`);
       console.log('API Response:', response.data); // Log the API response
       setServants(response.data);
       setFilteredServants(response.data);

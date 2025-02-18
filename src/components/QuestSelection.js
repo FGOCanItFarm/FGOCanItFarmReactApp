@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Box, Typography, Select, MenuItem, FormControl, InputLabel } from '@mui/material';
-const API_BASE_URL = process.env.REACT_APP_API_URL;
 
 const QuestSelection = () => {
   const [warLongNames, setWarLongNames] = useState([]);
@@ -12,7 +11,7 @@ const QuestSelection = () => {
   useEffect(() => {
     const fetchWarLongNames = async () => {
       try {
-        const response = await axios.get(`${API_BASE_URL}/quests/warLongNames`)
+        const response = await axios.get(`/quests/warLongNames`)
         console.log('Fetched warLongNames:', response.data);
         setWarLongNames(response.data);
       } catch (error) {
@@ -25,7 +24,7 @@ const QuestSelection = () => {
 
   const fetchQuests = async () => {
     try {
-      const response = await axios.get(`${API_BASE_URL}/api/servants}`, {
+      const response = await axios.get(`/api/servants}`, {
         params: {
           warLongName: selectedWarLongName,
           recommendLv

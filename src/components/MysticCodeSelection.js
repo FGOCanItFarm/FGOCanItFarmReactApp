@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { Grid, Typography, Card, CardMedia, CardContent } from '@mui/material';
-const API_BASE_URL = process.env.REACT_APP_API_URL;
 
 const MysticCodesComponent = () => {
 //   const [mysticCodes, setMysticCodes] = useState([]);

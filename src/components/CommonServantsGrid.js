@@ -4,7 +4,6 @@ import { Grid, Typography } from '@mui/material';
 import ServantAvatar from './ServantAvatar';
 
 const supportsList = [316, 284, 314, 357, 215];
-const API_BASE_URL = process.env.REACT_APP_API_URL;
 
 const CommonServantsGrid = ({ handleServantClick }) => {
   const [servants, setServants] = useState([]);
