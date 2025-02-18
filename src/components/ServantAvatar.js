@@ -24,16 +24,16 @@ const ServantAvatar = ({ bgType, servantFace = "https://static.atlasacademy.io/J
   let bgImage;
   switch (bgType) {
     case "buster":
-      bgImage = "../busterbg.svg";
+      bgImage = "public/busterbg.svg";
       break;
     case "arts":
-      bgImage = "../artsbg.svg";
+      bgImage = "public/artsbg.svg";
       break;
     case "quick":
-      bgImage = "../quickbg.svg";
+      bgImage = "public/quickbg.svg";
       break;
     default:
-      bgImage = "../artsbg.svg";
+      bgImage = "public/artsbg.svg";
   }
 
   return (
