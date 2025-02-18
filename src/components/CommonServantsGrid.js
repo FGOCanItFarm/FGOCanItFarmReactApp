@@ -14,7 +14,7 @@ const CommonServantsGrid = ({ handleServantClick }) => {
       try {
         const fetchedServants = await Promise.all(
           supportsList.map(async (collectionNo) => {
-            const response = await axios.get(`${API_BASE_URL}/api/servants/${collectionNo}`);
+            const response = await axios.get(`/api/servants/${collectionNo}`);
             return response.data;
           })
         );
