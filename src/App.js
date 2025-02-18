@@ -8,14 +8,7 @@ import ResultsTable from './components/ResultsTable';
 import ServantAvatar from './components/ServantAvatar';
 
 
-// TODO create GridComponentItem that has an inverted border in the corners that allows 
-//     NPTYPE and ATTACKTYPE to be displayed
-//     https://codepen.io/kristen17/pen/poMzXob?editors=1100
-
-// TODO Ensure SupportsList servants remain regardless of filter selection
-// TODO move SupposrtsList to right hand side
 // TODO Query mongodb for lists of executed CanItFarm logs
-// TODO Make the Grid items dynamically drag and droppable to reorder them on the fly
 // TODO create script entry that conforms to the same standards as FGA
 
 // TODO create mongodb credentials for read only access
