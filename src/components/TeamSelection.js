@@ -10,7 +10,7 @@ import QuestSelection from './QuestSelection';
 import MysticCodeSelection from './MysticCodeSelection';
 
 // Set the base URL for axios
-axios.defaults.baseURL = process.env.REACT_APP_API_URL;
+axios.defaults.baseURL = process.env.REACT_APP_API_URL || 'https://fgocanitfarm-flask-e8fha5djejc3ewgy.canadacentral-01.azurewebsites.net';
 console.log('Axios base URL:', axios.defaults.baseURL);
 
 const TeamSelection = () => {
