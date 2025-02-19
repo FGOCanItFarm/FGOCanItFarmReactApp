@@ -40,7 +40,7 @@ const MysticCodeSelection = ({ team, setTeam }) => {
     if (mysticCodeId === 210 || mysticCodeId === 20) {
       return (
         <Box>
-          <Grid container spacing={1} style={{ backgroundColor: '#d0ba98', padding: '10px' }}>
+          <Grid container spacing={1} style={{ padding: '10px' }}>
             <Grid item xs={4}>
               <Button 
                 size="small" 
@@ -139,12 +139,12 @@ const MysticCodeSelection = ({ team, setTeam }) => {
       <Typography variant="h5">Mystic Codes</Typography>
       <Grid container spacing={2}>
         {mysticCodes.map((mysticCode) => (
-          <Grid item xs={12} sm={6} md={4} key={mysticCode._id}>
+          <Grid item xs={12} sm={6} md={4} key={mysticCode.id}>
             <Card
-              onClick={() => setSelectedMysticCode(mysticCode._id)}
+              onClick={() => setSelectedMysticCode(mysticCode.id)}
               style={{
-                backgroundColor: selectedMysticCode === mysticCode._id ? '#d0ba98' : '#fff',
-                opacity: selectedMysticCode === mysticCode._id ? 1 : 0.5,
+                backgroundColor: selectedMysticCode === mysticCode.id ? '#d0ba98' : '#fff',
+                opacity: selectedMysticCode === mysticCode.id ? 1 : 0.5,
               }}
             >
               <CardMedia
