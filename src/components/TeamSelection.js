@@ -201,7 +201,6 @@ const TeamSelection = () => {
             servants={servants}
             activeServant={activeServant}
             handleTeamServantClick={handleTeamServantClick}
-            handleTeamServantDrag={handleTeamServantDrag}
           />
         </Grid>
         <Grid item xs={12} md={4}>
