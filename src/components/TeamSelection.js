@@ -72,7 +72,6 @@ const TeamSelection = () => {
   }, [fetchServants]);
 
   useEffect(() => {
-    console.log('Filtered Servants:', filteredServants); // Log the filtered servants
     const filterServants = () => {
       let filtered = servants;
 

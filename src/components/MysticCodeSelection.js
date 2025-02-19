@@ -40,70 +40,57 @@ const MysticCodeSelection = ({ team, setTeam }) => {
     if (mysticCodeId === 210 || mysticCodeId === 20) {
       return (
         <Box>
+            <Box>
+            <Box>
+                <Typography variant="h6">Skill 1</Typography>
+            </Box>
+            <Button size="small" onClick={() => addCommand(`k1`)}>On Servant 1</Button>
+            <Button size="small" onClick={() => addCommand(`k2`)}>On Servant 2</Button>
+            <Button size="small" onClick={() => addCommand(`k3`)}>On Servant 3</Button>
+            <Button size="small" onClick={() => addCommand(`k`)}>No Target</Button>
+          </Box>
+          <Box>
+            <Box>
+                <Typography variant="h6">Skill 2</Typography>
+            </Box>
+            <Button size="small" onClick={() => addCommand(`k1`)}>On Servant 1</Button>
+            <Button size="small" onClick={() => addCommand(`k2`)}>On Servant 2</Button>
+            <Button size="small" onClick={() => addCommand(`k3`)}>On Servant 3</Button>
+            <Button size="small" onClick={() => addCommand(`k`)}>No Target</Button>
+          </Box>
+          <Box>
+              <Typography variant="h6">Skill 3</Typography>
+          </Box>
           <Grid container spacing={1} style={{ padding: '10px' }}>
             <Grid item xs={4}>
-              <Button 
-                size="small" 
-                variant={selectedTop === 0 ? "contained" : "outlined"} 
-                onClick={() => setSelectedTop(0)}
-              >
-                1
+              <Button size="small" variant={selectedTop === 0 ? "contained" : "outlined"} onClick={() => setSelectedTop(0)}>1
               </Button>
             </Grid>
             <Grid item xs={4}>
-              <Button 
-                size="small" 
-                variant={selectedTop === 1 ? "contained" : "outlined"} 
-                onClick={() => setSelectedTop(1)}
-              >
-                2
+              <Button size="small" variant={selectedTop === 1 ? "contained" : "outlined"} onClick={() => setSelectedTop(1)}>2
               </Button>
             </Grid>
             <Grid item xs={4}>
-              <Button 
-                size="small" 
-                variant={selectedTop === 2 ? "contained" : "outlined"} 
-                onClick={() => setSelectedTop(2)}
-              >
-                3
+              <Button size="small" variant={selectedTop === 2 ? "contained" : "outlined"} onClick={() => setSelectedTop(2)}>3
               </Button>
             </Grid>
             <Grid item xs={4}>
-              <Button 
-                size="small" 
-                variant={selectedBottom === 3 ? "contained" : "outlined"} 
-                onClick={() => setSelectedBottom(3)}
-              >
-                4
+              <Button size="small" variant={selectedBottom === 3 ? "contained" : "outlined"} onClick={() => setSelectedBottom(3)}>4
               </Button>
             </Grid>
             <Grid item xs={4}>
-              <Button 
-                size="small" 
-                variant={selectedBottom === 4 ? "contained" : "outlined"} 
-                onClick={() => setSelectedBottom(4)}
-              >
-                5
+              <Button size="small" variant={selectedBottom === 4 ? "contained" : "outlined"} onClick={() => setSelectedBottom(4)}>5
               </Button>
             </Grid>
             <Grid item xs={4}>
-              <Button 
-                size="small" 
-                variant={selectedBottom === 5 ? "contained" : "outlined"} 
-                onClick={() => setSelectedBottom(5)}
-              >
-                6
+              <Button size="small" variant={selectedBottom === 5 ? "contained" : "outlined"} onClick={() => setSelectedBottom(5)}>6
               </Button>
             </Grid>
           </Grid>
           <Box display="flex" justifyContent="center" mt={2}>
             <Button 
               variant="contained" 
-              color="primary" 
-              onClick={handleSwap}
-              disabled={selectedTop === null || selectedBottom === null || !team[selectedTop] || !team[selectedBottom]}
-            >
-              Swap
+              color="primary" onClick={handleSwap}disabled={selectedTop === null || selectedBottom === null || !team[selectedTop] || !team[selectedBottom]}>Swap
             </Button>
           </Box>
         </Box>
@@ -112,18 +99,27 @@ const MysticCodeSelection = ({ team, setTeam }) => {
       return (
         <Box>
           <Box>
+            <Box>
+                <Typography variant="h6">Skill 1</Typography>
+            </Box>
             <Button size="small" onClick={() => addCommand(`k1`)}>On Servant 1</Button>
             <Button size="small" onClick={() => addCommand(`k2`)}>On Servant 2</Button>
             <Button size="small" onClick={() => addCommand(`k3`)}>On Servant 3</Button>
             <Button size="small" onClick={() => addCommand(`k`)}>No Target</Button>
           </Box>
           <Box>
+            <Box>
+                <Typography variant="h6">Skill 2</Typography>
+            </Box>
             <Button size="small" onClick={() => addCommand(`k1`)}>On Servant 1</Button>
             <Button size="small" onClick={() => addCommand(`k2`)}>On Servant 2</Button>
             <Button size="small" onClick={() => addCommand(`k3`)}>On Servant 3</Button>
             <Button size="small" onClick={() => addCommand(`k`)}>No Target</Button>
           </Box>
           <Box>
+            <Box>
+                <Typography variant="h6">Skill 3</Typography>
+            </Box>
             <Button size="small" onClick={() => addCommand(`k1`)}>On Servant 1</Button>
             <Button size="small" onClick={() => addCommand(`k2`)}>On Servant 2</Button>
             <Button size="small" onClick={() => addCommand(`k3`)}>On Servant 3</Button>
