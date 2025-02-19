@@ -171,7 +171,7 @@ const MysticCodeSelection = ({ team, setTeam }) => {
                 <Typography variant="body2" color="textSecondary">
                   {mysticCode.description}
                 </Typography>
-                {selectedMysticCode === mysicCode._id && renderButtons(mysicCode._id)}
+                {selectedMysticCode === mysticCode.id && renderButtons(mysticCode.id)}
               </CardContent>
             </Card>
           </Grid>
