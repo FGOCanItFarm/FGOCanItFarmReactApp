@@ -44,46 +44,46 @@ const MysticCodeSelection = ({ team, setTeam }) => {
             <Box>
                 <Typography variant="h6">Skill 1</Typography>
             </Box>
-            <Button size="small" onClick={() => addCommand(`k1`)}>On Servant 1</Button>
-            <Button size="small" onClick={() => addCommand(`k2`)}>On Servant 2</Button>
-            <Button size="small" onClick={() => addCommand(`k3`)}>On Servant 3</Button>
-            <Button size="small" onClick={() => addCommand(`k`)}>No Target</Button>
+            <Button size="sm" onClick={() => addCommand(`k1`)}>On Servant 1</Button>
+            <Button size="sm" onClick={() => addCommand(`k2`)}>On Servant 2</Button>
+            <Button size="sm" onClick={() => addCommand(`k3`)}>On Servant 3</Button>
+            <Button size="sm" onClick={() => addCommand(`k`)}>No Target</Button>
           </Box>
           <Box>
             <Box>
                 <Typography variant="h6">Skill 2</Typography>
             </Box>
-            <Button size="small" onClick={() => addCommand(`k1`)}>On Servant 1</Button>
-            <Button size="small" onClick={() => addCommand(`k2`)}>On Servant 2</Button>
-            <Button size="small" onClick={() => addCommand(`k3`)}>On Servant 3</Button>
-            <Button size="small" onClick={() => addCommand(`k`)}>No Target</Button>
+            <Button size="sm" onClick={() => addCommand(`k1`)}>On Servant 1</Button>
+            <Button size="sm" onClick={() => addCommand(`k2`)}>On Servant 2</Button>
+            <Button size="sm" onClick={() => addCommand(`k3`)}>On Servant 3</Button>
+            <Button size="sm" onClick={() => addCommand(`k`)}>No Target</Button>
           </Box>
           <Box>
               <Typography variant="h6">Skill 3</Typography>
           </Box>
           <Grid container spacing={1} style={{ padding: '10px' }}>
             <Grid item xs={4}>
-              <Button size="small" variant={selectedTop === 0 ? "contained" : "outlined"} onClick={() => setSelectedTop(0)}>1
+              <Button size="sm" variant={selectedTop === 0 ? "contained" : "outlined"} onClick={() => setSelectedTop(0)}>1
               </Button>
             </Grid>
             <Grid item xs={4}>
-              <Button size="small" variant={selectedTop === 1 ? "contained" : "outlined"} onClick={() => setSelectedTop(1)}>2
+              <Button size="sm" variant={selectedTop === 1 ? "contained" : "outlined"} onClick={() => setSelectedTop(1)}>2
               </Button>
             </Grid>
             <Grid item xs={4}>
-              <Button size="small" variant={selectedTop === 2 ? "contained" : "outlined"} onClick={() => setSelectedTop(2)}>3
+              <Button size="sm" variant={selectedTop === 2 ? "contained" : "outlined"} onClick={() => setSelectedTop(2)}>3
               </Button>
             </Grid>
             <Grid item xs={4}>
-              <Button size="small" variant={selectedBottom === 3 ? "contained" : "outlined"} onClick={() => setSelectedBottom(3)}>4
+              <Button size="sm" variant={selectedBottom === 3 ? "contained" : "outlined"} onClick={() => setSelectedBottom(3)}>4
               </Button>
             </Grid>
             <Grid item xs={4}>
-              <Button size="small" variant={selectedBottom === 4 ? "contained" : "outlined"} onClick={() => setSelectedBottom(4)}>5
+              <Button size="sm" variant={selectedBottom === 4 ? "contained" : "outlined"} onClick={() => setSelectedBottom(4)}>5
               </Button>
             </Grid>
             <Grid item xs={4}>
-              <Button size="small" variant={selectedBottom === 5 ? "contained" : "outlined"} onClick={() => setSelectedBottom(5)}>6
+              <Button size="sm" variant={selectedBottom === 5 ? "contained" : "outlined"} onClick={() => setSelectedBottom(5)}>6
               </Button>
             </Grid>
           </Grid>
@@ -102,28 +102,28 @@ const MysticCodeSelection = ({ team, setTeam }) => {
             <Box>
                 <Typography variant="h6">Skill 1</Typography>
             </Box>
-            <Button size="small" onClick={() => addCommand(`k1`)}>On Servant 1</Button>
-            <Button size="small" onClick={() => addCommand(`k2`)}>On Servant 2</Button>
-            <Button size="small" onClick={() => addCommand(`k3`)}>On Servant 3</Button>
-            <Button size="small" onClick={() => addCommand(`k`)}>No Target</Button>
+            <Button size="sm" onClick={() => addCommand(`k1`)}>On Servant 1</Button>
+            <Button size="sm" onClick={() => addCommand(`k2`)}>On Servant 2</Button>
+            <Button size="sm" onClick={() => addCommand(`k3`)}>On Servant 3</Button>
+            <Button size="sm" onClick={() => addCommand(`k`)}>No Target</Button>
           </Box>
           <Box>
             <Box>
                 <Typography variant="h6">Skill 2</Typography>
             </Box>
-            <Button size="small" onClick={() => addCommand(`k1`)}>On Servant 1</Button>
-            <Button size="small" onClick={() => addCommand(`k2`)}>On Servant 2</Button>
-            <Button size="small" onClick={() => addCommand(`k3`)}>On Servant 3</Button>
-            <Button size="small" onClick={() => addCommand(`k`)}>No Target</Button>
+            <Button size="sm" onClick={() => addCommand(`k1`)}>On Servant 1</Button>
+            <Button size="sm" onClick={() => addCommand(`k2`)}>On Servant 2</Button>
+            <Button size="sm" onClick={() => addCommand(`k3`)}>On Servant 3</Button>
+            <Button size="sm" onClick={() => addCommand(`k`)}>No Target</Button>
           </Box>
           <Box>
             <Box>
                 <Typography variant="h6">Skill 3</Typography>
             </Box>
-            <Button size="small" onClick={() => addCommand(`k1`)}>On Servant 1</Button>
-            <Button size="small" onClick={() => addCommand(`k2`)}>On Servant 2</Button>
-            <Button size="small" onClick={() => addCommand(`k3`)}>On Servant 3</Button>
-            <Button size="small" onClick={() => addCommand(`k`)}>No Target</Button>
+            <Button size="sm" onClick={() => addCommand(`k1`)}>On Servant 1</Button>
+            <Button size="sm" onClick={() => addCommand(`k2`)}>On Servant 2</Button>
+            <Button size="sm" onClick={() => addCommand(`k3`)}>On Servant 3</Button>
+            <Button size="sm" onClick={() => addCommand(`k`)}>No Target</Button>
           </Box>
         </Box>
       );
