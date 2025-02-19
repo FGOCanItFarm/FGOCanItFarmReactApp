@@ -185,23 +185,26 @@ const TeamSelection = () => {
             handleCheckboxChange={handleCheckboxChange}
             attackTypeLabels={attackTypeLabels}
           />
-
-          {/* TODO add mystic code selection */}
-          <Typography variant="h4" style={{marginBottom:"2rem"}}>Select Mystic Code</Typography>
-          <Grid container spacing={2} direction="row">
-            <MysticCodeSelection />
-          </Grid>
-
+          <Box>
           <Button variant="contained" color="secondary" onClick={clearTeam} style={{ marginTop: '20px' }}>
             Clear Team
           </Button>
 
-          <TeamSection
-            team={team}
-            servants={servants}
-            activeServant={activeServant}
-            handleTeamServantClick={handleTeamServantClick}
-          />
+          <Grid>
+            <Grid>
+            <TeamSection
+              team={team}
+              servants={servants}
+              activeServant={activeServant}
+              handleTeamServantClick={handleTeamServantClick}
+            />
+            </Grid>
+          <Grid container spacing={2} direction="row">
+            <Typography variant="h4" style={{marginBottom:"2rem"}}>Select Mystic Code</Typography>
+            <MysticCodeSelection />
+          </Grid>
+          </Grid>
+          </Box>
         </Grid>
         
         <Grid item style={{ backgroundColor: '#ffffff', padding: '1rem', borderRadius: '0.5px', borderColor: '#d8caa9' }} md={4}>
