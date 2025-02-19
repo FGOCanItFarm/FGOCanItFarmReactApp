@@ -29,7 +29,7 @@ const MysticCodeSelection = ({ team, setTeam }) => {
   };
 
   const handleSwap = () => {
-    if (selectedTop !== null && selectedBottom !== null) {
+    if (selectedTop !== null && selectedBottom !== null && team[selectedTop] && team[selectedBottom]) {
       swapServants(selectedTop, selectedBottom);
       setSelectedTop(null);
       setSelectedBottom(null);
@@ -101,7 +101,7 @@ const MysticCodeSelection = ({ team, setTeam }) => {
               variant="contained" 
               color="primary" 
               onClick={handleSwap}
-              disabled={selectedTop === null || selectedBottom === null}
+              disabled={selectedTop === null || selectedBottom === null || !team[selectedTop] || !team[selectedBottom]}
             >
               Swap
             </Button>
@@ -112,26 +112,31 @@ const MysticCodeSelection = ({ team, setTeam }) => {
       return (
         <Box>
           <Box>
-            <Button size="small">On Servant 1</Button>
-            <Button size="small">On Servant 2</Button>
-            <Button size="small">On Servant 3</Button>
-            <Button size="small">No Target</Button>
+            <Button size="small" onClick={() => addCommand(`k1`)}>On Servant 1</Button>
+            <Button size="small" onClick={() => addCommand(`k2`)}>On Servant 2</Button>
+            <Button size="small" onClick={() => addCommand(`k3`)}>On Servant 3</Button>
+            <Button size="small" onClick={() => addCommand(`k`)}>No Target</Button>
           </Box>
           <Box>
-            <Button size="small">On Servant 1</Button>
-            <Button size="small">On Servant 2</Button>
-            <Button size="small">On Servant 3</Button>
-            <Button size="small">No Target</Button>
+            <Button size="small" onClick={() => addCommand(`k1`)}>On Servant 1</Button>
+            <Button size="small" onClick={() => addCommand(`k2`)}>On Servant 2</Button>
+            <Button size="small" onClick={() => addCommand(`k3`)}>On Servant 3</Button>
+            <Button size="small" onClick={() => addCommand(`k`)}>No Target</Button>
           </Box>
           <Box>
-            <Button size="small">On Servant 1</Button>
-            <Button size="small">On Servant 2</Button>
-            <Button size="small">On Servant 3</Button>
-            <Button size="small">No Target</Button>
+            <Button size="small" onClick={() => addCommand(`k1`)}>On Servant 1</Button>
+            <Button size="small" onClick={() => addCommand(`k2`)}>On Servant 2</Button>
+            <Button size="small" onClick={() => addCommand(`k3`)}>On Servant 3</Button>
+            <Button size="small" onClick={() => addCommand(`k`)}>No Target</Button>
           </Box>
         </Box>
       );
     }
+  };
+
+  const addCommand = (command) => {
+    // Implement the logic to add the command to the list of commands
+    console.log(`Command added: ${command}`);
   };
 
   return (
