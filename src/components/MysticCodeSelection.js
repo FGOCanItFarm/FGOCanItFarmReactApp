@@ -40,19 +40,7 @@ const MysticCodeSelection = ({ team, setTeam }) => {
     if (mysticCodeId === 210 || mysticCodeId === 20) {
       return (
         <Box>
-<Box style={{ backgroundColor: '#d0ba98'}}>
-            <Button>On Servant 1</Button>
-            <Button>On Servant 2</Button>
-            <Button>On Servant 3</Button>
-            <Button>No Target</Button>
-          </Box>
-          <Box style={{ backgroundColor: '#d0ba98'}}>
-            <Button>On Servant 1</Button>
-            <Button>On Servant 2</Button>
-            <Button>On Servant 3</Button>
-            <Button>No Target</Button>
-          </Box>
-          <Grid container spacing={1} style={{ backgroundColor: '#021825'}}>
+          <Grid container spacing={1} style={{ backgroundColor: '#d0ba98', padding: '10px' }}>
             <Grid item xs={4}>
               <Button 
                 size="small" 

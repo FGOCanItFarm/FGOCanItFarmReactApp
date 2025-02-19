@@ -187,7 +187,7 @@ const TeamSelection = () => {
           />
 
           {/* TODO add mystic code selection */}
-          <Typography variant="h4">Select Mystic Code</Typography>
+          <Typography variant="h4" style={{marginBottom:"2rem"}}>Select Mystic Code</Typography>
           <Grid container spacing={2} direction="row">
             <MysticCodeSelection />
           </Grid>
@@ -203,12 +203,13 @@ const TeamSelection = () => {
             handleTeamServantClick={handleTeamServantClick}
           />
         </Grid>
-        <Grid item xs={12} md={4}>
-          <ServantSelection style={{ backgroundColor: '#d8caa9', padding: '20px', borderRadius: '8px' }}
+        
+        <Grid item style={{ backgroundColor: '#ffffff', padding: '1rem', borderRadius: '0.5px', borderColor: '#d8caa9' }} md={4}>
+          <ServantSelection style={{ padding: '0.5rem', borderRadius: '0.5rem', borderColor: '#d8caa9' }}
             servants={filteredServants}
             handleServantClick={handleServantClick}
           />
-          <CommonServantsGrid style={{ backgroundColor: '#b8b6b0', padding: '20px', borderRadius: '8px' }}
+          <CommonServantsGrid style={{ padding: '0.5rem', borderRadius: '0.5rem', borderColoe: '#d8caa9' }}
             servants={servants}
             handleServantClick={handleServantClick}
           />
@@ -234,7 +235,7 @@ const TeamSelection = () => {
       </Button>
 
       {/* TODO add farming node selection section */}
-      <Typography variant="h4">Select Farming Node</Typography>
+      <Typography variant="h4" style={{marginBottom:"2rem"}}>Select Farming Node</Typography>
       <Grid container spacing={2} style={{ backgroundColor: '#d0ba98', padding: '20px', borderRadius: '8px' }} direction="row">
         <QuestSelection />
       </Grid>

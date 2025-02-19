@@ -5,7 +5,7 @@ import ServantAvatar from './ServantAvatar';
 const ServantSelection = ({ servants, handleServantClick }) => {
   return (
     <div>
-      <Typography variant="h6">Servant Selection</Typography>
+      <Typography variant="h6" style={{marginBottom:"1rem"}}>Servant Selection</Typography>
       <Grid container spacing={2} style={{ width: '40rem', height: '70vh', overflowY: 'auto' }}>
         {servants.map((servant, index) => (
           <Grid item xs={4} key={index} onClick={() => handleServantClick(servant)}>
