@@ -223,12 +223,20 @@ const TeamSelection = () => {
         </Grid>
       </Grid>
 
-      {activeServant && (
-        <Box mt={4}>
-          <CommandInputMenu activeServant={activeServant} updateCommands={setCommands} />
-        </Box>
-      )}
-
+      <Grid>
+        <Grid>
+          {activeServant && (
+            <Box mt={4}>
+              <CommandInputMenu activeServant={activeServant} updateCommands={setCommands} />
+            </Box>
+          )}
+        </Grid>
+        <Grid>
+          <Box mt={4}>
+            <MysticCodeSelection updateCommands={setCommands} />
+          </Box>
+        </Grid>
+      </Grid>
       <Box mt={4}>
         <Typography variant="h6">Commands</Typography>
         <Box component="pre" p={2} border="1px solid black" bgcolor="#f5f5f5" style={{ whiteSpace: 'nowrap' }}>
