@@ -43,7 +43,7 @@ const MysticCodeSelection = ({ team, setTeam }) => {
           </Box>
           <Grid container spacing={1}>
             <Grid item xs={4}>
-              <Button size="small" onClick={() => swapServants(0, 3)}>1 & 4</Button>
+              <Button size="sm" onClick={() => swapServants(0, 3)}>1 & 4</Button>
             </Grid>
             <Grid item xs={4}>
               <Button size="small" onClick={() => swapServants(0, 4)}>1 & 5</Button>

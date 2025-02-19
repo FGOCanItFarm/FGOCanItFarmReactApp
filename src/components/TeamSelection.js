@@ -59,7 +59,6 @@ const TeamSelection = () => {
   const fetchServants = useCallback(async () => {
     try {
       const response = await axios.get(`/api/servants`);
-      console.log('API Response:', response.data); // Log the API response
       setServants(response.data);
       setFilteredServants(response.data);
     } catch (error) {
@@ -119,12 +118,6 @@ const TeamSelection = () => {
     setActiveServant(servant);
   };
 
-  const handleTeamServantDrag = (fromIndex, toIndex) => {
-    const newTeam = [...team];
-    const [movedServant] = newTeam.splice(fromIndex, 1);
-    newTeam.splice(toIndex, 0, movedServant);
-    setTeam(newTeam);
-  };
 
   const handleServantClick = (servant) => {
     const newTeam = [...team];
@@ -224,18 +217,11 @@ const TeamSelection = () => {
       </Grid>
 
       <Grid>
-        <Grid>
           {activeServant && (
             <Box mt={4}>
               <CommandInputMenu activeServant={activeServant} updateCommands={setCommands} />
             </Box>
           )}
-        </Grid>
-        <Grid>
-          <Box mt={4}>
-            <MysticCodeSelection updateCommands={setCommands} />
-          </Box>
-        </Grid>
       </Grid>
       <Box mt={4}>
         <Typography variant="h6">Commands</Typography>
