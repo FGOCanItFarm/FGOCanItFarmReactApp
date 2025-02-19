@@ -35,9 +35,7 @@ const MysticCodeSelection = ({ team = [], setTeam, updateCommands, addCommand })
             setSelectedBottom(null);
         }
     };
-    const addCommand = (command) => {
-        updateCommands((prevCommands) => [...prevCommands, command]);
-      };
+
     const renderButtons = (mysticCodeId) => {
         if (mysticCodeId === 210 || mysticCodeId === 20) {
             return (
