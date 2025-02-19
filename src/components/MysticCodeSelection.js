@@ -144,11 +144,6 @@ const MysticCodeSelection = ({ team = [], setTeam, updateCommands, addCommand })
         }
     };
 
-    const addCommand = (command) => {
-        // Implement the logic to add the command to the list of commands
-        console.log(`Command added: ${command}`);
-    };
-
     return (
         <div style={{ backgroundColor: '#e0f7fa', padding: '20px', borderRadius: '8px' }}>
             <Typography variant="h5">Mystic Codes</Typography>
