@@ -102,7 +102,8 @@ const MysticCodeSelection = ({ team, setTeam }) => {
               <CardMedia
                 component="img"
                 alt={mysticCode.name}
-                height="140"
+                height="80"
+                width="80"
                 image={mysticCode.extraAssets?.item?.male}
               />
               <CardContent>

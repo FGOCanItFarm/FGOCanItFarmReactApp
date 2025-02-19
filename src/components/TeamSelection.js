@@ -204,18 +204,18 @@ const TeamSelection = () => {
           />
         </Grid>
         <Grid item xs={12} md={4}>
-          <ServantSelection
+          <ServantSelection style={{ backgroundColor: '#d8caa9', padding: '20px', borderRadius: '8px' }}
             servants={filteredServants}
             handleServantClick={handleServantClick}
           />
-          <CommonServantsGrid
+          <CommonServantsGrid style={{ backgroundColor: '#b8b6b0', padding: '20px', borderRadius: '8px' }}
             servants={servants}
             handleServantClick={handleServantClick}
           />
         </Grid>
       </Grid>
 
-      <Grid>
+      <Grid style={{ backgroundColor: '#aeb2a6', padding: '20px', borderRadius: '8px' }}>
           {activeServant && (
             <Box mt={4}>
               <CommandInputMenu activeServant={activeServant} updateCommands={setCommands} />
@@ -235,7 +235,7 @@ const TeamSelection = () => {
 
       {/* TODO add farming node selection section */}
       <Typography variant="h4">Select Farming Node</Typography>
-      <Grid container spacing={2} direction="row">
+      <Grid container spacing={2} style={{ backgroundColor: '#d0ba98', padding: '20px', borderRadius: '8px' }} direction="row">
         <QuestSelection />
       </Grid>
 
