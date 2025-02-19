@@ -4,6 +4,7 @@ import { Grid, Typography, Card, CardMedia, CardContent, Box, Button } from '@mu
 
 const MysticCodeSelection = ({ team, setTeam }) => {
   const [mysticCodes, setMysticCodes] = useState([]);
+  const [selectedMysticCode, setSelectedMysticCode] = useState(null);
   const [selectedTop, setSelectedTop] = useState(null);
   const [selectedBottom, setSelectedBottom] = useState(null);
 
@@ -39,7 +40,7 @@ const MysticCodeSelection = ({ team, setTeam }) => {
     if (mysticCodeId === 210 || mysticCodeId === 20) {
       return (
         <Box>
-          <Box style={{ backgroundColor: '#d0ba98'}}>
+<Box style={{ backgroundColor: '#d0ba98'}}>
             <Button>On Servant 1</Button>
             <Button>On Servant 2</Button>
             <Button>On Servant 3</Button>
@@ -123,22 +124,22 @@ const MysticCodeSelection = ({ team, setTeam }) => {
       return (
         <Box>
           <Box>
-            <Button>On Servant 1</Button>
-            <Button>On Servant 2</Button>
-            <Button>On Servant 3</Button>
-            <Button>No Target</Button>
+            <Button size="small">On Servant 1</Button>
+            <Button size="small">On Servant 2</Button>
+            <Button size="small">On Servant 3</Button>
+            <Button size="small">No Target</Button>
           </Box>
           <Box>
-            <Button>On Servant 1</Button>
-            <Button>On Servant 2</Button>
-            <Button>On Servant 3</Button>
-            <Button>No Target</Button>
+            <Button size="small">On Servant 1</Button>
+            <Button size="small">On Servant 2</Button>
+            <Button size="small">On Servant 3</Button>
+            <Button size="small">No Target</Button>
           </Box>
           <Box>
-            <Button>On Servant 1</Button>
-            <Button>On Servant 2</Button>
-            <Button>On Servant 3</Button>
-            <Button>No Target</Button>
+            <Button size="small">On Servant 1</Button>
+            <Button size="small">On Servant 2</Button>
+            <Button size="small">On Servant 3</Button>
+            <Button size="small">No Target</Button>
           </Box>
         </Box>
       );
@@ -151,7 +152,13 @@ const MysticCodeSelection = ({ team, setTeam }) => {
       <Grid container spacing={2}>
         {mysticCodes.map((mysticCode) => (
           <Grid item xs={12} sm={6} md={4} key={mysticCode._id}>
-            <Card>
+            <Card
+              onClick={() => setSelectedMysticCode(mysticCode._id)}
+              style={{
+                backgroundColor: selectedMysticCode === mysticCode._id ? '#d0ba98' : '#fff',
+                opacity: selectedMysticCode === mysticCode._id ? 1 : 0.5,
+              }}
+            >
               <CardMedia
                 component="img"
                 alt={mysticCode.name}
@@ -164,7 +171,7 @@ const MysticCodeSelection = ({ team, setTeam }) => {
                 <Typography variant="body2" color="textSecondary">
                   {mysticCode.description}
                 </Typography>
-                {renderButtons(mysticCode.id)}
+                {selectedMysticCode === mysicCode._id && renderButtons(mysicCode._id)}
               </CardContent>
             </Card>
           </Grid>
