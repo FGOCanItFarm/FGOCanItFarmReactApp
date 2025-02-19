@@ -4,6 +4,8 @@ import { Grid, Typography, Card, CardMedia, CardContent, Box, Button } from '@mu
 
 const MysticCodeSelection = ({ team, setTeam }) => {
   const [mysticCodes, setMysticCodes] = useState([]);
+  const [selectedTop, setSelectedTop] = useState(null);
+  const [selectedBottom, setSelectedBottom] = useState(null);
 
   useEffect(() => {
     // Fetch mystic codes data from API
@@ -25,68 +27,119 @@ const MysticCodeSelection = ({ team, setTeam }) => {
     setTeam(newTeam);
   };
 
+  const handleSwap = () => {
+    if (selectedTop !== null && selectedBottom !== null) {
+      swapServants(selectedTop, selectedBottom);
+      setSelectedTop(null);
+      setSelectedBottom(null);
+    }
+  };
+
   const renderButtons = (mysticCodeId) => {
     if (mysticCodeId === 210 || mysticCodeId === 20) {
       return (
         <Box>
-          <Box>
+          <Box style={{ backgroundColor: '#d0ba98'}}>
             <Button>On Servant 1</Button>
             <Button>On Servant 2</Button>
             <Button>On Servant 3</Button>
             <Button>No Target</Button>
           </Box>
-          <Box>
+          <Box style={{ backgroundColor: '#d0ba98'}}>
             <Button>On Servant 1</Button>
             <Button>On Servant 2</Button>
             <Button>On Servant 3</Button>
             <Button>No Target</Button>
           </Box>
-          <Grid container spacing={1}>
+          <Grid container spacing={1} style={{ backgroundColor: '#021825'}}>
             <Grid item xs={4}>
-              <Button size="sm" onClick={() => swapServants(0, 3)}>1 & 4</Button>
+              <Button 
+                size="small" 
+                variant={selectedTop === 0 ? "contained" : "outlined"} 
+                onClick={() => setSelectedTop(0)}
+              >
+                1
+              </Button>
             </Grid>
             <Grid item xs={4}>
-              <Button size="small" onClick={() => swapServants(0, 4)}>1 & 5</Button>
+              <Button 
+                size="small" 
+                variant={selectedTop === 1 ? "contained" : "outlined"} 
+                onClick={() => setSelectedTop(1)}
+              >
+                2
+              </Button>
             </Grid>
             <Grid item xs={4}>
-              <Button size="small" onClick={() => swapServants(0, 5)}>1 & 6</Button>
+              <Button 
+                size="small" 
+                variant={selectedTop === 2 ? "contained" : "outlined"} 
+                onClick={() => setSelectedTop(2)}
+              >
+                3
+              </Button>
             </Grid>
             <Grid item xs={4}>
-              <Button size="small" onClick={() => swapServants(1, 3)}>2 & 4</Button>
+              <Button 
+                size="small" 
+                variant={selectedBottom === 3 ? "contained" : "outlined"} 
+                onClick={() => setSelectedBottom(3)}
+              >
+                4
+              </Button>
             </Grid>
             <Grid item xs={4}>
-              <Button size="small" onClick={() => swapServants(1, 4)}>2 & 5</Button>
+              <Button 
+                size="small" 
+                variant={selectedBottom === 4 ? "contained" : "outlined"} 
+                onClick={() => setSelectedBottom(4)}
+              >
+                5
+              </Button>
             </Grid>
             <Grid item xs={4}>
-              <Button size="small" onClick={() => swapServants(1, 5)}>2 & 6</Button>
-            </Grid>
-            <Grid item xs={4}>
-              <Button size="small" onClick={() => swapServants(2, 3)}>3 & 4</Button>
-            </Grid>
-            <Grid item xs={4}>
-              <Button size="small" onClick={() => swapServants(2, 4)}>3 & 5</Button>
-            </Grid>
-            <Grid item xs={4}>
-              <Button size="small" onClick={() => swapServants(2, 5)}>3 & 6</Button>
+              <Button 
+                size="small" 
+                variant={selectedBottom === 5 ? "contained" : "outlined"} 
+                onClick={() => setSelectedBottom(5)}
+              >
+                6
+              </Button>
             </Grid>
           </Grid>
+          <Box display="flex" justifyContent="center" mt={2}>
+            <Button 
+              variant="contained" 
+              color="primary" 
+              onClick={handleSwap}
+              disabled={selectedTop === null || selectedBottom === null}
+            >
+              Swap
+            </Button>
+          </Box>
         </Box>
       );
     } else {
       return (
         <Box>
-          <Button>On Servant 1</Button>
-          <Button>On Servant 2</Button>
-          <Button>On Servant 3</Button>
-          <Button>No Target</Button>
-          <Button>On Servant 1</Button>
-          <Button>On Servant 2</Button>
-          <Button>On Servant 3</Button>
-          <Button>No Target</Button>
-          <Button>On Servant 1</Button>
-          <Button>On Servant 2</Button>
-          <Button>On Servant 3</Button>
-          <Button>No Target</Button>
+          <Box>
+            <Button>On Servant 1</Button>
+            <Button>On Servant 2</Button>
+            <Button>On Servant 3</Button>
+            <Button>No Target</Button>
+          </Box>
+          <Box>
+            <Button>On Servant 1</Button>
+            <Button>On Servant 2</Button>
+            <Button>On Servant 3</Button>
+            <Button>No Target</Button>
+          </Box>
+          <Box>
+            <Button>On Servant 1</Button>
+            <Button>On Servant 2</Button>
+            <Button>On Servant 3</Button>
+            <Button>No Target</Button>
+          </Box>
         </Box>
       );
     }
@@ -111,7 +164,7 @@ const MysticCodeSelection = ({ team, setTeam }) => {
                 <Typography variant="body2" color="textSecondary">
                   {mysticCode.description}
                 </Typography>
-                {renderButtons(mysticCode._id)}
+                {renderButtons(mysticCode.id)}
               </CardContent>
             </Card>
           </Grid>
