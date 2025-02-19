@@ -57,30 +57,41 @@ const generateChoiceTargetCommand = (servantIndex, skillIndex, choice, targetInd
 
 const renderSkillButtons = (servantIndex, skillIndex, addCommand) => (
   <Box className="skill-buttons">
+    
+  <Grid>
   <Button className={`servant-${servantIndex+1}`} onClick={() => addCommand(generateSkillCommand(servantIndex, skillIndex, 0))}>On Servant 1</Button>
   <Button className={`servant-${servantIndex+1}`} onClick={() => addCommand(generateSkillCommand(servantIndex, skillIndex, 1))} > On Servant 2 </Button>
   <Button className={`servant-${servantIndex+1}`} onClick={() => addCommand(generateSkillCommand(servantIndex, skillIndex, 2))} > On Servant 3 </Button>
+  </Grid>
   <Button className={`servant-${servantIndex+1}`} onClick={() => addCommand(generateSkillCommand(servantIndex, skillIndex))} > No Target </Button> 
   </Box>
 );
 
 const renderChoiceButtons = (servantIndex, skillIndex, addCommand, targetIndex=null) => (
   <Box className="choice-skill-buttons">
+  <Grid>
   <Button className={`servant-${servantIndex+1}`} onClick={() => addCommand(generateChoiceCommand(servantIndex, skillIndex, 12))} > Choice 1 | 2 </Button>
   <Button className={`servant-${servantIndex+1}`} onClick={() => addCommand(generateChoiceCommand(servantIndex, skillIndex, 22))} > Choice 2 | 2 </Button>
+  </Grid>
+  <Grid>
   <Button className={`servant-${servantIndex+1}`} onClick={() => addCommand(generateChoiceCommand(servantIndex, skillIndex, 13))} > Choice 1 | 3 </Button>
   <Button className={`servant-${servantIndex+1}`} onClick={() => addCommand(generateChoiceCommand(servantIndex, skillIndex, 23))} > Choice 2 | 3 </Button>
   <Button className={`servant-${servantIndex+1}`} onClick={() => addCommand(generateChoiceCommand(servantIndex, skillIndex, 33))} > Choice 3 | 3 </Button> 
+  </Grid>
   </Box> 
 );
 const render2ChoiceTargetButtons = (servantIndex, skillIndex, addCommand) => ( 
   <Box className="choice-skill-buttons">
+  <Grid>
   <Button className={`servant-${servantIndex+1}`} onClick={() => addCommand(generateChoiceTargetCommand(servantIndex, skillIndex, 12, 1))} > Choice 1 | 2 On Servant 1</Button>
   <Button className={`servant-${servantIndex+1}`} onClick={() => addCommand(generateChoiceTargetCommand(servantIndex, skillIndex, 12, 2))} > Choice 1 | 2 On Servant 2</Button>
   <Button className={`servant-${servantIndex+1}`} onClick={() => addCommand(generateChoiceTargetCommand(servantIndex, skillIndex, 12, 3))} > Choice 1 | 2 On Servant 3</Button>
+  </Grid>
+  <Grid>
   <Button className={`servant-${servantIndex+1}`} onClick={() => addCommand(generateChoiceTargetCommand(servantIndex, skillIndex, 22, 1))} > Choice 2 | 2 On Servant 1</Button>
   <Button className={`servant-${servantIndex+1}`} onClick={() => addCommand(generateChoiceTargetCommand(servantIndex, skillIndex, 22, 2))} > Choice 2 | 2 On Servant 2</Button>
   <Button className={`servant-${servantIndex+1}`} onClick={() => addCommand(generateChoiceTargetCommand(servantIndex, skillIndex, 22, 3))} > Choice 2 | 2 On Servant 3</Button>
+  </Grid>
 
   </Box>
 );
