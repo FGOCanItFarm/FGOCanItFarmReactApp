@@ -11,7 +11,6 @@ import MysticCodeSelection from './MysticCodeSelection';
 
 // Set the base URL for axios
 axios.defaults.baseURL = process.env.REACT_APP_API_URL;
-// console.log('Axios base URL:', axios.defaults.baseURL);
 
 const TeamSelection = () => {
   const [team, setTeam] = useState(Array(6).fill(''));
@@ -117,7 +116,6 @@ const TeamSelection = () => {
     setActiveServant(servant);
   };
 
-
   const handleServantClick = (servant) => {
     const newTeam = [...team];
     const count = newTeam.filter(s => s === servant.collectionNo).length;
@@ -203,6 +201,7 @@ const TeamSelection = () => {
             <MysticCodeSelection
               team={team}
               setTeam={setTeam}
+              updateCommands={setCommands}
               />
           </Grid>
           </Grid>

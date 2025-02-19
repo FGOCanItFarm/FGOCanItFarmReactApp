@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { Grid, Typography, Card, CardMedia, CardContent, Box, Button } from '@mui/material';
 
-const MysticCodeSelection = ({ team, setTeam }) => {
+const MysticCodeSelection = ({ team = [], setTeam, updateCommands, addCommand }) => {
     const [mysticCodes, setMysticCodes] = useState([]);
     const [selectedMysticCode, setSelectedMysticCode] = useState(null);
     const [selectedTop, setSelectedTop] = useState(null);
@@ -35,7 +35,9 @@ const MysticCodeSelection = ({ team, setTeam }) => {
             setSelectedBottom(null);
         }
     };
-
+    const addCommand = (command) => {
+        updateCommands((prevCommands) => [...prevCommands, command]);
+      };
     const renderButtons = (mysticCodeId) => {
         if (mysticCodeId === 210 || mysticCodeId === 20) {
             return (
@@ -66,72 +68,25 @@ const MysticCodeSelection = ({ team, setTeam }) => {
                 <Typography variant="h6">Skill 3</Typography>
                 </Box>
                     <Grid container spacing={1} style={{ padding: '10px' }}>
-                        <Grid item xs={4}>
-                            <Button
-                                size="small"
-                                variant={selectedTop === 0 ? "contained" : "outlined"}
-                                onClick={() => setSelectedTop(0)}
-                                style={{ border: '1px solid lightgray' }}
-                                title={`Swap with ${team[0]?.name || 'Empty'}`}
-                            >
-                                1
-                            </Button>
-                        </Grid>
-                        <Grid item xs={4}>
-                            <Button
-                                size="small"
-                                variant={selectedTop === 1 ? "contained" : "outlined"}
-                                onClick={() => setSelectedTop(1)}
-                                style={{ border: '1px solid lightgray' }}
-                                title={`Swap with ${team[1]?.name || 'Empty'}`}
-                            >
-                                2
-                            </Button>
-                        </Grid>
-                        <Grid item xs={4}>
-                            <Button
-                                size="small"
-                                variant={selectedTop === 2 ? "contained" : "outlined"}
-                                onClick={() => setSelectedTop(2)}
-                                style={{ border: '1px solid lightgray' }}
-                                title={`Swap with ${team[2]?.name || 'Empty'}`}
-                            >
-                                3
-                            </Button>
-                        </Grid>
-                        <Grid item xs={4}>
-                            <Button
-                                size="small"
-                                variant={selectedBottom === 3 ? "contained" : "outlined"}
-                                onClick={() => setSelectedBottom(3)}
-                                style={{ border: '1px solid lightgray' }}
-                                title={`Swap with ${team[3]?.name || 'Empty'}`}
-                            >
-                                4
-                            </Button>
-                        </Grid>
-                        <Grid item xs={4}>
-                            <Button
-                                size="small"
-                                variant={selectedBottom === 4 ? "contained" : "outlined"}
-                                onClick={() => setSelectedBottom(4)}
-                                style={{ border: '1px solid lightgray' }}
-                                title={`Swap with ${team[4]?.name || 'Empty'}`}
-                            >
-                                5
-                            </Button>
-                        </Grid>
-                        <Grid item xs={4}>
-                            <Button
-                                size="small"
-                                variant={selectedBottom === 5 ? "contained" : "outlined"}
-                                onClick={() => setSelectedBottom(5)}
-                                style={{ border: '1px solid lightgray' }}
-                                title={`Swap with ${team[5]?.name || 'Empty'}`}
-                            >
-                                6
-                            </Button>
-                        </Grid>
+                        {[0, 1, 2, 3, 4, 5].map((index) => (
+                            <Grid item xs={4} key={index}>
+                                <Button
+                                    size="small"
+                                    variant={selectedTop === index || selectedBottom === index ? "contained" : "outlined"}
+                                    onClick={() => {
+                                        if (index < 3) {
+                                            setSelectedTop(index);
+                                        } else {
+                                            setSelectedBottom(index);
+                                        }
+                                    }}
+                                    style={{ border: '1px solid lightgray' }}
+                                    title={`Swap with ${team[index]?.name || 'Empty'}`}
+                                >
+                                    {index + 1}
+                                </Button>
+                            </Grid>
+                        ))}
                     </Grid>
                     <Box display="flex" justifyContent="center" mt={2}>
                         <Button
@@ -148,108 +103,42 @@ const MysticCodeSelection = ({ team, setTeam }) => {
         } else {
             return (
                 <Box>
-                    <Box>
-                        <Button
-                            size="small"
-                            onClick={() => addCommand(`k1`)}
-                            style={{ border: '1px solid lightgray' }}
-                            title={`Skill 1 on ${team[0]?.name || 'Empty'}`}
-                        >
-                            S1
-                        </Button>
-                        <Button
-                            size="small"
-                            onClick={() => addCommand(`k2`)}
-                            style={{ border: '1px solid lightgray' }}
-                            title={`Skill 1 on ${team[1]?.name || 'Empty'}`}
-                        >
-                            S2
-                        </Button>
-                        <Button
-                            size="small"
-                            onClick={() => addCommand(`k3`)}
-                            style={{ border: '1px solid lightgray' }}
-                            title={`Skill 1 on ${team[2]?.name || 'Empty'}`}
-                        >
-                            S3
-                        </Button>
-                        <Button
-                            size="small"
-                            onClick={() => addCommand(`k`)}
-                            style={{ border: '1px solid lightgray' }}
-                            title="Skill 1 No Target"
-                        >
-                            NT
-                        </Button>
-                    </Box>
-                    <Box>
-                        <Button
-                            size="small"
-                            onClick={() => addCommand(`k1`)}
-                            style={{ border: '1px solid lightgray' }}
-                            title={`Skill 2 on ${team[0]?.name || 'Empty'}`}
-                        >
-                            S1
-                        </Button>
-                        <Button
-                            size="small"
-                            onClick={() => addCommand(`k2`)}
-                            style={{ border: '1px solid lightgray' }}
-                            title={`Skill 2 on ${team[1]?.name || 'Empty'}`}
-                        >
-                            S2
-                        </Button>
-                        <Button
-                            size="small"
-                            onClick={() => addCommand(`k3`)}
-                            style={{ border: '1px solid lightgray' }}
-                            title={`Skill 2 on ${team[2]?.name || 'Empty'}`}
-                        >
-                            S3
-                        </Button>
-                        <Button
-                            size="small"
-                            onClick={() => addCommand(`k`)}
-                            style={{ border: '1px solid lightgray' }}
-                            title="Skill 2 No Target"
-                        >
-                            NT
-                        </Button>
-                    </Box>
-                    <Box>
-                        <Button
-                            size="small"
-                            onClick={() => addCommand(`k1`)}
-                            style={{ border: '1px solid lightgray' }}
-                            title={`Skill 3 on ${team[0]?.name || 'Empty'}`}
-                        >
-                            S1
-                        </Button>
-                        <Button
-                            size="small"
-                            onClick={() => addCommand(`k2`)}
-                            style={{ border: '1px solid lightgray' }}
-                            title={`Skill 3 on ${team[1]?.name || 'Empty'}`}
-                        >
-                            S2
-                        </Button>
-                        <Button
-                            size="small"
-                            onClick={() => addCommand(`k3`)}
-                            style={{ border: '1px solid lightgray' }}
-                            title={`Skill 3 on ${team[2]?.name || 'Empty'}`}
-                        >
-                            S3
-                        </Button>
-                        <Button
-                            size="small"
-                            onClick={() => addCommand(`k`)}
-                            style={{ border: '1px solid lightgray' }}
-                            title="Skill 3 No Target"
-                        >
-                            NT
-                        </Button>
-                    </Box>
+                    {[1, 2, 3].map((skillIndex) => (
+                        <Box key={skillIndex}>
+                            <Button
+                                size="small"
+                                onClick={() => addCommand(`k${skillIndex}`)}
+                                style={{ border: '1px solid lightgray' }}
+                                title={`Skill ${skillIndex} on ${team[0]?.name || 'Empty'}`}
+                            >
+                                S{skillIndex}
+                            </Button>
+                            <Button
+                                size="small"
+                                onClick={() => addCommand(`k${skillIndex}`)}
+                                style={{ border: '1px solid lightgray' }}
+                                title={`Skill ${skillIndex} on ${team[1]?.name || 'Empty'}`}
+                            >
+                                S{skillIndex}
+                            </Button>
+                            <Button
+                                size="small"
+                                onClick={() => addCommand(`k${skillIndex}`)}
+                                style={{ border: '1px solid lightgray' }}
+                                title={`Skill ${skillIndex} on ${team[2]?.name || 'Empty'}`}
+                            >
+                                S{skillIndex}
+                            </Button>
+                            <Button
+                                size="small"
+                                onClick={() => addCommand(`k`)}
+                                style={{ border: '1px solid lightgray' }}
+                                title={`Skill ${skillIndex} No Target`}
+                            >
+                                NT
+                            </Button>
+                        </Box>
+                    ))}
                 </Box>
             );
         }
