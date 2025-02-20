@@ -89,7 +89,7 @@ const MysticCodeSelection = ({ team, setTeam, updateCommands }) => {
                             <Button
                                 variant="contained"
                                 color="primary"
-                                onClick={handleSwap}
+                                onClick={() => { handleSwap(); addCommand(`x${selectedTop}${selectedBottom}`); }}
                                 disabled={selectedTop === null || selectedBottom === null || !team[selectedTop] || !team[selectedBottom]}
                             >
                                 Swap
@@ -101,42 +101,33 @@ const MysticCodeSelection = ({ team, setTeam, updateCommands }) => {
         } else {
             return (
                 <Box>
-                    {[1, 2, 3].map((skillIndex) => (
-                        <Box key={skillIndex}>
-                            <Button
-                                size="small"
-                                onClick={() => addCommand(`k${skillIndex}`)}
-                                style={{ border: '1px solid lightgray' }}
-                                title={`Skill ${skillIndex} on ${team[0]?.name}`}
-                            >
-                                S{skillIndex}
-                            </Button>
-                            <Button
-                                size="small"
-                                onClick={() => addCommand(`k${skillIndex}`)}
-                                style={{ border: '1px solid lightgray' }}
-                                title={`Skill ${skillIndex} on ${team[1]?.name}`}
-                            >
-                                S{skillIndex}
-                            </Button>
-                            <Button
-                                size="small"
-                                onClick={() => addCommand(`k${skillIndex}`)}
-                                style={{ border: '1px solid lightgray' }}
-                                title={`Skill ${skillIndex} on ${team[2]?.name}`}
-                            >
-                                S{skillIndex}
-                            </Button>
-                            <Button
-                                size="small"
-                                onClick={() => addCommand(`k`)}
-                                style={{ border: '1px solid lightgray' }}
-                                title={`Skill ${skillIndex} No Target`}
-                            >
-                                None
-                            </Button>
-                        </Box>
-                    ))}
+                    <Box>
+                        <Typography variant="h6">Skill 1</Typography>
+                        <Grid>
+                            <Button size="small" style={{ border: '1px solid lightgray' }} onClick={() => addCommand(`k1`)} title={`Use Skill 1 on Servant 1 ${team[0]?.name}`}>1</Button>
+                            <Button size="small" style={{ border: '1px solid lightgray' }} onClick={() => addCommand(`k2`)} title={`Use Skill 1 on Servant 2 ${team[1]?.name}`}>2</Button>
+                            <Button size="small" style={{ border: '1px solid lightgray' }} onClick={() => addCommand(`k3`)} title={`Use Skill 1 on Servant 3 ${team[2]?.name}`}>3</Button>
+                        </Grid>
+                        <Button size="small" style={{ border: '1px solid lightgray' }} onClick={() => addCommand(`k`)} title={`Use Skill 1 on Self/Team`}>None</Button>
+                    </Box>
+                    <Box>
+                        <Typography variant="h6">Skill 2</Typography>
+                        <Grid>
+                            <Button size="small" style={{ border: '1px solid lightgray' }} onClick={() => addCommand(`k1`)} title={`Use Skill 2 on Servant 1 ${team[0]?.name}`}>1</Button>
+                            <Button size="small" style={{ border: '1px solid lightgray' }} onClick={() => addCommand(`k2`)} title={`Use Skill 2 on Servant 2 ${team[1]?.name}`}>2</Button>
+                            <Button size="small" style={{ border: '1px solid lightgray' }} onClick={() => addCommand(`k3`)} title={`Use Skill 2 on Servant 3 ${team[2]?.name}`}>3</Button>
+                        </Grid>
+                        <Button size="small" style={{ border: '1px solid lightgray' }} onClick={() => addCommand(`k`)} title={`Use Skill 2 on Self/Team`}>None</Button>
+                    </Box>
+                    <Box>
+                        <Typography variant="h6">Skill 3</Typography>
+                        <Grid>
+                            <Button size="small" style={{ border: '1px solid lightgray' }} onClick={() => addCommand(`k1`)} title={`Use Skill 3 on Servant 1 ${team[0]?.name}`}>1</Button>
+                            <Button size="small" style={{ border: '1px solid lightgray' }} onClick={() => addCommand(`k2`)} title={`Use Skill 3 on Servant 2 ${team[1]?.name}`}>2</Button>
+                            <Button size="small" style={{ border: '1px solid lightgray' }} onClick={() => addCommand(`k3`)} title={`Use Skill 3 on Servant 3 ${team[2]?.name}`}>3</Button>
+                        </Grid>
+                        <Button size="small" style={{ border: '1px solid lightgray' }} onClick={() => addCommand(`k`)} title={`Use Skill 3 on Self/Team`}>None</Button>
+                    </Box>
                 </Box>
             );
         }
@@ -154,7 +145,7 @@ const MysticCodeSelection = ({ team, setTeam, updateCommands }) => {
             >
                 <MenuItem value="" disabled>Select Mystic Code</MenuItem>
                 {mysticCodes.map((mysticCode) => (
-                    <MenuItem key={mysticCode.id} value={mysticCode.id}>
+                    <MenuItem key={mysticCode.id} value={mysticCode.id} style={{ whiteSpace: 'normal' }}>
                         {mysticCode.name}
                     </MenuItem>
                 ))}
