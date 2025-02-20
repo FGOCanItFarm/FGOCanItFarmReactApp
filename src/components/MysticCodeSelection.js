@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { Grid, Typography, Card, CardMedia, CardContent, Box, Button, Select, MenuItem } from '@mui/material';
+import { Grid, Typography, Box, Button, Select, MenuItem } from '@mui/material';
 
 const MysticCodeSelection = ({ team, setTeam, updateCommands }) => {
     const [mysticCodes, setMysticCodes] = useState([]);
@@ -43,20 +43,20 @@ const MysticCodeSelection = ({ team, setTeam, updateCommands }) => {
                     <Box>
                         <Typography variant="h6">Skill 1</Typography>
                         <Grid>
-                            <Button size="sm" style={{ border: '1px solid lightgray' }} onClick={() => updateCommands(`j1`)} title={`Use Skill 1 on Servant 1: ${team[0]?.name}`}>1</Button>
-                            <Button size="sm" style={{ border: '1px solid lightgray' }} onClick={() => updateCommands(`j2`)} title={`Use Skill 1 on Servant 2: ${team[1]?.name}`}>2</Button>
-                            <Button size="sm" style={{ border: '1px solid lightgray' }} onClick={() => updateCommands(`j3`)} title={`Use Skill 1 on Servant 3: ${team[2]?.name}`}>3</Button>
+                            <Button size="small" style={{ border: '1px solid lightgray' }} onClick={() => updateCommands(`j1`)} title={`Use Skill 1 on Servant 1: ${team[0]?.name}`}>1</Button>
+                            <Button size="small" style={{ border: '1px solid lightgray' }} onClick={() => updateCommands(`j2`)} title={`Use Skill 1 on Servant 2: ${team[1]?.name}`}>2</Button>
+                            <Button size="small" style={{ border: '1px solid lightgray' }} onClick={() => updateCommands(`j3`)} title={`Use Skill 1 on Servant 3: ${team[2]?.name}`}>3</Button>
                         </Grid>
-                        <Button size="sm" style={{ border: '1px solid lightgray' }} onClick={() => updateCommands(`j`)} title={`Use Skill on Self/Team`}>None</Button>
+                        <Button size="small" style={{ border: '1px solid lightgray' }} onClick={() => updateCommands(`j`)} title={`Use Skill on Self/Team`}>None</Button>
                     </Box>
                     <Box>
                         <Typography variant="h6">Skill 2</Typography>
                         <Grid>
-                            <Button size="sm" style={{ border: '1px solid lightgray' }} onClick={() => updateCommands(`k1`)} title={`Use Skill 2 on Servant 1 ${team[0]?.name}`}>1</Button>
-                            <Button size="sm" style={{ border: '1px solid lightgray' }} onClick={() => updateCommands(`k2`)} title={`Use Skill 2 on Servant 2 ${team[1]?.name}`}>2</Button>
-                            <Button size="sm" style={{ border: '1px solid lightgray' }} onClick={() => updateCommands(`k3`)} title={`Use Skill 2 on Servant 3 ${team[2]?.name}`}>3</Button>
+                            <Button size="small" style={{ border: '1px solid lightgray' }} onClick={() => updateCommands(`k1`)} title={`Use Skill 2 on Servant 1 ${team[0]?.name}`}>1</Button>
+                            <Button size="small" style={{ border: '1px solid lightgray' }} onClick={() => updateCommands(`k2`)} title={`Use Skill 2 on Servant 2 ${team[1]?.name}`}>2</Button>
+                            <Button size="small" style={{ border: '1px solid lightgray' }} onClick={() => updateCommands(`k3`)} title={`Use Skill 2 on Servant 3 ${team[2]?.name}`}>3</Button>
                         </Grid>
-                        <Button size="sm" style={{ border: '1px solid lightgray' }} onClick={() => updateCommands(`k`)} title={`Use Skill 2 on Self/Team`}>None</Button>
+                        <Button size="small" style={{ border: '1px solid lightgray' }} onClick={() => updateCommands(`k`)} title={`Use Skill 2 on Self/Team`}>None</Button>
                     </Box>
                     <Box>
                         <Typography variant="h6">Skill 3</Typography>
@@ -103,7 +103,7 @@ const MysticCodeSelection = ({ team, setTeam, updateCommands }) => {
                                 size="small"
                                 onClick={() => updateCommands(`k${skillIndex}`)}
                                 style={{ border: '1px solid lightgray' }}
-                                title={`Skill ${skillIndex} on ${team[0]?.name }`}
+                                title={`Skill ${skillIndex} on ${team[0]?.name}`}
                             >
                                 S{skillIndex}
                             </Button>
@@ -111,7 +111,7 @@ const MysticCodeSelection = ({ team, setTeam, updateCommands }) => {
                                 size="small"
                                 onClick={() => updateCommands(`k${skillIndex}`)}
                                 style={{ border: '1px solid lightgray' }}
-                                title={`Skill ${skillIndex} on ${team[1]?.name }`}
+                                title={`Skill ${skillIndex} on ${team[1]?.name}`}
                             >
                                 S{skillIndex}
                             </Button>
@@ -119,7 +119,7 @@ const MysticCodeSelection = ({ team, setTeam, updateCommands }) => {
                                 size="small"
                                 onClick={() => updateCommands(`k${skillIndex}`)}
                                 style={{ border: '1px solid lightgray' }}
-                                title={`Skill ${skillIndex} on ${team[2]?.name }`}
+                                title={`Skill ${skillIndex} on ${team[2]?.name}`}
                             >
                                 S{skillIndex}
                             </Button>
