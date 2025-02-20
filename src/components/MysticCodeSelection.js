@@ -141,12 +141,12 @@ const MysticCodeSelection = ({ team, setTeam, updateCommands }) => {
                 onChange={(e) => setSelectedMysticCode(e.target.value)}
                 displayEmpty
                 fullWidth
-                style={{ marginBottom: '20px' }}
+                style={{ marginBottom: '20px', minWidth: '200px' }}
             >
                 <MenuItem value="" disabled>Select Mystic Code</MenuItem>
                 {mysticCodes.map((mysticCode) => (
                     <MenuItem key={mysticCode.id} value={mysticCode.id} style={{ whiteSpace: 'normal' }}>
-                        {mysticCode.collectionNo}
+                        {mysticCode.name}
                     </MenuItem>
                 ))}
             </Select>

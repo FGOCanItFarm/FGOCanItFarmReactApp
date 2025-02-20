@@ -208,12 +208,12 @@ const TeamSelection = () => {
           </Box>
         </Grid>
         
-        <Grid item border={2} borderColor="indigo-600-a50" style={{ backgroundColor: '#ffffff', padding: '1rem' }} md={4}>
+        <Grid item style={{ backgroundColor: '#ffffff', padding: '1rem' }} md={4}>
           <ServantSelection style={{ padding: '0.5rem', borderRadius: '0.5rem', borderColor: '#d8caa9' }}
             servants={filteredServants}
             handleServantClick={handleServantClick}
           />
-          <CommonServantsGrid border={2} borderColor="indigo-600-a50" style={{ padding: '0.5rem', borderRadius: '0.5rem', borderColoe: '#d8caa9' }}
+          <CommonServantsGrid style={{ padding: '0.5rem', borderRadius: '0.5rem', borderColoe: '#d8caa9' }}
             servants={servants}
             handleServantClick={handleServantClick}
           />
