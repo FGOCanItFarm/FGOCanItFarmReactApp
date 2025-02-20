@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { Grid, Typography, Card, CardMedia, CardContent, Box, Button } from '@mui/material';
+import { Grid, Typography, Card, CardMedia, CardContent, Box, Button, Select, MenuItem } from '@mui/material';
 
 const MysticCodeSelection = ({ team, setTeam, updateCommands }) => {
     const [mysticCodes, setMysticCodes] = useState([]);
-    const [selectedMysticCode, setSelectedMysticCode] = useState(null);
+    const [selectedMysticCode, setSelectedMysticCode] = useState('');
     const [selectedTop, setSelectedTop] = useState(null);
     const [selectedBottom, setSelectedBottom] = useState(null);
 
@@ -40,61 +40,57 @@ const MysticCodeSelection = ({ team, setTeam, updateCommands }) => {
         if (mysticCodeId === 210 || mysticCodeId === 20) {
             return (
                 <Box>
-                <Box>
-                <Box>
-                <Typography variant="h6">Skill 1</Typography>
-                </Box>
-                <Grid>
-                <Button size="sm" style={{border: '1px solid lightgray'}} onClick={() => updateCommands(`j1`)} title={`Swap with ${team[index]?.name}`}>1</Button>
-                <Button size="sm" style={{border: '1px solid lightgray'}} onClick={() => updateCommands(`j2`)} title={`Swap with ${team[index]?.name}`}>2</Button>
-                <Button size="sm" style={{border: '1px solid lightgray'}} onClick={() => updateCommands(`j3`)} title={`Swap with ${team[index]?.name}`}>3</Button>
-                </Grid>
-                <Button size="sm" style={{border: '1px solid lightgray'}} onClick={() => updateCommands(`j`)} title={`Swap with ${team[index]?.name}`}>None</Button>
-                </Box>
-                <Box>
-                <Box>
-                <Typography variant="h6">Skill 2</Typography>
-                </Box>
-                <Grid>
-                <Button size="sm" style={{border: '1px solid lightgray'}} onClick={() => updateCommands(`k1`)} title={`Swap with ${team[index]?.name}`}>1</Button>
-                <Button size="sm" style={{border: '1px solid lightgray'}} onClick={() => updateCommands(`k2`)} title={`Swap with ${team[index]?.name}`}>2</Button>
-                <Button size="sm" style={{border: '1px solid lightgray'}} onClick={() => updateCommands(`k3`)} title={`Swap with ${team[index]?.name}`}>3</Button>
-                </Grid>
-                <Button size="sm" style={{border: '1px solid lightgray'}} onClick={() => updateCommands(`k`)} title={`Swap with ${team[index]?.name}`}>None</Button>
-                </Box>
-                <Box>
-                <Typography variant="h6">Skill 3</Typography>
-                </Box>
-                    <Grid container spacing={1} style={{ padding: '10px' }}>
-                        {[0, 1, 2, 3, 4, 5].map((index) => (
-                            <Grid item xs={4} key={index}>
-                                <Button
-                                    size="small"
-                                    variant={selectedTop === index || selectedBottom === index ? "contained" : "outlined"}
-                                    onClick={() => {
-                                        if (index < 3) {
-                                            setSelectedTop(index);
-                                        } else {
-                                            setSelectedBottom(index);
-                                        }
-                                    }}
-                                    style={{ border: '1px solid lightgray' }}
-                                    title={`Swap with ${team[index]?.name}`}
-                                >
-                                    {index + 1}
-                                </Button>
-                            </Grid>
-                        ))}
-                    </Grid>
-                    <Box display="flex" justifyContent="center" mt={2}>
-                        <Button
-                            variant="contained"
-                            color="primary"
-                            onClick={handleSwap}
-                            disabled={selectedTop === null || selectedBottom === null || !team[selectedTop] || !team[selectedBottom]}
-                        >
-                            Swap
-                        </Button>
+                    <Box>
+                        <Typography variant="h6">Skill 1</Typography>
+                        <Grid>
+                            <Button size="sm" style={{ border: '1px solid lightgray' }} onClick={() => updateCommands(`j1`)} title={`Use Skill 1 on Servant 1: ${team[0]?.name}`}>1</Button>
+                            <Button size="sm" style={{ border: '1px solid lightgray' }} onClick={() => updateCommands(`j2`)} title={`Use Skill 1 on Servant 2: ${team[1]?.name}`}>2</Button>
+                            <Button size="sm" style={{ border: '1px solid lightgray' }} onClick={() => updateCommands(`j3`)} title={`Use Skill 1 on Servant 3: ${team[2]?.name}`}>3</Button>
+                        </Grid>
+                        <Button size="sm" style={{ border: '1px solid lightgray' }} onClick={() => updateCommands(`j`)} title={`Use Skill on Self/Team`}>None</Button>
+                    </Box>
+                    <Box>
+                        <Typography variant="h6">Skill 2</Typography>
+                        <Grid>
+                            <Button size="sm" style={{ border: '1px solid lightgray' }} onClick={() => updateCommands(`k1`)} title={`Use Skill 2 on Servant 1 ${team[0]?.name}`}>1</Button>
+                            <Button size="sm" style={{ border: '1px solid lightgray' }} onClick={() => updateCommands(`k2`)} title={`Use Skill 2 on Servant 2 ${team[1]?.name}`}>2</Button>
+                            <Button size="sm" style={{ border: '1px solid lightgray' }} onClick={() => updateCommands(`k3`)} title={`Use Skill 2 on Servant 3 ${team[2]?.name}`}>3</Button>
+                        </Grid>
+                        <Button size="sm" style={{ border: '1px solid lightgray' }} onClick={() => updateCommands(`k`)} title={`Use Skill 2 on Self/Team`}>None</Button>
+                    </Box>
+                    <Box>
+                        <Typography variant="h6">Skill 3</Typography>
+                        <Grid container spacing={1} style={{ padding: '10px' }}>
+                            {[0, 1, 2, 3, 4, 5].map((index) => (
+                                <Grid item xs={4} key={index}>
+                                    <Button
+                                        size="small"
+                                        variant={selectedTop === index || selectedBottom === index ? "contained" : "outlined"}
+                                        onClick={() => {
+                                            if (index < 3) {
+                                                setSelectedTop(index);
+                                            } else {
+                                                setSelectedBottom(index);
+                                            }
+                                        }}
+                                        style={{ border: '1px solid lightgray' }}
+                                        title={`Swap with ${team[index]?.name}`}
+                                    >
+                                        {index + 1}
+                                    </Button>
+                                </Grid>
+                            ))}
+                        </Grid>
+                        <Box display="flex" justifyContent="center" mt={2}>
+                            <Button
+                                variant="contained"
+                                color="primary"
+                                onClick={handleSwap}
+                                disabled={selectedTop === null || selectedBottom === null || !team[selectedTop] || !team[selectedBottom]}
+                            >
+                                Swap
+                            </Button>
+                        </Box>
                     </Box>
                 </Box>
             );
@@ -144,35 +140,22 @@ const MysticCodeSelection = ({ team, setTeam, updateCommands }) => {
 
     return (
         <div style={{ backgroundColor: '#e0f7fa', padding: '20px', borderRadius: '8px' }}>
-            <Typography variant="h5">Mystic Codes</Typography>
-            <Grid container spacing={2}>
+            <Typography variant="h6">Mystic Codes</Typography>
+            <Select
+                value={selectedMysticCode}
+                onChange={(e) => setSelectedMysticCode(e.target.value)}
+                displayEmpty
+                fullWidth
+                style={{ marginBottom: '20px' }}
+            >
+                <MenuItem value="" disabled>Select Mystic Code</MenuItem>
                 {mysticCodes.map((mysticCode) => (
-                    <Grid item xs={12} sm={6} md={4} key={mysticCode.id}>
-                        <Card
-                            onClick={() => setSelectedMysticCode(mysticCode.id)}
-                            style={{
-                                backgroundColor: selectedMysticCode === mysticCode.id ? '#d0ba98' : '#fff',
-                                opacity: selectedMysticCode === mysticCode.id ? 1 : 0.5,
-                            }}
-                        >
-                            <CardMedia
-                                component="img"
-                                alt={mysticCode.name}
-                                height="160"
-                                width="160"
-                                image={mysticCode.extraAssets?.item?.male}
-                            />
-                            <CardContent>
-                                <Typography variant="h6">{mysticCode.name}</Typography>
-                                <Typography variant="body2" color="textSecondary">
-                                    {mysticCode.description}
-                                </Typography>
-                                {selectedMysticCode === mysticCode.id && renderButtons(mysticCode.id)}
-                            </CardContent>
-                        </Card>
-                    </Grid>
+                    <MenuItem key={mysticCode.id} value={mysticCode.id}>
+                        {mysticCode.name}
+                    </MenuItem>
                 ))}
-            </Grid>
+            </Select>
+            {selectedMysticCode && renderButtons(selectedMysticCode)}
         </div>
     );
 };
