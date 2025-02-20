@@ -91,13 +91,15 @@ const QuestSelection = () => {
             {quest.stages.map((stage, stageIndex) => (
               <Box key={stageIndex} mt={2}>
                 <Typography variant="body2">Wave: {stage.wave}</Typography>
-                {stage.enemies.map((enemy, enemyIndex) => (
-                  <Box key={enemyIndex} display="flex" alignItems="center" mb={1}>
-                    <Typography>{enemy.svtClassName}</Typography>
-                    <Typography>{enemy.hp}</Typography>
-                    <img src={enemy.svt.face} alt={`${enemy.svtClassName} face`} style={{ marginLeft: '8px', width: '50px' }} />
-                  </Box>
-                ))}
+                <Box display="flex" flexDirection="row" flexWrap="wrap">
+                  {stage.enemies.map((enemy, enemyIndex) => (
+                    <Box key={enemyIndex} display="flex" alignItems="center" mb={1} mr={2}>
+                      <Typography>{enemy.svtClassName}</Typography>
+                      <Typography>{enemy.hp}</Typography>
+                      <img src={enemy.svt.face} alt={`${enemy.svtClassName} face`} style={{ marginLeft: '8px', width: '50px' }} />
+                    </Box>
+                  ))}
+                </Box>
               </Box>
             ))}
           </Box>
