@@ -208,19 +208,19 @@ const TeamSelection = () => {
           </Box>
         </Grid>
         
-        <Grid item style={{ backgroundColor: '#ffffff', padding: '1rem', borderRadius: '0.5px', borderColor: '#d8caa9' }} md={4}>
+        <Grid item border={2} borderColor="indigo-600-a50" style={{ backgroundColor: '#ffffff', padding: '1rem' }} md={4}>
           <ServantSelection style={{ padding: '0.5rem', borderRadius: '0.5rem', borderColor: '#d8caa9' }}
             servants={filteredServants}
             handleServantClick={handleServantClick}
           />
-          <CommonServantsGrid style={{ padding: '0.5rem', borderRadius: '0.5rem', borderColoe: '#d8caa9' }}
+          <CommonServantsGrid border={2} borderColor="indigo-600-a50" style={{ padding: '0.5rem', borderRadius: '0.5rem', borderColoe: '#d8caa9' }}
             servants={servants}
             handleServantClick={handleServantClick}
           />
         </Grid>
       </Grid>
 
-      <Grid style={{ backgroundColor: '#aeb2a6', padding: '20px', borderRadius: '8px' }}>
+      <Grid style={{ padding: '20px', borderRadius: '8px' }}>
           {activeServant && (
             <Box mt={4}>
               <CommandInputMenu activeServant={activeServant} updateCommands={setCommands} team={team} />
