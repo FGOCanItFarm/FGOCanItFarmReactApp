@@ -8,6 +8,7 @@
     "@emotion/styled": "^11.14.0",
     "@mui/icons-material": "^5.2.3",
     "@mui/material": "^5.16.14",
+    "@mui/x-data-grid": "^7.27.0",
     "axios": "^0.24.0",
     "concurrently": "^6.0.0",
     "cra-template": "1.2.0",
