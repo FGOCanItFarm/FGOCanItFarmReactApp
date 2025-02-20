@@ -1,26 +1,18 @@
-import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import React, { useState } from 'react';
 import { Grid, Typography, Box, Button, Select, MenuItem } from '@mui/material';
 
+const mysticCodes = [
+    { id: 410, name: 'Winter Casual' },
+    { id: 210, name: 'Chaldea Uniform - Decisive Battle' },
+    { id: 100, name: 'A Fragment of 2004' },
+    { id: 40, name: 'Atlas Institute Uniform' },
+    { id: 20, name: 'Chaldea Combat Uniform' },
+];
+
 const MysticCodeSelection = ({ team, setTeam, updateCommands }) => {
-    const [mysticCodes, setMysticCodes] = useState([]);
     const [selectedMysticCode, setSelectedMysticCode] = useState('');
     const [selectedTop, setSelectedTop] = useState(null);
     const [selectedBottom, setSelectedBottom] = useState(null);
-
-    useEffect(() => {
-        // Fetch mystic codes data from API
-        const fetchMysticCodes = async () => {
-            try {
-                const response = await axios.get('/api/mysticcodes');
-                setMysticCodes(response.data);
-            } catch (error) {
-                console.error('Error fetching mystic codes:', error);
-            }
-        };
-
-        fetchMysticCodes();
-    }, []);
 
     const swapServants = (index1, index2) => {
         const newTeam = [...team];

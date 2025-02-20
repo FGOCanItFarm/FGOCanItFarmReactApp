@@ -1,19 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Box, Typography, Select, MenuItem, FormControl, InputLabel } from '@mui/material';
+import { Box, Typography, FormControl, FormControlLabel, Checkbox, FormGroup } from '@mui/material';
 
 const QuestSelection = () => {
   const [warLongNames, setWarLongNames] = useState([]);
-  const [selectedWarLongName, setSelectedWarLongName] = useState('');
+  const [selectedWarLongNames, setSelectedWarLongNames] = useState([]);
   const [quests, setQuests] = useState([]);
   const [recommendLv, setRecommendLv] = useState('90');
 
   useEffect(() => {
     const fetchWarLongNames = async () => {
       try {
-        const response = await axios.get(`/api/quests/warLongNames`)
-        console.log('Fetched warLongNames:', response.data);
-        setWarLongNames(response.data);
+        const response = await axios.get(`/api/quests/warLongNames`);
+        const uniqueNames = [...new Set(response.data.map(item => item.warLongName))]; // Remove duplicates
+        setWarLongNames(uniqueNames);
       } catch (error) {
         console.error('Error fetching warLongNames', error);
       }
@@ -26,11 +26,10 @@ const QuestSelection = () => {
     try {
       const response = await axios.get(`/api/quests`, {
         params: {
-          warLongName: selectedWarLongName,
+          warLongNames: selectedWarLongNames,
           recommendLv
         }
       });
-      console.log('Fetched quests data:', response.data);
       setQuests(response.data);
     } catch (error) {
       console.error('Error fetching quests', error);
@@ -38,31 +37,42 @@ const QuestSelection = () => {
   };
 
   useEffect(() => {
-    if (selectedWarLongName) {
+    if (selectedWarLongNames.length > 0) {
       fetchQuests();
     }
-  }, [selectedWarLongName, recommendLv]);
+  }, [selectedWarLongNames, recommendLv]);
+
+  const handleCheckboxChange = (event) => {
+    const { value, checked } = event.target;
+    setSelectedWarLongNames((prev) =>
+      checked ? [...prev, value] : prev.filter((name) => name !== value)
+    );
+  };
 
   return (
     <div style={{ backgroundColor: '#e8f5e9', padding: '20px', borderRadius: '8px' }}>
       <Box>
-        <FormControl fullWidth>
-          <InputLabel>War Long Name</InputLabel>
-          <Select
-            value={selectedWarLongName}
-            onChange={(e) => setSelectedWarLongName(e.target.value)}
-            style={{ width: '100%' }} // Ensure the Select component has full width
-          >
+        <FormControl component="fieldset">
+          <Typography variant="h6">War Long Names</Typography>
+          <FormGroup>
             {warLongNames.map((name, index) => (
-              <MenuItem key={index} value={name} style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                {name}
-              </MenuItem>
+              <FormControlLabel
+                key={index}
+                control={
+                  <Checkbox
+                    value={name}
+                    checked={selectedWarLongNames.includes(name)}
+                    onChange={handleCheckboxChange}
+                  />
+                }
+                label={name}
+              />
             ))}
-          </Select>
+          </FormGroup>
         </FormControl>
 
         <FormControl fullWidth style={{ marginTop: '16px' }}>
-          <InputLabel>Recommended Level</InputLabel>
+          <Typography variant="h6">Recommended Level</Typography>
           <Select
             value={recommendLv}
             onChange={(e) => setRecommendLv(e.target.value)}
@@ -87,6 +97,7 @@ const QuestSelection = () => {
                     {stage.enemies.map((enemy, enemyIndex) => (
                       <Box key={enemyIndex} display="flex" alignItems="center" mb={1}>
                         <Typography>{enemy.svtClassName}</Typography>
+                        <Typography>{enemy.hp}</Typography>
                         <img src={enemy.svt.face} alt={`${enemy.svtClassName} face`} style={{ marginLeft: '8px', width: '50px' }} />
                       </Box>
                     ))}
@@ -98,9 +109,7 @@ const QuestSelection = () => {
         ))}
       </Box>
     </div>
- 
   );
-
 };
 
 export default QuestSelection;

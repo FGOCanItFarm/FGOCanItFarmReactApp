@@ -208,7 +208,7 @@ const TeamSelection = () => {
           </Box>
         </Grid>
         
-        <Grid item style={{ backgroundColor: '#ffffff', padding: '1rem' }} md={4}>
+        <Grid item style={{ backgroundColor: '#ffffff', padding: '1rem' }} md={2} spacing={1}>
           <ServantSelection style={{ padding: '0.5rem', borderRadius: '0.5rem', borderColor: '#d8caa9' }}
             servants={filteredServants}
             handleServantClick={handleServantClick}
