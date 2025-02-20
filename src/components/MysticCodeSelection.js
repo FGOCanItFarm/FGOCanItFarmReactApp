@@ -40,27 +40,27 @@ const MysticCodeSelection = ({ team = [], setTeam, updateCommands, addCommand })
         if (mysticCodeId === 210 || mysticCodeId === 20) {
             return (
                 <Box>
-<Box>
+                <Box>
                 <Box>
                 <Typography variant="h6">Skill 1</Typography>
                 </Box>
                 <Grid>
-                <Button size="sm" onClick={() => addCommand(`j1`)}>On Servant 1</Button>
-                <Button size="sm" onClick={() => addCommand(`j2`)}>On Servant 2</Button>
-                <Button size="sm" onClick={() => addCommand(`j3`)}>On Servant 3</Button>
+                <Button size="sm" onClick={() => addCommand(`j1`)}>1</Button>
+                <Button size="sm" onClick={() => addCommand(`j2`)}>2</Button>
+                <Button size="sm" onClick={() => addCommand(`j3`)}>3</Button>
                 </Grid>
-                <Button size="sm" onClick={() => addCommand(`j`)}>No Target</Button>
+                <Button size="sm" onClick={() => addCommand(`j`)}>None</Button>
                 </Box>
                 <Box>
                 <Box>
                 <Typography variant="h6">Skill 2</Typography>
                 </Box>
                 <Grid>
-                <Button size="sm" onClick={() => addCommand(`k1`)}>On Servant 1</Button>
-                <Button size="sm" onClick={() => addCommand(`k2`)}>On Servant 2</Button>
-                <Button size="sm" onClick={() => addCommand(`k3`)}>On Servant 3</Button>
+                <Button size="sm" onClick={() => addCommand(`k1`)}>1</Button>
+                <Button size="sm" onClick={() => addCommand(`k2`)}>2</Button>
+                <Button size="sm" onClick={() => addCommand(`k3`)}>3</Button>
                 </Grid>
-                <Button size="sm" onClick={() => addCommand(`k`)}>No Target</Button>
+                <Button size="sm" onClick={() => addCommand(`k`)}>None</Button>
                 </Box>
                 <Box>
                 <Typography variant="h6">Skill 3</Typography>
@@ -133,7 +133,7 @@ const MysticCodeSelection = ({ team = [], setTeam, updateCommands, addCommand })
                                 style={{ border: '1px solid lightgray' }}
                                 title={`Skill ${skillIndex} No Target`}
                             >
-                                NT
+                                None
                             </Button>
                         </Box>
                     ))}

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Box, Button, Typography, Grid } from '@mui/material';
 import '../buttons.css';
 
@@ -237,8 +237,7 @@ const renderButtonsForServant = (servantIndex, skillIndex, collectionNo, addComm
   return buttons;
 };
 
-const CommandInputMenu = ({ activeServant, updateCommands, team, setTeam }) => {
-  const [commands, setCommands] = useState([]);
+const CommandInputMenu = ({ activeServant, updateCommands, team }) => {
 
   const addCommand = (command) => {
     updateCommands((prevCommands) => [...prevCommands, command]);
