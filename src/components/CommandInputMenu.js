@@ -189,7 +189,9 @@ const render2ChoiceTargetButtons = (servantIndex, skillIndex, addCommand, team) 
 
 const renderButtonsForServant = (servantIndex, skillIndex, collectionNo, addCommand, team) => {
   let buttons = renderSkillButtons(servantIndex, skillIndex, addCommand, team);
+  console.error(`${team}`)
 
+  
   switch (collectionNo) {
     case 373:
       if (skillIndex === 1 || skillIndex === 3) {
