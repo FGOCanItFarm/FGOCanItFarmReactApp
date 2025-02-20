@@ -2,17 +2,6 @@ import React from 'react';
 import { Box, Button, Typography, Grid } from '@mui/material';
 import '../buttons.css';
 
-// Function to save data to local storage
-const saveToLocalStorage = (key, value) => {
-  localStorage.setItem(key, JSON.stringify(value));
-};
-
-// Function to load data from local storage
-const loadFromLocalStorage = (key) => {
-  const savedData = localStorage.getItem(key);
-  return savedData ? JSON.parse(savedData) : [];
-};
-
 const generateSkillCommand = (servantIndex, skillIndex, targetIndex = null) => {
   const skillLabels = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i'];
   let command = skillLabels[servantIndex * 3 + (skillIndex - 1)];

@@ -223,7 +223,7 @@ const TeamSelection = () => {
       <Grid style={{ backgroundColor: '#aeb2a6', padding: '20px', borderRadius: '8px' }}>
           {activeServant && (
             <Box mt={4}>
-              <CommandInputMenu activeServant={activeServant} updateCommands={setCommands} />
+              <CommandInputMenu activeServant={activeServant} updateCommands={setCommands} team={team} />
             </Box>
           )}
       </Grid>
