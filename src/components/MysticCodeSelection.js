@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { Grid, Typography, Card, CardMedia, CardContent, Box, Button } from '@mui/material';
 
-const MysticCodeSelection = ({ team = [], setTeam, updateCommands, addCommand }) => {
+const MysticCodeSelection = ({ team, setTeam, updateCommands }) => {
     const [mysticCodes, setMysticCodes] = useState([]);
     const [selectedMysticCode, setSelectedMysticCode] = useState(null);
     const [selectedTop, setSelectedTop] = useState(null);
@@ -45,22 +45,22 @@ const MysticCodeSelection = ({ team = [], setTeam, updateCommands, addCommand })
                 <Typography variant="h6">Skill 1</Typography>
                 </Box>
                 <Grid>
-                <Button size="sm" onClick={() => addCommand(`j1`)}>1</Button>
-                <Button size="sm" onClick={() => addCommand(`j2`)}>2</Button>
-                <Button size="sm" onClick={() => addCommand(`j3`)}>3</Button>
+                <Button size="sm" style={{border: '1px solid lightgray'}} onClick={() => updateCommands(`j1`)} title={`Swap with ${team[index]?.name}`}>1</Button>
+                <Button size="sm" style={{border: '1px solid lightgray'}} onClick={() => updateCommands(`j2`)} title={`Swap with ${team[index]?.name}`}>2</Button>
+                <Button size="sm" style={{border: '1px solid lightgray'}} onClick={() => updateCommands(`j3`)} title={`Swap with ${team[index]?.name}`}>3</Button>
                 </Grid>
-                <Button size="sm" onClick={() => addCommand(`j`)}>None</Button>
+                <Button size="sm" style={{border: '1px solid lightgray'}} onClick={() => updateCommands(`j`)} title={`Swap with ${team[index]?.name}`}>None</Button>
                 </Box>
                 <Box>
                 <Box>
                 <Typography variant="h6">Skill 2</Typography>
                 </Box>
                 <Grid>
-                <Button size="sm" onClick={() => addCommand(`k1`)}>1</Button>
-                <Button size="sm" onClick={() => addCommand(`k2`)}>2</Button>
-                <Button size="sm" onClick={() => addCommand(`k3`)}>3</Button>
+                <Button size="sm" style={{border: '1px solid lightgray'}} onClick={() => updateCommands(`k1`)} title={`Swap with ${team[index]?.name}`}>1</Button>
+                <Button size="sm" style={{border: '1px solid lightgray'}} onClick={() => updateCommands(`k2`)} title={`Swap with ${team[index]?.name}`}>2</Button>
+                <Button size="sm" style={{border: '1px solid lightgray'}} onClick={() => updateCommands(`k3`)} title={`Swap with ${team[index]?.name}`}>3</Button>
                 </Grid>
-                <Button size="sm" onClick={() => addCommand(`k`)}>None</Button>
+                <Button size="sm" style={{border: '1px solid lightgray'}} onClick={() => updateCommands(`k`)} title={`Swap with ${team[index]?.name}`}>None</Button>
                 </Box>
                 <Box>
                 <Typography variant="h6">Skill 3</Typography>
@@ -79,7 +79,7 @@ const MysticCodeSelection = ({ team = [], setTeam, updateCommands, addCommand })
                                         }
                                     }}
                                     style={{ border: '1px solid lightgray' }}
-                                    title={`Swap with ${team[index]?.name || 'Empty'}`}
+                                    title={`Swap with ${team[index]?.name}`}
                                 >
                                     {index + 1}
                                 </Button>
@@ -105,31 +105,31 @@ const MysticCodeSelection = ({ team = [], setTeam, updateCommands, addCommand })
                         <Box key={skillIndex}>
                             <Button
                                 size="small"
-                                onClick={() => addCommand(`k${skillIndex}`)}
+                                onClick={() => updateCommands(`k${skillIndex}`)}
                                 style={{ border: '1px solid lightgray' }}
-                                title={`Skill ${skillIndex} on ${team[0]?.name || 'Empty'}`}
+                                title={`Skill ${skillIndex} on ${team[0]?.name }`}
                             >
                                 S{skillIndex}
                             </Button>
                             <Button
                                 size="small"
-                                onClick={() => addCommand(`k${skillIndex}`)}
+                                onClick={() => updateCommands(`k${skillIndex}`)}
                                 style={{ border: '1px solid lightgray' }}
-                                title={`Skill ${skillIndex} on ${team[1]?.name || 'Empty'}`}
+                                title={`Skill ${skillIndex} on ${team[1]?.name }`}
                             >
                                 S{skillIndex}
                             </Button>
                             <Button
                                 size="small"
-                                onClick={() => addCommand(`k${skillIndex}`)}
+                                onClick={() => updateCommands(`k${skillIndex}`)}
                                 style={{ border: '1px solid lightgray' }}
-                                title={`Skill ${skillIndex} on ${team[2]?.name || 'Empty'}`}
+                                title={`Skill ${skillIndex} on ${team[2]?.name }`}
                             >
                                 S{skillIndex}
                             </Button>
                             <Button
                                 size="small"
-                                onClick={() => addCommand(`k`)}
+                                onClick={() => updateCommands(`k`)}
                                 style={{ border: '1px solid lightgray' }}
                                 title={`Skill ${skillIndex} No Target`}
                             >

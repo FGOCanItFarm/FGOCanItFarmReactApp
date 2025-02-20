@@ -76,7 +76,7 @@ const renderSkillButtons = (servantIndex, skillIndex, addCommand, team) => (
       title="No Target"
       style={{ border: '1px solid lightgray' }}
     >
-      NT
+      None
     </Button>
   </Box>
 );
