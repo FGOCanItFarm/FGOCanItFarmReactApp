@@ -54,7 +54,7 @@ const QuestSelection = () => {
         <FormControl component="fieldset">
           <Typography variant="h6">War Long Names</Typography>
           <FormGroup style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 1fr))', gap: '10px' }}>
-            {warLongNames.map((name, index) => (
+            {warLongNames && warLongNames.map((name, index) => (
               <Box key={index} style={{ border: '1px solid lightgray', borderRadius: '4px', padding: '8px' }}>
                 <FormControlLabel
                   control={
