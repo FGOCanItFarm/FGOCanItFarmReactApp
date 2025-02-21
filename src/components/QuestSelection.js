@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
-import { Box, Typography, FormControl, FormControlLabel, Checkbox, FormGroup, Select, MenuItem } from '@mui/material';
+import { Box, FormControlLabel, Checkbox, FormGroup  } from '@mui/material';
 
 const QuestSelection = () => {
   const [warLongNames, setWarLongNames] = useState([]);
@@ -81,6 +81,7 @@ const QuestSelection = () => {
             <MenuItem value="90+">90+</MenuItem>
             <MenuItem value="90++">90++</MenuItem>
             <MenuItem value="90*">90*</MenuItem>
+            <MenuItem value="90*">90**</MenuItem>
           </Select>
         </FormControl>
 
