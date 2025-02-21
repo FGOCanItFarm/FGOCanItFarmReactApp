@@ -23,15 +23,16 @@ const QuestSelection = () => {
 
   const fetchQuests = useCallback(async () => {
     try {
-      const response = await axios.get(`/api/quests/filter`, {
-        params: {
-          warLongNames: selectedWarLongNames,
-          recommendLv
-        }
-      });
+      const params = new URLSearchParams();
+      selectedWarLongNames.forEach(name => params.append('warLongNames', name));
+      if (recommendLv) {
+        params.append('recommendLv', recommendLv);
+      }
+
+      const response = await axios.get(`/api/quests/filter`, { params });
       setQuests(response.data);
     } catch (error) {
-      console.error('Error fetching quests', error);
+      console.error('Error fetching quests', error.response ? error.response.data : error.message);
     }
   }, [selectedWarLongNames, recommendLv]);
 
@@ -81,7 +82,7 @@ const QuestSelection = () => {
             <MenuItem value="90+">90+</MenuItem>
             <MenuItem value="90++">90++</MenuItem>
             <MenuItem value="90*">90*</MenuItem>
-            <MenuItem value="90*">90**</MenuItem>
+            <MenuItem value="90**">90**</MenuItem>
           </Select>
         </FormControl>
 
