@@ -86,13 +86,13 @@ const QuestSelection = () => {
           </Select>
         </FormControl>
 
-        {Array.isArray(quests) && quests.length > 0 && (
-          <Box mt={2}>
-            <Typography variant="h6">War: {quests[0].warLongName}</Typography>
-            <Typography variant="body1">Quest: {quests[0].name}</Typography>
-            <Typography variant="body2">Recommended Lv: {quests[0].recommendLv}</Typography>
+        {Array.isArray(quests) && quests.length > 0 && quests.map((quest, questIndex) => (
+          <Box key={questIndex} mt={2}>
+            <Typography variant="h6">War: {quest.warLongName}</Typography>
+            <Typography variant="body1">Quest: {quest.name}</Typography>
+            <Typography variant="body2">Recommended Lv: {quest.recommendLv}</Typography>
 
-            {quests[0].stages && quests[0].stages.map((stage, stageIndex) => (
+            {quest.stages && quest.stages.map((stage, stageIndex) => (
               <Box key={stageIndex} mt={2}>
                 <Typography variant="body2">Stage {stageIndex + 1}</Typography>
                 <Box display="flex" flexDirection="row" flexWrap="wrap">
@@ -107,7 +107,7 @@ const QuestSelection = () => {
               </Box>
             ))}
           </Box>
-        )}
+        ))}
       </Box>
     </div>
   );
