@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
-import { Box, FormControlLabel, Checkbox, FormGroup, FormControl, Typography, Select, MenuItem } from '@mui/material';
+import { Box, FormControlLabel, Checkbox, FormGroup, FormControl, Typography, Select, MenuItem } from '@mui.material';
 
 const QuestSelection = () => {
   const [warLongNames, setWarLongNames] = useState([]);
@@ -54,7 +54,7 @@ const QuestSelection = () => {
         <FormControl component="fieldset">
           <Typography variant="h6">War Long Names</Typography>
           <FormGroup style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 1fr))', gap: '10px' }}>
-            {warLongNames && warLongNames.map((name, index) => (
+            {warLongNames.map((name, index) => (
               <Box key={index} style={{ border: '1px solid lightgray', borderRadius: '4px', padding: '8px' }}>
                 <FormControlLabel
                   control={
@@ -85,32 +85,28 @@ const QuestSelection = () => {
           </Select>
         </FormControl>
 
-        {Array.isArray(quests) && quests.map((quest, index) => {
-          console.log(quest);
-          console.error(quest.stages);
-          return (
-            <Box key={index} mt={2}>
-              <Typography variant="h6">War: {quest.warLongName}</Typography>
-              <Typography variant="body1">Quest: {quest.name}</Typography>
-              <Typography variant="body2">Recommended Lv: {quest.recommendLv}</Typography>
+        {Array.isArray(quests) && quests.length > 0 && (
+          <Box mt={2}>
+            <Typography variant="h6">War: {quests[0].warLongName}</Typography>
+            <Typography variant="body1">Quest: {quests[0].name}</Typography>
+            <Typography variant="body2">Recommended Lv: {quests[0].recommendLv}</Typography>
 
-              {quest.stages && quest.stages.map((stage, stageIndex) => (
-                <Box key={stageIndex} mt={2}>
-                  <Typography variant="body2">Wave: {stage.wave}</Typography>
-                  <Box display="flex" flexDirection="row" flexWrap="wrap">
-                    {stage.enemies.map((enemy, enemyIndex) => (
-                      <Box key={enemyIndex} display="flex" alignItems="center" mb={1} mr={2}>
-                        <Typography>{enemy.svtClassName}</Typography>
-                        <Typography>{enemy.hp}</Typography>
-                        <img src={enemy.svt.face} alt={`${enemy.svtClassName} face`} style={{ marginLeft: '8px', width: '50px' }} />
-                      </Box>
-                    ))}
-                  </Box>
+            {quests[0].stages && quests[0].stages.map((stage, stageIndex) => (
+              <Box key={stageIndex} mt={2}>
+                <Typography variant="body2">Wave: {stage.wave}</Typography>
+                <Box display="flex" flexDirection="row" flexWrap="wrap">
+                  {stage.enemies.map((enemy, enemyIndex) => (
+                    <Box key={enemyIndex} display="flex" alignItems="center" mb={1} mr={2}>
+                      <Typography>{enemy.svtClassName}</Typography>
+                      <Typography>{enemy.hp}</Typography>
+                      <img src={enemy.svt.face} alt={`${enemy.svtClassName} face`} style={{ marginLeft: '8px', width: '50px' }} />
+                    </Box>
+                  ))}
                 </Box>
-              ))}
-            </Box>
-          );
-        })}
+              </Box>
+            ))}
+          </Box>
+        )}
       </Box>
     </div>
   );
