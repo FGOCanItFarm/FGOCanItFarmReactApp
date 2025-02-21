@@ -53,19 +53,20 @@ const QuestSelection = () => {
       <Box>
         <FormControl component="fieldset">
           <Typography variant="h6">War Long Names</Typography>
-          <FormGroup>
+          <FormGroup style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 1fr))', gap: '10px' }}>
             {warLongNames.map((name, index) => (
-              <FormControlLabel
-                key={index}
-                control={
-                  <Checkbox
-                    value={name}
-                    checked={selectedWarLongNames.includes(name)}
-                    onChange={handleCheckboxChange}
-                  />
-                }
-                label={name}
-              />
+              <Box key={index} style={{ border: '1px solid lightgray', borderRadius: '4px', padding: '8px' }}>
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      value={name}
+                      checked={selectedWarLongNames.includes(name)}
+                      onChange={handleCheckboxChange}
+                    />
+                  }
+                  label={name}
+                />
+              </Box>
             ))}
           </FormGroup>
         </FormControl>
