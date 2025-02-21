@@ -1,6 +1,6 @@
 {
   "name": "fgo-canitfarm-reactapp",
-  "homepage": "https://fgocanitfarm.github.io/FGOCanItFarmReactApp/",
+  "homepage": "https://fgocanitfarm.github.io/FGOCanItFarmReactApp",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
