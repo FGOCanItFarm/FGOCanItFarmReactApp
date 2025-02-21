@@ -8,15 +8,6 @@ import ResultsTable from './components/ResultsTable';
 import ServantAvatar from './components/ServantAvatar';
 
 
-// TODO Query mongodb for lists of executed CanItFarm logs
-// TODO create script entry that conforms to the same standards as FGA
-
-// TODO create mongodb credentials for read only access
-//  TODO create mystic code db 
-//       update servant db
-//       
-
-
 function App() {
   return (
     <Router>
