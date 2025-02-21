@@ -85,11 +85,14 @@ const QuestSelection = () => {
           </Select>
         </FormControl>
 
+        console.log(quest)
+        console.error(quest.stages)
         {Array.isArray(quests) && quests.map((quest, index) => (
           <Box key={index} mt={2}>
             <Typography variant="h6">War: {quest.warLongName}</Typography>
             <Typography variant="body1">Quest: {quest.name}</Typography>
             <Typography variant="body2">Recommended Lv: {quest.recommendLv}</Typography>
+
             {quest.stages.map((stage, stageIndex) => (
               <Box key={stageIndex} mt={2}>
                 <Typography variant="body2">Wave: {stage.wave}</Typography>
