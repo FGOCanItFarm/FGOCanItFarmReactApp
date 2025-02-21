@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import { Box, Typography, FormControl, FormControlLabel, Checkbox, FormGroup, Select, MenuItem } from '@mui/material';
 
@@ -21,7 +21,7 @@ const QuestSelection = () => {
     fetchWarLongNames();
   }, []);
 
-  const fetchQuests = async () => {
+  const fetchQuests = useCallback(async () => {
     try {
       const response = await axios.get(`/api/quests/filter`, {
         params: {
@@ -33,13 +33,13 @@ const QuestSelection = () => {
     } catch (error) {
       console.error('Error fetching quests', error);
     }
-  };
+  }, [selectedWarLongNames, recommendLv]);
 
   useEffect(() => {
     if (selectedWarLongNames.length > 0) {
       fetchQuests();
     }
-  }, [selectedWarLongNames, recommendLv]);
+  }, [selectedWarLongNames, recommendLv, fetchQuests]);
 
   const handleCheckboxChange = (event) => {
     const { value, checked } = event.target;
