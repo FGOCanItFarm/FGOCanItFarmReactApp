@@ -93,7 +93,7 @@ const QuestSelection = () => {
 
             {quests[0].stages && quests[0].stages.map((stage, stageIndex) => (
               <Box key={stageIndex} mt={2}>
-                <Typography variant="body2">Wave: {stage.wave}</Typography>
+                <Typography variant="body2">Stage {stageIndex + 1}</Typography>
                 <Box display="flex" flexDirection="row" flexWrap="wrap">
                   {stage.enemies.map((enemy, enemyIndex) => (
                     <Box key={enemyIndex} display="flex" alignItems="center" mb={1} mr={2}>
