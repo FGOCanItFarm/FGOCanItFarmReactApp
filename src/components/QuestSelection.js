@@ -49,6 +49,10 @@ const QuestSelection = () => {
     );
   };
 
+  const getHighestHpEnemy = (enemies) => {
+    return enemies.reduce((max, enemy) => (enemy.hp > max.hp ? enemy : max), enemies[0]);
+  };
+
   return (
     <div style={{ backgroundColor: '#e8f5e9', padding: '20px', borderRadius: '8px' }}>
       <Box>
@@ -92,20 +96,26 @@ const QuestSelection = () => {
             <Typography variant="body1">Quest: {quest.name}</Typography>
             <Typography variant="body2">Recommended Lv: {quest.recommendLv}</Typography>
 
-            {quest.stages && quest.stages.map((stage, stageIndex) => (
-              <Box key={stageIndex} mt={2}>
-                <Typography variant="body2">Stage {stageIndex + 1}</Typography>
-                <Box display="flex" flexDirection="row" flexWrap="wrap">
-                  {stage.enemies.map((enemy, enemyIndex) => (
-                    <Box key={enemyIndex} display="flex" alignItems="center" mb={1} mr={2}>
-                      <Typography>{enemy.svtClassName}</Typography>
-                      <Typography>{enemy.hp}</Typography>
-                      <img src={enemy.svt.face} alt={`${enemy.svtClassName} face`} style={{ marginLeft: '8px', width: '50px' }} />
-                    </Box>
-                  ))}
+            {quest.stages && quest.stages.map((stage, stageIndex) => {
+              const highestHpEnemy = getHighestHpEnemy(stage.enemies);
+              return (
+                <Box key={stageIndex} mt={2}>
+                  <Typography variant="body2">Stage {stageIndex + 1}</Typography>
+                  <Box display="flex" flexDirection="row" flexWrap="wrap">
+                    {stage.enemies.map((enemy, enemyIndex) => (
+                      <Box key={enemyIndex} display="flex" alignItems="center" mb={1} mr={2}>
+                        <Typography>{enemy.svtClassName}</Typography>
+                        <Typography>{enemy.hp}</Typography>
+                        <img src={enemy.svt.face} alt={`${enemy.svtClassName} face`} style={{ marginLeft: '8px', width: '50px' }} />
+                      </Box>
+                    ))}
+                  </Box>
+                  <Typography variant="body2" color="secondary">
+                    Highest HP Enemy Traits: {highestHpEnemy.traits.join(', ')}
+                  </Typography>
                 </Box>
-              </Box>
-            ))}
+              );
+            })}
           </Box>
         ))}
       </Box>
