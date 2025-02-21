@@ -23,7 +23,7 @@ const QuestSelection = () => {
 
   const fetchQuests = async () => {
     try {
-      const response = await axios.get(`/api/quests`, {
+      const response = await axios.get(`/api/quests/filter`, {
         params: {
           warLongNames: selectedWarLongNames,
           recommendLv
