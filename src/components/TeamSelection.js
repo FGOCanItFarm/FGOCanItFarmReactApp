@@ -175,6 +175,20 @@ const TeamSelection = () => {
     support: 'Support'
   };
 
+  const handleSubmit = () => {
+    const teamData = {
+      team,
+      mysticCodeId: selectedMysticCode,
+      questId: selectedQuest?.id,
+      commands
+    };
+    console.log('Submit team', teamData);
+    // Optionally, send the data to an API endpoint
+    // axios.post('/api/submitTeam', teamData)
+    //   .then(response => console.log('Team submitted successfully', response))
+    //   .catch(error => console.error('Error submitting team', error));
+  };
+
   return (
     <Container>
       <Typography variant="h4">Select Your Team</Typography>
@@ -261,7 +275,7 @@ const TeamSelection = () => {
         <QuestSelection setSelectedQuest={setSelectedQuest} />
       </Grid>
 
-      <Button variant="contained" color="primary" onClick={() => console.log('Submit team', team)} style={{ marginTop: '20px' }}>
+      <Button variant="contained" color="primary" onClick={handleSubmit} style={{ marginTop: '20px' }}>
         Submit Team
       </Button>
     </Container>

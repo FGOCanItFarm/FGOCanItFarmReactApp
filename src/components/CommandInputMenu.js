@@ -262,6 +262,44 @@ const CommandInputMenu = ({ activeServant, updateCommands, team }) => {
       <Grid className="margin-left-grid" container spacing={2} justifyContent="center">
         {renderSpecificButtons()}
       </Grid>
+      <Grid container spacing={2} justifyContent="center" mt={2}>
+        <Grid item>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={() => addCommand('#')}
+          >
+            End Turn
+          </Button>
+        </Grid>
+        <Grid item>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={() => addCommand('4')}
+          >
+            Use NP (Servant 1)
+          </Button>
+        </Grid>
+        <Grid item>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={() => addCommand('5')}
+          >
+            Use NP (Servant 2)
+          </Button>
+        </Grid>
+        <Grid item>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={() => addCommand('6')}
+          >
+            Use NP (Servant 3)
+          </Button>
+        </Grid>
+      </Grid>
     </Box>
   );
 };
