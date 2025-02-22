@@ -25,6 +25,8 @@ const TeamSelection = () => {
   const [selectedAttackType, setSelectedAttackType] = useState([]);
   const [activeServant, setActiveServant] = useState(null);
   const [commands, setCommands] = useState([]);
+  const [selectedQuest, setSelectedQuest] = useState(null); // State to hold the selected quest
+  const [selectedMysticCode, setSelectedMysticCode] = useState(null); // State to hold the selected mystic code
 
   // Function to save data to local storage
   const saveToLocalStorage = (key, value) => {
@@ -37,12 +39,16 @@ const TeamSelection = () => {
     return savedData ? JSON.parse(savedData) : [];
   };
 
-  // Load team and commands data from local storage when the component mounts
+  // Load team, commands, quest, and mystic code data from local storage when the component mounts
   useEffect(() => {
     const savedTeam = loadFromLocalStorage('team');
     setTeam(savedTeam);
     const savedCommands = loadFromLocalStorage('commands');
     setCommands(savedCommands);
+    const savedQuest = loadFromLocalStorage('selectedQuest');
+    setSelectedQuest(savedQuest);
+    const savedMysticCode = loadFromLocalStorage('selectedMysticCode');
+    setSelectedMysticCode(savedMysticCode);
   }, []);
 
   // Save team data to local storage whenever it changes
@@ -54,6 +60,16 @@ const TeamSelection = () => {
   useEffect(() => {
     saveToLocalStorage('commands', commands);
   }, [commands]);
+
+  // Save selected quest data to local storage whenever it changes
+  useEffect(() => {
+    saveToLocalStorage('selectedQuest', selectedQuest);
+  }, [selectedQuest]);
+
+  // Save selected mystic code data to local storage whenever it changes
+  useEffect(() => {
+    saveToLocalStorage('selectedMysticCode', selectedMysticCode);
+  }, [selectedMysticCode]);
 
   const fetchServants = useCallback(async () => {
     try {
@@ -199,10 +215,9 @@ const TeamSelection = () => {
           <Grid container spacing={2} direction="row">
             <Typography variant="h4" style={{marginBottom:"2rem"}}>Select Mystic Code</Typography>
             <MysticCodeSelection
-              team={team}
-              setTeam={setTeam}
-              updateCommands={setCommands}
-              />
+              selectedMysticCode={selectedMysticCode}
+              setSelectedMysticCode={setSelectedMysticCode}
+            />
           </Grid>
           </Grid>
           </Box>
@@ -213,7 +228,7 @@ const TeamSelection = () => {
             servants={filteredServants}
             handleServantClick={handleServantClick}
           />
-          <CommonServantsGrid style={{ padding: '0.5rem', borderRadius: '0.5rem', borderColoe: '#d8caa9' }}
+          <CommonServantsGrid style={{ padding: '0.5rem', borderRadius: '0.5rem', borderColor: '#d8caa9' }}
             servants={servants}
             handleServantClick={handleServantClick}
           />
@@ -238,10 +253,9 @@ const TeamSelection = () => {
         Clear Commands
       </Button>
 
-      {/* TODO add farming node selection section */}
       <Typography variant="h4" style={{marginBottom:"2rem"}}>Select Farming Node</Typography>
       <Grid container spacing={2} style={{ backgroundColor: '#d0ba98', padding: '20px', borderRadius: '8px' }} direction="row">
-        <QuestSelection />
+        <QuestSelection setSelectedQuest={setSelectedQuest} />
       </Grid>
 
       <Button variant="contained" color="primary" onClick={() => console.log('Submit team', team)} style={{ marginTop: '20px' }}>
