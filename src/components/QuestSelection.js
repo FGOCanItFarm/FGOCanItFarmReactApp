@@ -125,7 +125,6 @@ const QuestSelection = ({ setSelectedQuest }) => {
             <Typography variant="body2">Recommended Lv: {quest.recommendLv}</Typography>
 
             {quest.stages && quest.stages.map((stage, stageIndex) => {
-              const highestHpEnemy = getHighestHpEnemy(stage.enemies);
               return (
                 <Box key={stageIndex} mt={2}>
                   <Typography variant="body2">Stage {stageIndex + 1}</Typography>
@@ -138,9 +137,6 @@ const QuestSelection = ({ setSelectedQuest }) => {
                       </Box>
                     ))}
                   </Box>
-                  <Typography variant="body2" color="secondary">
-                    Highest HP Enemy Traits: {highestHpEnemy.traits.join(', ')}
-                  </Typography>
                 </Box>
               );
             })}
