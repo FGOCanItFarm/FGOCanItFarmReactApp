@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
-import { Box, FormControlLabel, Checkbox, FormGroup, FormControl, Typography, Select, MenuItem, Button } from '@mui/material';
+import { FormControlLabel, Checkbox, FormGroup, FormControl, Typography, Select, MenuItem, Button } from '@mui/material';
 import '../questSelection.css';
 
 const QuestSelection = ({ setSelectedQuest }) => {
@@ -56,7 +56,7 @@ const QuestSelection = ({ setSelectedQuest }) => {
 
   return (
     <div style={{ backgroundColor: '#e8f5e9', padding: '20px', borderRadius: '8px' }}>
-      <Box>
+      <div>
         <FormControl component="fieldset" style={{ marginTop: '16px' }}>
           <Typography variant="h6">War Long Names</Typography>
           <FormGroup className="masonry">
@@ -92,34 +92,34 @@ const QuestSelection = ({ setSelectedQuest }) => {
         </FormControl>
 
         {Array.isArray(quests) && quests.length > 0 && quests.map((quest, questIndex) => (
-          <Box key={questIndex} mt={2} border="1px solid lightgray" borderRadius="8px" padding="16px">
+          <div key={questIndex} style={{ marginTop: '16px', border: '1px solid lightgray', borderRadius: '8px', padding: '16px' }}>
             <Typography variant="h6">War: {quest.warLongName}</Typography>
             <Typography variant="body1">Quest: {quest.name}</Typography>
             <Typography variant="body2">Recommended Lv: {quest.recommendLv}</Typography>
 
             {quest.stages && quest.stages.map((stage, stageIndex) => {
               return (
-                <Box key={stageIndex} mt={2}>
+                <div key={stageIndex} style={{ marginTop: '16px' }}>
                   <Typography variant="body2">Stage {stageIndex + 1}</Typography>
-                  <Box display="flex" flexDirection="row" flexWrap="wrap">
+                  <div style={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap' }}>
                     {stage.enemies.map((enemy, enemyIndex) => (
-                      <Box key={enemyIndex} display="flex" alignItems="center" mb={1} mr={2}>
+                      <div key={enemyIndex} style={{ display: 'flex', alignItems: 'center', marginBottom: '8px', marginRight: '16px' }}>
                         <Typography>{enemy.svtClassName}</Typography>
                         <Typography>{enemy.hp}</Typography>
                         <img src={enemy.svt.face} alt={`${enemy.svtClassName} face`} style={{ marginLeft: '8px', width: '50px' }} />
-                      </Box>
+                      </div>
                     ))}
-                  </Box>
-                </Box>
+                  </div>
+                </div>
               );
             })}
 
             <Button variant="contained" color="primary" onClick={() => handleQuestSelect(quest)} style={{ marginTop: '16px' }}>
               Select Quest
             </Button>
-          </Box>
+          </div>
         ))}
-      </Box>
+      </div>
     </div>
   );
 };
