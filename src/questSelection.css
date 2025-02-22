@@ -1,5 +1,5 @@
 .masonry {
-    columns: 5 192px;
+    columns: 192px 5;
     column-gap: 0.5rem;
 }
 
