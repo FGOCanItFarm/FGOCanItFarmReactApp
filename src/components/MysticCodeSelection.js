@@ -9,8 +9,7 @@ const mysticCodes = [
     { id: 20, name: 'Chaldea Combat Uniform' },
 ];
 
-const MysticCodeSelection = ({ team, setTeam, updateCommands }) => {
-    const [selectedMysticCode, setSelectedMysticCode] = useState('');
+const MysticCodeSelection = ({ team, setTeam, updateCommands, selectedMysticCode, setSelectedMysticCode }) => {
     const [selectedTop, setSelectedTop] = useState(null);
     const [selectedBottom, setSelectedBottom] = useState(null);
 
@@ -125,12 +124,16 @@ const MysticCodeSelection = ({ team, setTeam, updateCommands }) => {
         }
     };
 
+    const handleMysticCodeChange = (event) => {
+        setSelectedMysticCode(event.target.value);
+    };
+
     return (
         <div style={{ backgroundColor: '#e0f7fa', padding: '20px', borderRadius: '8px', width: '30rem' }}>
             <Typography variant="h6">Mystic Codes</Typography>
             <Select
                 value={selectedMysticCode}
-                onChange={(e) => setSelectedMysticCode(e.target.value)}
+                onChange={handleMysticCodeChange}
                 displayEmpty
                 fullWidth
                 style={{ marginBottom: '20px', minWidth: '200px' }}
