@@ -1,18 +1,18 @@
 {
   "files": {
     "main.css": "/FGOCanItFarmReactApp/static/css/main.3926af24.css",
-    "main.js": "/FGOCanItFarmReactApp/static/js/main.0f34eec9.js",
+    "main.js": "/FGOCanItFarmReactApp/static/js/main.5114847a.js",
     "static/js/488.6e696c41.chunk.js": "/FGOCanItFarmReactApp/static/js/488.6e696c41.chunk.js",
     "static/media/Support.svg": "/FGOCanItFarmReactApp/static/media/Support.fdfde9f5cd45c4fb764125f9859ce27a.svg",
     "static/media/AoE.svg": "/FGOCanItFarmReactApp/static/media/AoE.415199c61e549567f1e97a3f6d54a046.svg",
     "static/media/SingleTarget.svg": "/FGOCanItFarmReactApp/static/media/SingleTarget.556e910089446150a92b6f3e7292143b.svg",
     "index.html": "/FGOCanItFarmReactApp/index.html",
     "main.3926af24.css.map": "/FGOCanItFarmReactApp/static/css/main.3926af24.css.map",
-    "main.0f34eec9.js.map": "/FGOCanItFarmReactApp/static/js/main.0f34eec9.js.map",
+    "main.5114847a.js.map": "/FGOCanItFarmReactApp/static/js/main.5114847a.js.map",
     "488.6e696c41.chunk.js.map": "/FGOCanItFarmReactApp/static/js/488.6e696c41.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.3926af24.css",
-    "static/js/main.0f34eec9.js"
+    "static/js/main.5114847a.js"
   ]
 }
