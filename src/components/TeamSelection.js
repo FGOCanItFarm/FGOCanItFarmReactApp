@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Button, Grid, Typography, Box, Container } from '@mui/material';
+import { Button, Grid, Typography, Box, Container, Modal } from '@mui/material';
 import axios from 'axios';
 import FilterSection from './FilterSection';
 import ServantSelection from './ServantSelection';
@@ -27,6 +27,7 @@ const TeamSelection = () => {
   const [commands, setCommands] = useState([]);
   const [selectedQuest, setSelectedQuest] = useState(null); // State to hold the selected quest
   const [selectedMysticCode, setSelectedMysticCode] = useState(null); // State to hold the selected mystic code
+  const [openModal, setOpenModal] = useState(false); // State to control the modal
 
   // Function to save data to local storage
   const saveToLocalStorage = (key, value) => {
@@ -189,6 +190,14 @@ const TeamSelection = () => {
     //   .catch(error => console.error('Error submitting team', error));
   };
 
+  const handleOpenModal = () => {
+    setOpenModal(true);
+  };
+
+  const handleCloseModal = () => {
+    setOpenModal(false);
+  };
+
   return (
     <Container>
       <Typography variant="h4">Select Your Team</Typography>
@@ -275,9 +284,27 @@ const TeamSelection = () => {
         <QuestSelection setSelectedQuest={setSelectedQuest} />
       </Grid>
 
-      <Button variant="contained" color="primary" onClick={handleSubmit} style={{ marginTop: '20px' }}>
+      <Button variant="contained" color="primary" onClick={handleOpenModal} style={{ marginTop: '20px' }}>
         Submit Team
       </Button>
+
+      <Modal open={openModal} onClose={handleCloseModal}>
+        <Box p={4} bgcolor="white" borderRadius="8px" boxShadow={3} style={{ margin: 'auto', marginTop: '10%', width: '50%' }}>
+          <Typography variant="h6">Confirm Submission</Typography>
+          <Typography variant="body1"><strong>Team:</strong> {team.join(', ')}</Typography>
+          <Typography variant="body1"><strong>Mystic Code ID:</strong> {selectedMysticCode}</Typography>
+          <Typography variant="body1"><strong>Quest ID:</strong> {selectedQuest?.id}</Typography>
+          <Typography variant="body1"><strong>Commands:</strong> {commands.join(' ')}</Typography>
+          <Box mt={2}>
+            <Button variant="contained" color="primary" onClick={handleSubmit} style={{ marginRight: '10px' }}>
+              Confirm
+            </Button>
+            <Button variant="contained" color="secondary" onClick={handleCloseModal}>
+              Cancel
+            </Button>
+          </Box>
+        </Box>
+      </Modal>
     </Container>
   );
 };
