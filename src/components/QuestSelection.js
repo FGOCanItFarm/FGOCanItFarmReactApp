@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import { Box, FormControlLabel, Checkbox, FormGroup, FormControl, Typography, Select, MenuItem, Button } from '@mui/material';
+import './QuestSelection.css';
 
 const QuestSelection = ({ setSelectedQuest }) => {
   const [warLongNames, setWarLongNames] = useState([]);
@@ -58,9 +59,9 @@ const QuestSelection = ({ setSelectedQuest }) => {
       <Box>
         <FormControl component="fieldset" style={{ marginTop: '16px' }}>
           <Typography variant="h6">War Long Names</Typography>
-          <FormGroup style={{ columnCount: 5, columnWidth: '192px', gap: '10px' }}>
+          <FormGroup className="masonry">
             {warLongNames.map((name, index) => (
-              <Box key={index} style={{ border: '1px solid lightgray', borderRadius: '4px', padding: '8px', display: 'inline-block', breakInside: 'avoid' }}>
+              <Box key={index} className="masonry-item">
                 <FormControlLabel
                   control={
                     <Checkbox

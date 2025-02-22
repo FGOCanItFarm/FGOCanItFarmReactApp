@@ -1,0 +1,12 @@
+.masonry {
+    columns: 5 192px;
+    column-gap: 0.5rem;
+}
+
+.masonry-item {
+    border: 1px solid lightgray;
+    border-radius: 4px;
+    padding: 8px;
+    display: inline-block;
+    break-inside: avoid;
+}
