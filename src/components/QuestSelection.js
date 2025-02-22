@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
-import { FormControlLabel, Checkbox, FormGroup, FormControl, Typography, Select, MenuItem, Button } from '@mui/material';
+import { FormControlLabel, Checkbox, Typography, Select, MenuItem, Button } from '@mui/material';
 import '../questSelection.css';
 
 const QuestSelection = ({ setSelectedQuest }) => {
@@ -57,9 +57,9 @@ const QuestSelection = ({ setSelectedQuest }) => {
   return (
     <div style={{ backgroundColor: '#e8f5e9', padding: '20px', borderRadius: '8px' }}>
       <div>
-        <FormControl component="fieldset" style={{ marginTop: '16px' }}>
+        <div style={{ marginTop: '16px' }}>
           <Typography variant="h6">War Long Names</Typography>
-          <FormGroup className="masonry">
+          <div className="masonry">
             {warLongNames.map((name, index) => (
               <div key={index} className="masonry-item">
                 <FormControlLabel
@@ -74,14 +74,15 @@ const QuestSelection = ({ setSelectedQuest }) => {
                 />
               </div>
             ))}
-          </FormGroup>
-        </FormControl>
+          </div>
+        </div>
 
-        <FormControl fullWidth style={{ marginTop: '16px' }}>
+        <div style={{ marginTop: '16px' }}>
           <Typography variant="h6">Recommended Level</Typography>
           <Select
             value={recommendLv}
             onChange={(e) => setRecommendLv(e.target.value)}
+            fullWidth
           >
             <MenuItem value="90">90</MenuItem>
             <MenuItem value="90+">90+</MenuItem>
@@ -89,7 +90,7 @@ const QuestSelection = ({ setSelectedQuest }) => {
             <MenuItem value="90*">90*</MenuItem>
             <MenuItem value="90**">90**</MenuItem>
           </Select>
-        </FormControl>
+        </div>
 
         {Array.isArray(quests) && quests.length > 0 && quests.map((quest, questIndex) => (
           <div key={questIndex} style={{ marginTop: '16px', border: '1px solid lightgray', borderRadius: '8px', padding: '16px' }}>
