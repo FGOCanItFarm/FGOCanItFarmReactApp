@@ -215,6 +215,9 @@ const TeamSelection = () => {
           <Grid container spacing={2} direction="row">
             <Typography variant="h4" style={{marginBottom:"2rem"}}>Select Mystic Code</Typography>
             <MysticCodeSelection
+              team={team}
+              setTeam={setTeam}
+              updateCommands={setCommands}
               selectedMysticCode={selectedMysticCode}
               setSelectedMysticCode={setSelectedMysticCode}
             />
