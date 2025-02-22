@@ -61,7 +61,7 @@ const QuestSelection = ({ setSelectedQuest }) => {
           <Typography variant="h6">War Long Names</Typography>
           <FormGroup className="masonry">
             {warLongNames.map((name, index) => (
-              <Box key={index} className="masonry-item">
+              <div key={index} className="masonry-item">
                 <FormControlLabel
                   control={
                     <Checkbox
@@ -72,7 +72,7 @@ const QuestSelection = ({ setSelectedQuest }) => {
                   }
                   label={name}
                 />
-              </Box>
+              </div>
             ))}
           </FormGroup>
         </FormControl>
