@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import { Box, FormControlLabel, Checkbox, FormGroup, FormControl, Typography, Select, MenuItem, Button } from '@mui/material';
-import './QuestSelection.css';
+import '../questSelection.css';
 
 const QuestSelection = ({ setSelectedQuest }) => {
   const [warLongNames, setWarLongNames] = useState([]);
