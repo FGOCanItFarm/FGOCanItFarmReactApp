@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Grid, Typography, TextField, Box, FormControlLabel, Checkbox, Accordion, AccordionSummary, AccordionDetails } from '@mui/material';
+import { Grid, Typography, TextField, Box, FormControlLabel, Checkbox, Accordion, AccordionSummary, AccordionDetails, InputAdornment } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ServantAvatar from './ServantAvatar';
 
@@ -82,63 +82,170 @@ const TeamSection = ({ servants, team, activeServant, handleTeamServantClick, up
                           <TextField
                             label="Attack"
                             type="number"
+                            value={servant.attack || ''}
                             onChange={(e) => handleEffectChange(index, 'attack', e.target.value)}
                             fullWidth
                             margin="dense"
+                            inputProps={{
+                              style: { padding: '4px' },
+                              autoComplete: 'off'
+                            }}
                           />
                         </Grid>
                         <Grid item xs={6}>
                           <TextField
                             label="Atk Up"
                             type="number"
+                            value={servant.atkUp || ''}
                             onChange={(e) => handleEffectChange(index, 'atkUp', e.target.value)}
                             fullWidth
                             margin="dense"
+                            inputProps={{
+                              style: { padding: '4px' },
+                              autoComplete: 'off'
+                            }}
+                            InputProps={{
+                              endAdornment: <InputAdornment position="end">%</InputAdornment>
+                            }}
                           />
                         </Grid>
                         <Grid item xs={6}>
                           <TextField
                             label="Arts Up"
                             type="number"
+                            value={servant.artsUp || ''}
                             onChange={(e) => handleEffectChange(index, 'artsUp', e.target.value)}
                             fullWidth
                             margin="dense"
+                            inputProps={{
+                              style: { padding: '4px' },
+                              autoComplete: 'off'
+                            }}
+                            InputProps={{
+                              endAdornment: <InputAdornment position="end">%</InputAdornment>
+                            }}
+                          />
+                        </Grid>
+                        <Grid item xs={6}>
+                          <TextField
+                            label="Arts Damage Up"
+                            type="number"
+                            title='Acts like Valentines 2025 color boost chocolate or Class Score'
+                            value={servant.artsDamageUp || ''}
+                            onChange={(e) => handleEffectChange(index, 'artsDamageUp', e.target.value)}
+                            fullWidth
+                            margin="dense"
+                            inputProps={{
+                              style: { padding: '4px' },
+                              autoComplete: 'off'
+                            }}
+                            InputProps={{
+                              endAdornment: <InputAdornment position="end">%</InputAdornment>
+                            }}
                           />
                         </Grid>
                         <Grid item xs={6}>
                           <TextField
                             label="Quick Up"
                             type="number"
+                            value={servant.quickUp || ''}
                             onChange={(e) => handleEffectChange(index, 'quickUp', e.target.value)}
                             fullWidth
                             margin="dense"
+                            inputProps={{
+                              style: { padding: '4px' },
+                              autoComplete: 'off'
+                            }}
+                            InputProps={{
+                              endAdornment: <InputAdornment position="end">%</InputAdornment>
+                            }}
+                          />
+                        </Grid>
+                        <Grid item xs={6}>
+                          <TextField
+                            label="Quick Damage Up"
+                            type="number"
+                            title='Acts like Valentines 2025 color boost chocolate or Class Score'
+                            value={servant.artsDamageUp || ''}
+                            onChange={(e) => handleEffectChange(index, 'quickDamageUp', e.target.value)}
+                            fullWidth
+                            margin="dense"
+                            inputProps={{
+                              style: { padding: '4px' },
+                              autoComplete: 'off'
+                            }}
+                            InputProps={{
+                              endAdornment: <InputAdornment position="end">%</InputAdornment>
+                            }}
                           />
                         </Grid>
                         <Grid item xs={6}>
                           <TextField
                             label="Buster Up"
                             type="number"
+                            value={servant.busterUp || ''}
                             onChange={(e) => handleEffectChange(index, 'busterUp', e.target.value)}
                             fullWidth
                             margin="dense"
+                            inputProps={{
+                              style: { padding: '4px' },
+                              autoComplete: 'off'
+                            }}
+                            InputProps={{
+                              endAdornment: <InputAdornment position="end">%</InputAdornment>
+                            }}
+                          />
+                        </Grid>
+                        <Grid item xs={6}>
+                          <TextField
+                            label="Buster Damage Up"
+                            type="number"
+                            title='Acts like Valentines 2025 color boost chocolate or Class Score'
+                            value={servant.artsDamageUp || ''}
+                            onChange={(e) => handleEffectChange(index, 'busterDamageUp', e.target.value)}
+                            fullWidth
+                            margin="dense"
+                            inputProps={{
+                              style: { padding: '4px' },
+                              autoComplete: 'off'
+                            }}
+                            InputProps={{
+                              endAdornment: <InputAdornment position="end">%</InputAdornment>
+                            }}
                           />
                         </Grid>
                         <Grid item xs={6}>
                           <TextField
                             label="NP Up"
                             type="number"
+                            value={servant.npUp || ''}
                             onChange={(e) => handleEffectChange(index, 'npUp', e.target.value)}
                             fullWidth
                             margin="dense"
+                            inputProps={{
+                              style: { padding: '4px' },
+                              autoComplete: 'off'
+                            }}
+                            InputProps={{
+                              endAdornment: <InputAdornment position="end">%</InputAdornment>
+                            }}
                           />
                         </Grid>
                         <Grid item xs={6}>
                           <TextField
                             label="Initial Charge"
                             type="number"
+                            value={servant.initialCharge || ''}
                             onChange={(e) => handleEffectChange(index, 'initialCharge', e.target.value)}
                             fullWidth
                             margin="dense"
+                            inputProps={{
+                              style: { padding: '4px' },
+                              autoComplete: 'off'
+                            }}
+                            InputProps={{
+                              endAdornment: <InputAdornment position="end">%</InputAdornment>
+                            }}
                           />
                         </Grid>
                         {/* Add more fields as needed */}
