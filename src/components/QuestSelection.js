@@ -58,7 +58,7 @@ const QuestSelection = ({ setSelectedQuest }) => {
     <div style={{ backgroundColor: '#e8f5e9', padding: '20px', borderRadius: '8px' }}>
       <div>
         <div style={{ marginTop: '16px' }}>
-          <Typography variant="h6">War Long Names</Typography>
+          <Typography variant="h6">Event Titles</Typography>
           <div className="masonry">
             {warLongNames.map((name, index) => (
               <div key={index} className="masonry-item">

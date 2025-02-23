@@ -303,7 +303,7 @@ const TeamSelection = () => {
       </Button>
 
       <Typography variant="h4" style={{marginBottom:"2rem"}}>Select Farming Node</Typography>
-      <Grid container spacing={2} style={{ backgroundColor: '#d0ba98', padding: '20px', borderRadius: '8px' }} direction="row">
+      <Grid container spacing={2} direction="row">
         <QuestSelection setSelectedQuest={setSelectedQuest} />
       </Grid>
 
