@@ -6,7 +6,7 @@ import TeamSelection from './components/TeamSelection';
 import QuestSelection from './components/QuestSelection';
 import ResultsTable from './components/ResultsTable';
 import ServantAvatar from './components/ServantAvatar';
-import HowToUse from './components/HowToUse';
+import HowToUse from './components/Instructions';
 
 function App() {
   return (
