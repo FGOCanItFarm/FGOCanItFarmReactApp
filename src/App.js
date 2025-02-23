@@ -6,7 +6,7 @@ import TeamSelection from './components/TeamSelection';
 import QuestSelection from './components/QuestSelection';
 import ResultsTable from './components/ResultsTable';
 import ServantAvatar from './components/ServantAvatar';
-
+import HowToUse from './components/HowToUse';
 
 function App() {
   return (
@@ -19,7 +19,7 @@ function App() {
           <Route path="/teams" element={<TeamSelection />} />
           <Route path="/quests" element={<QuestSelection />} />
           <Route path="/test" element={<ServantAvatar />} />
-
+          <Route path="/how-to-use" element={<HowToUse />} />
         </Routes>
       </Container>
     </Router>
