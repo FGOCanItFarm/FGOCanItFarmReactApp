@@ -1,9 +1,14 @@
-import React from 'react';
-import { Grid, Typography } from '@mui/material';
+import React, { useState } from 'react';
+import { Grid, Typography, TextField, Box, FormControlLabel, Checkbox, Accordion, AccordionSummary, AccordionDetails } from '@mui/material';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ServantAvatar from './ServantAvatar';
 
-const TeamSection = ({ servants, team, activeServant, handleTeamServantClick }) => {
+const TeamSection = ({ servants, team, activeServant, handleTeamServantClick, updateServantEffects }) => {
   const maxServants = 6;
+
+  const handleEffectChange = (index, field, value) => {
+    updateServantEffects(index, field, value);
+  };
 
   return (
     <div>
@@ -47,6 +52,101 @@ const TeamSection = ({ servants, team, activeServant, handleTeamServantClick }) 
                   <Typography variant="body2" color="textSecondary">Empty Slot</Typography>
                 )}
               </div>
+              {servant && (
+                <Accordion>
+                  <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                    <Typography>{servant.name}</Typography>
+                  </AccordionSummary>
+                  <AccordionDetails>
+                    <Box mt={2}>
+                      <FormControlLabel
+                        control={
+                          <Checkbox
+                            checked={servant.append_2 || false}
+                            onChange={(e) => handleEffectChange(index, 'append_2', e.target.checked)}
+                          />
+                        }
+                        label="Append 2"
+                      />
+                      <FormControlLabel
+                        control={
+                          <Checkbox
+                            checked={servant.append_5 || false}
+                            onChange={(e) => handleEffectChange(index, 'append_5', e.target.checked)}
+                          />
+                        }
+                        label="Append 5"
+                      />
+                      <Grid container spacing={2}>
+                        <Grid item xs={6}>
+                          <TextField
+                            label="Attack"
+                            type="number"
+                            onChange={(e) => handleEffectChange(index, 'attack', e.target.value)}
+                            fullWidth
+                            margin="dense"
+                          />
+                        </Grid>
+                        <Grid item xs={6}>
+                          <TextField
+                            label="Atk Up"
+                            type="number"
+                            onChange={(e) => handleEffectChange(index, 'atkUp', e.target.value)}
+                            fullWidth
+                            margin="dense"
+                          />
+                        </Grid>
+                        <Grid item xs={6}>
+                          <TextField
+                            label="Arts Up"
+                            type="number"
+                            onChange={(e) => handleEffectChange(index, 'artsUp', e.target.value)}
+                            fullWidth
+                            margin="dense"
+                          />
+                        </Grid>
+                        <Grid item xs={6}>
+                          <TextField
+                            label="Quick Up"
+                            type="number"
+                            onChange={(e) => handleEffectChange(index, 'quickUp', e.target.value)}
+                            fullWidth
+                            margin="dense"
+                          />
+                        </Grid>
+                        <Grid item xs={6}>
+                          <TextField
+                            label="Buster Up"
+                            type="number"
+                            onChange={(e) => handleEffectChange(index, 'busterUp', e.target.value)}
+                            fullWidth
+                            margin="dense"
+                          />
+                        </Grid>
+                        <Grid item xs={6}>
+                          <TextField
+                            label="NP Up"
+                            type="number"
+                            onChange={(e) => handleEffectChange(index, 'npUp', e.target.value)}
+                            fullWidth
+                            margin="dense"
+                          />
+                        </Grid>
+                        <Grid item xs={6}>
+                          <TextField
+                            label="Initial Charge"
+                            type="number"
+                            onChange={(e) => handleEffectChange(index, 'initialCharge', e.target.value)}
+                            fullWidth
+                            margin="dense"
+                          />
+                        </Grid>
+                        {/* Add more fields as needed */}
+                      </Grid>
+                    </Box>
+                  </AccordionDetails>
+                </Accordion>
+              )}
             </Grid>
           );
         })}

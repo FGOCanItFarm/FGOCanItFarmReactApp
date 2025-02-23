@@ -28,6 +28,7 @@ const TeamSelection = () => {
   const [selectedQuest, setSelectedQuest] = useState(null); // State to hold the selected quest
   const [selectedMysticCode, setSelectedMysticCode] = useState(null); // State to hold the selected mystic code
   const [openModal, setOpenModal] = useState(false); // State to control the modal
+  const [servantEffects, setServantEffects] = useState(Array(6).fill({})); // State to hold the custom effects for each servant
 
   // Function to save data to local storage
   const saveToLocalStorage = (key, value) => {
@@ -50,6 +51,8 @@ const TeamSelection = () => {
     setSelectedQuest(savedQuest);
     const savedMysticCode = loadFromLocalStorage('selectedMysticCode');
     setSelectedMysticCode(savedMysticCode);
+    const savedServantEffects = loadFromLocalStorage('servantEffects');
+    setServantEffects(savedServantEffects);
   }, []);
 
   // Save team data to local storage whenever it changes
@@ -71,6 +74,11 @@ const TeamSelection = () => {
   useEffect(() => {
     saveToLocalStorage('selectedMysticCode', selectedMysticCode);
   }, [selectedMysticCode]);
+
+  // Save servant effects data to local storage whenever it changes
+  useEffect(() => {
+    saveToLocalStorage('servantEffects', servantEffects);
+  }, [servantEffects]);
 
   const fetchServants = useCallback(async () => {
     try {
@@ -176,11 +184,25 @@ const TeamSelection = () => {
     support: 'Support'
   };
 
+  const updateServantEffects = (index, field, value) => {
+    const newEffects = [...servantEffects];
+    newEffects[index] = {
+      ...newEffects[index],
+      [field]: value
+    };
+    setServantEffects(newEffects);
+  };
+
   const handleSubmit = () => {
     const teamData = {
-      team,
-      mysticCodeId: selectedMysticCode,
-      questId: selectedQuest?.id,
+      team: team.map((collectionNo, index) => ({
+        servant_id: collectionNo,
+        append_2: servantEffects[index].append_2 || false,
+        append_5: servantEffects[index].append_5 || false,
+        ...servantEffects[index]
+      })),
+      mc_id: selectedMysticCode,
+      quest_id: selectedQuest?.id,
       commands
     };
     console.log('Submit team', teamData);
@@ -233,6 +255,7 @@ const TeamSelection = () => {
               servants={servants}
               activeServant={activeServant}
               handleTeamServantClick={handleTeamServantClick}
+              updateServantEffects={updateServantEffects}
             />
             </Grid>
           <Grid container spacing={2} direction="row">
@@ -291,7 +314,12 @@ const TeamSelection = () => {
       <Modal open={openModal} onClose={handleCloseModal}>
         <Box p={4} bgcolor="white" borderRadius="8px" boxShadow={3} style={{ margin: 'auto', marginTop: '10%', width: '50%' }}>
           <Typography variant="h6">Confirm Submission</Typography>
-          <Typography variant="body1"><strong>Team:</strong> {team.join(', ')}</Typography>
+          <Typography variant="body1"><strong>Team:</strong> {JSON.stringify(team.map((collectionNo, index) => ({
+            servant_id: collectionNo,
+            append_2: servantEffects[index].append_2 || false,
+            append_5: servantEffects[index].append_5 || false,
+            ...servantEffects[index]
+          })), null, 2)}</Typography>
           <Typography variant="body1"><strong>Mystic Code ID:</strong> {selectedMysticCode}</Typography>
           <Typography variant="body1"><strong>Quest ID:</strong> {selectedQuest?.id}</Typography>
           <Typography variant="body1"><strong>Commands:</strong> {commands.join(' ')}</Typography>
