@@ -6,7 +6,7 @@ const ServantSelection = ({ servants, handleServantClick }) => {
   return (
     <div>
       <Typography variant="h6" style={{ marginBottom: "1rem" }}>Servant Selection</Typography>
-      <Grid container spacing={2} style={{ width: '40rem', height: '70vh', overflowY: 'auto' }}>
+      <Grid container spacing={2} style={{ width: '35rem', height: '50rem', overflowY: 'auto' }}>
         {servants.map((servant, index) => (
           <Grid
             item
@@ -14,8 +14,8 @@ const ServantSelection = ({ servants, handleServantClick }) => {
             key={index}
             onClick={() => handleServantClick(servant)}
             sx={{
-              width: '128px', // Set the width to 128px or 144px as needed
-              height: '128px', // Set the height to 128px or 144px as needed
+              width: '128px',
+              height: '128px',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center'

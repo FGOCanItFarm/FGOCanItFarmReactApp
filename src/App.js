@@ -27,6 +27,56 @@ const App = () => {
 
   axios.defaults.baseURL = process.env.REACT_APP_API_URL;
 
+  // Function to save data to local storage
+  const saveToLocalStorage = (key, value) => {
+    localStorage.setItem(key, JSON.stringify(value));
+  };
+
+  // Function to load data from local storage
+  const loadFromLocalStorage = (key) => {
+    const savedData = localStorage.getItem(key);
+    return savedData ? JSON.parse(savedData) : [];
+  };
+
+  // Load team, commands, quest, and mystic code data from local storage when the component mounts
+  useEffect(() => {
+    const savedTeam = loadFromLocalStorage('team');
+    setTeam(savedTeam);
+    const savedCommands = loadFromLocalStorage('commands');
+    setCommands(savedCommands);
+    const savedQuest = loadFromLocalStorage('selectedQuest');
+    setSelectedQuest(savedQuest);
+    const savedMysticCode = loadFromLocalStorage('selectedMysticCode');
+    setSelectedMysticCode(savedMysticCode);
+    const savedServantEffects = loadFromLocalStorage('servantEffects');
+    setServantEffects(savedServantEffects);
+  }, []);
+
+  // Save team data to local storage whenever it changes
+  useEffect(() => {
+    saveToLocalStorage('team', team);
+  }, [team]);
+
+  // Save commands data to local storage whenever it changes
+  useEffect(() => {
+    saveToLocalStorage('commands', commands);
+  }, [commands]);
+
+  // Save selected quest data to local storage whenever it changes
+  useEffect(() => {
+    saveToLocalStorage('selectedQuest', selectedQuest);
+  }, [selectedQuest]);
+
+  // Save selected mystic code data to local storage whenever it changes
+  useEffect(() => {
+    saveToLocalStorage('selectedMysticCode', selectedMysticCode);
+  }, [selectedMysticCode]);
+
+  // Save servant effects data to local storage whenever it changes
+  useEffect(() => {
+    saveToLocalStorage('servantEffects', servantEffects);
+  }, [servantEffects]);
+
   const fetchServants = useCallback(async () => {
     try {
       const response = await axios.get(`/api/servants`);

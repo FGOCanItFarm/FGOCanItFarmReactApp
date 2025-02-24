@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Button, Grid, Typography, Box, Container } from '@mui/material';
 import FilterSection from './FilterSection';
 import ServantSelection from './ServantSelection';
@@ -12,6 +12,48 @@ const TeamSelectionPage = ({ team, setTeam, servants, filteredServants, handleSe
   const handleNext = () => {
     navigate('/quest-selection');
   };
+
+  useEffect(() => {
+    const filterServants = () => {
+      let filtered = servants;
+
+      if (selectedRarity.length > 0) {
+        filtered = filtered.filter(servant => selectedRarity.includes(servant.rarity.toString()));
+      }
+      if (selectedClass.length > 0) {
+        filtered = filtered.filter(servant => selectedClass.includes(servant.className.toLowerCase()));
+      }
+      if (selectedNpType.length > 0) {
+        filtered = filtered.filter(servant =>
+          servant.noblePhantasms &&
+          servant.noblePhantasms.some(np => selectedNpType.includes(np.card.toLowerCase()))
+        );
+      }
+      if (selectedAttackType.length > 0) {
+        filtered = filtered.filter(servant =>
+          servant.noblePhantasms &&
+          servant.noblePhantasms.some(np =>
+            np.effectFlags &&
+            np.effectFlags.some(flag => selectedAttackType.includes(flag))
+          )
+        );
+      }
+      if (searchQuery) {
+        filtered = filtered.filter(servant => servant.name.toLowerCase().includes(searchQuery.toLowerCase()));
+      }
+      if (sortOrder) {
+        filtered = filtered.sort((a, b) => a[sortOrder].localeCompare(b[sortOrder]));
+      }
+
+      // Ensure team members are included in the filtered list
+      const teamMembers = servants.filter(servant => team.includes(servant.collectionNo));
+      filtered = [...new Set([...filtered, ...teamMembers])];
+
+      setFilteredServants(filtered);
+    };
+
+    filterServants();
+  }, [selectedRarity, selectedClass, selectedNpType, selectedAttackType, searchQuery, sortOrder, servants, team]);
 
   return (
     <Container>

@@ -3,7 +3,7 @@ import { Drawer, List, ListItem, ListItemIcon, ListItemText } from '@mui/materia
 import { Home, Group, Assignment } from '@mui/icons-material';
 import { Link } from 'react-router-dom';
 
-const drawerWidth = 160; // Set a fixed width for the drawer
+const drawerWidth = 176; // Set a fixed width for the drawer
 
 const Sidebar = () => {
   return (

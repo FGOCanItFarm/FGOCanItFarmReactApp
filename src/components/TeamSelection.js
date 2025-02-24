@@ -13,130 +13,24 @@ import MysticCodeSelection from './MysticCodeSelection';
 // axios.defaults.baseURL = process.env.REACT_APP_API_URL;
 
 const TeamSelection = () => {
-  const [team, setTeam] = useState(Array(6).fill(''));
-  const [servants, setServants] = useState([]);
-  const [filteredServants, setFilteredServants] = useState([]);
-  const [sortOrder, setSortOrder] = useState('');
-  const [searchQuery, setSearchQuery] = useState('');
-  const [error, setError] = useState(null);
-  const [selectedRarity, setSelectedRarity] = useState([]);
-  const [selectedClass, setSelectedClass] = useState([]);
-  const [selectedNpType, setSelectedNpType] = useState([]);
-  const [selectedAttackType, setSelectedAttackType] = useState([]);
-  const [activeServant, setActiveServant] = useState(null);
-  const [commands, setCommands] = useState([]);
-  const [selectedQuest, setSelectedQuest] = useState(null); // State to hold the selected quest
-  const [selectedMysticCode, setSelectedMysticCode] = useState(null); // State to hold the selected mystic code
-  const [openModal, setOpenModal] = useState(false); // State to control the modal
-  const [servantEffects, setServantEffects] = useState(Array(6).fill({})); // State to hold the custom effects for each servant
+  // const [team, setTeam] = useState(Array(6).fill(''));
+  // const [servants, setServants] = useState([]);
+  // const [filteredServants, setFilteredServants] = useState([]);
+  // const [sortOrder, setSortOrder] = useState('');
+  // const [searchQuery, setSearchQuery] = useState('');
+  // const [error, setError] = useState(null);
+  // const [selectedRarity, setSelectedRarity] = useState([]);
+  // const [selectedClass, setSelectedClass] = useState([]);
+  // const [selectedNpType, setSelectedNpType] = useState([]);
+  // const [selectedAttackType, setSelectedAttackType] = useState([]);
+  // const [activeServant, setActiveServant] = useState(null);
+  // const [commands, setCommands] = useState([]);
+  // const [selectedQuest, setSelectedQuest] = useState(null); // State to hold the selected quest
+  // const [selectedMysticCode, setSelectedMysticCode] = useState(null); // State to hold the selected mystic code
+  // const [openModal, setOpenModal] = useState(false); // State to control the modal
+  // const [servantEffects, setServantEffects] = useState(Array(6).fill({})); // State to hold the custom effects for each servant
 
-  // Function to save data to local storage
-  const saveToLocalStorage = (key, value) => {
-    localStorage.setItem(key, JSON.stringify(value));
-  };
-
-  // Function to load data from local storage
-  const loadFromLocalStorage = (key) => {
-    const savedData = localStorage.getItem(key);
-    return savedData ? JSON.parse(savedData) : [];
-  };
-
-  // Load team, commands, quest, and mystic code data from local storage when the component mounts
-  useEffect(() => {
-    const savedTeam = loadFromLocalStorage('team');
-    setTeam(savedTeam);
-    const savedCommands = loadFromLocalStorage('commands');
-    setCommands(savedCommands);
-    const savedQuest = loadFromLocalStorage('selectedQuest');
-    setSelectedQuest(savedQuest);
-    const savedMysticCode = loadFromLocalStorage('selectedMysticCode');
-    setSelectedMysticCode(savedMysticCode);
-    const savedServantEffects = loadFromLocalStorage('servantEffects');
-    setServantEffects(savedServantEffects);
-  }, []);
-
-  // Save team data to local storage whenever it changes
-  useEffect(() => {
-    saveToLocalStorage('team', team);
-  }, [team]);
-
-  // Save commands data to local storage whenever it changes
-  useEffect(() => {
-    saveToLocalStorage('commands', commands);
-  }, [commands]);
-
-  // Save selected quest data to local storage whenever it changes
-  useEffect(() => {
-    saveToLocalStorage('selectedQuest', selectedQuest);
-  }, [selectedQuest]);
-
-  // Save selected mystic code data to local storage whenever it changes
-  useEffect(() => {
-    saveToLocalStorage('selectedMysticCode', selectedMysticCode);
-  }, [selectedMysticCode]);
-
-  // Save servant effects data to local storage whenever it changes
-  useEffect(() => {
-    saveToLocalStorage('servantEffects', servantEffects);
-  }, [servantEffects]);
-
-  const fetchServants = useCallback(async () => {
-    try {
-      const response = await axios.get(`/api/servants`);
-      setServants(response.data);
-      setFilteredServants(response.data);
-    } catch (error) {
-      console.error('There was an error fetching the servant data!', error);
-      setError('There was an error fetching the servant data.');
-    }
-  }, []);
-
-  useEffect(() => {
-    fetchServants();
-  }, [fetchServants]);
-
-  useEffect(() => {
-    const filterServants = () => {
-      let filtered = servants;
-
-      if (selectedRarity.length > 0) {
-        filtered = filtered.filter(servant => selectedRarity.includes(servant.rarity.toString()));
-      }
-      if (selectedClass.length > 0) {
-        filtered = filtered.filter(servant => selectedClass.includes(servant.className.toLowerCase()));
-      }
-      if (selectedNpType.length > 0) {
-        filtered = filtered.filter(servant =>
-          servant.noblePhantasms &&
-          servant.noblePhantasms.some(np => selectedNpType.includes(np.card.toLowerCase()))
-        );
-      }
-      if (selectedAttackType.length > 0) {
-        filtered = filtered.filter(servant =>
-          servant.noblePhantasms &&
-          servant.noblePhantasms.some(np =>
-            np.effectFlags &&
-            np.effectFlags.some(flag => selectedAttackType.includes(flag))
-          )
-        );
-      }
-      if (searchQuery) {
-        filtered = filtered.filter(servant => servant.name.toLowerCase().includes(searchQuery.toLowerCase()));
-      }
-      if (sortOrder) {
-        filtered = filtered.sort((a, b) => a[sortOrder].localeCompare(b[sortOrder]));
-      }
-
-      // Ensure team members are included in the filtered list
-      const teamMembers = servants.filter(servant => team.includes(servant.collectionNo));
-      filtered = [...new Set([...filtered, ...teamMembers])];
-
-      setFilteredServants(filtered);
-    };
-
-    filterServants();
-  }, [selectedRarity, selectedClass, selectedNpType, selectedAttackType, searchQuery, sortOrder, servants, team]);
-
+  
   const handleTeamServantClick = (servant) => {
     setActiveServant(servant);
   };
@@ -165,24 +59,6 @@ const TeamSelection = () => {
     setCommands([]);
   };
 
-  const handleCheckboxChange = (event, setState, state) => {
-    const value = event.target.value;
-    if (state.includes(value)) {
-      setState(state.filter(item => item !== value));
-    } else {
-      setState([...state, value]);
-    }
-  };
-
-  const capitalize = (str) => {
-    return str.charAt(0).toUpperCase() + str.slice(1);
-  };
-
-  const attackTypeLabels = {
-    attackEnemyOne: 'Single Target',
-    attackEnemyAll: 'AoE',
-    support: 'Support'
-  };
 
   const updateServantEffects = (index, field, value) => {
     const newEffects = [...servantEffects];
@@ -191,33 +67,6 @@ const TeamSelection = () => {
       [field]: value
     };
     setServantEffects(newEffects);
-  };
-
-  const handleSubmit = () => {
-    const teamData = {
-      team: team.map((collectionNo, index) => ({
-        servant_id: collectionNo,
-        append_2: servantEffects[index].append_2 || false,
-        append_5: servantEffects[index].append_5 || false,
-        ...servantEffects[index]
-      })),
-      mc_id: selectedMysticCode,
-      quest_id: selectedQuest?.id,
-      commands
-    };
-    console.log('Submit team', teamData);
-    // Optionally, send the data to an API endpoint
-    // axios.post('/api/submitTeam', teamData)
-    //   .then(response => console.log('Team submitted successfully', response))
-    //   .catch(error => console.error('Error submitting team', error));
-  };
-
-  const handleOpenModal = () => {
-    setOpenModal(true);
-  };
-
-  const handleCloseModal = () => {
-    setOpenModal(false);
   };
 
   return (
