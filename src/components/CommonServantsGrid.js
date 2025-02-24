@@ -32,24 +32,11 @@ const CommonServantsGrid = ({ handleServantClick }) => {
       <Typography variant="h6" style={{ marginBottom: "1rem" }}>Common Servants</Typography>
       <Grid container spacing={2} style={{ flexDirection: 'column' }}>
         {servants.map((servant, index) => (
-          <Grid
-            item
-            key={index}
-            onClick={() => handleServantClick(servant)}
-            style={{
-              width: '100%',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              marginBottom: '1rem'
-            }}
-          >
-            <ServantAvatar
-              servantFace={servant.extraAssets?.faces?.ascension?.['4']}
-              bgType={servant.noblePhantasms?.['0']?.card}
-              tagType={servant.noblePhantasms?.['0']?.effectFlags?.['0']}
-            />
-          </Grid>
+          <ServantAvatar
+            servantFace={servant.extraAssets?.faces?.ascension?.['4']}
+            bgType={servant.noblePhantasms?.['0']?.card}
+            tagType={servant.noblePhantasms?.['0']?.effectFlags?.['0']}
+          />
         ))}
       </Grid>
     </div>
