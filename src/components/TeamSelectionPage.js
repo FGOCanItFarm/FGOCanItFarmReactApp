@@ -61,7 +61,7 @@ const TeamSelectionPage = ({ team, setTeam, servants, filteredServants, setFilte
         <Container>
         <Typography variant="h4">Select Your Team</Typography>
         <div className="filter-common-servants">
-            <div className "filter-common-servants-grid-item">
+            <div className="filter-common-servants-grid-item">
             <FilterSection
             sortOrder={sortOrder}
             setSortOrder={setSortOrder}
