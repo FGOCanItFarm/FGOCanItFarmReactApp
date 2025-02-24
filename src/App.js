@@ -23,6 +23,7 @@ const App = () => {
   const [selectedMysticCode, setSelectedMysticCode] = useState(null);
   const [openModal, setOpenModal] = useState(false);
   const [servantEffects, setServantEffects] = useState(Array(6).fill({}));
+  const [activeServant, setActiveServant] = useState(null);
 
   const fetchServants = useCallback(async () => {
     try {
