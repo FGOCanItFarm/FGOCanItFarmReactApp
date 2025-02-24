@@ -62,6 +62,7 @@ const TeamSelectionPage = ({ team, setTeam, servants, filteredServants, setFilte
       <Typography variant="h4">Select Your Team</Typography>
       <Grid container spacing={2}>
         <div className="filter-common-servants">
+            <div className="filter-common-servants-grid-item">
             <FilterSection
             sortOrder={sortOrder}
             setSortOrder={setSortOrder}
@@ -79,13 +80,19 @@ const TeamSelectionPage = ({ team, setTeam, servants, filteredServants, setFilte
             handleCheckboxChange={handleCheckboxChange}
             attackTypeLabels={attackTypeLabels}
             />
+            </div>
+
+            <div className="filter-common-servants-grid-item">
             <CommonServantsGrid
             handleServantClick={handleServantClick}
             />
+            </div>
+            <div className="filter-common-servants-grid-item">
             <ServantSelection
             servants={filteredServants}
             handleServantClick={handleServantClick}
             />
+            </div>
         </div>
       </Grid>
       <Box mt={2}>
@@ -110,7 +117,10 @@ const TeamSelectionPage = ({ team, setTeam, servants, filteredServants, setFilte
       </Grid>
       <Box mt={2}>
         <Button variant="contained" color="primary" onClick={handleNext}>
-          Next
+          GOTO Quests
+        </Button>
+        <Button variant="contained" color="primary" onClick={handleNext}>
+          GOTO 
         </Button>
       </Box>
     </Container>
