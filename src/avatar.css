@@ -146,7 +146,7 @@ a {
             @include mQ(53rem) {
               border-radius: 1.6rem;
             }
-            z-index:2;
+            z-index:1;
 
           }
         }
@@ -163,6 +163,7 @@ a {
           background: white;
           padding: 0.25rem 0.25rem 0.25rem 0.25rem;
           border-top-right-radius: 1rem;
+          z-index: 1;
           &::before {
             position: absolute;
             content: "";
