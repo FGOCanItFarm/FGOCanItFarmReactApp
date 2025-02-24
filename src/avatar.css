@@ -163,7 +163,7 @@ a {
           background: white;
           padding: 0.25rem 0.25rem 0.25rem 0.25rem;
           border-top-right-radius: 1rem;
-          z-index: 1;
+          z-index: 3;
           &::before {
             position: absolute;
             content: "";
@@ -175,7 +175,7 @@ a {
             border-bottom-right-radius: 2rem;
             box-shadow: 0.313rem 0.313rem 0px 0.313rem var(--clr-white);
             transform: rotate(90deg);
-            z-index: 1;
+            z-index: 2;
           }
           &::after {
             position: absolute;
@@ -188,7 +188,7 @@ a {
             border-bottom-right-radius: 1rem;
             box-shadow: 0.313rem 0.313rem 0px 0.313rem var(--clr-white);
             transform: rotate(90deg);
-            z-index: 1;
+            z-index: 2;
           }
 
           a {
