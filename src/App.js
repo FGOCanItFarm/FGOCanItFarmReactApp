@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import { HashRouter as Router, Route, Routes } from 'react-router-dom';
 import { CssBaseline, Container } from '@mui/material';
 import Sidebar from './components/Sidebar';
 import TeamSelectionPage from './components/TeamSelectionPage';
@@ -24,6 +24,8 @@ const App = () => {
   const [openModal, setOpenModal] = useState(false);
   const [servantEffects, setServantEffects] = useState(Array(6).fill({}));
   const [activeServant, setActiveServant] = useState(null);
+
+  axios.defaults.baseURL = process.env.REACT_APP_API_URL;
 
   const fetchServants = useCallback(async () => {
     try {

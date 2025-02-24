@@ -10,7 +10,7 @@ import QuestSelection from './QuestSelection';
 import MysticCodeSelection from './MysticCodeSelection';
 
 // Set the base URL for axios
-axios.defaults.baseURL = process.env.REACT_APP_API_URL;
+// axios.defaults.baseURL = process.env.REACT_APP_API_URL;
 
 const TeamSelection = () => {
   const [team, setTeam] = useState(Array(6).fill(''));
