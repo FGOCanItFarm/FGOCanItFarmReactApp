@@ -1,16 +1,12 @@
 import React from 'react';
-import { Button, Grid, Typography, Box, Container, Modal, FormControl, InputLabel, Select, MenuItem } from '@mui/material';
+import { Button, Grid, Typography, Box, Container, Modal } from '@mui/material';
 import CommandInputMenu from './CommandInputMenu';
 import TeamSection from './TeamSection';
-import MysticCodeSelection from './MysticCodeSelection';
+import MysticCodeCommand from './MysticCodeCommand';
 import { useNavigate } from 'react-router-dom';
 
 const CommandInputPage = ({ team, setTeam, servants, activeServant, setActiveServant, commands, setCommands, selectedQuest, selectedMysticCode, setSelectedMysticCode, handleSubmit, openModal, handleOpenModal, handleCloseModal, updateServantEffects, handleTeamServantClick }) => {
   const navigate = useNavigate();
-
-  const handleMysticCodeChange = (event) => {
-    setSelectedMysticCode(event.target.value);
-  };
 
   return (
     <Container>
@@ -62,7 +58,7 @@ const CommandInputPage = ({ team, setTeam, servants, activeServant, setActiveSer
             style={{ height: '100%' }}
           />
           <Box mt={4}>
-            <MysticCodeSelection
+            <MysticCodeCommand
               team={team}
               setTeam={setTeam}
               updateCommands={setCommands}

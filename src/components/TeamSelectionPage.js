@@ -4,65 +4,64 @@ import FilterSection from './FilterSection';
 import ServantSelection from './ServantSelection';
 import TeamSection from './TeamSection';
 import CommonServantsGrid from './CommonServantsGrid';
-import MysticCodeSelection from './MysticCodeSelection';
+import SimpleMysticCodeSelection from './SimpleMysticCodeSelection';
 import { useNavigate } from 'react-router-dom';
 import '../TeamSelectionPage.css';
 
 const TeamSelectionPage = ({ team, setTeam, servants, filteredServants, setFilteredServants, handleServantClick, handleTeamServantClick, updateServantEffects, clearTeam, sortOrder, setSortOrder, searchQuery, setSearchQuery, selectedRarity, setSelectedRarity, selectedClass, setSelectedClass, selectedNpType, setSelectedNpType, selectedAttackType, setSelectedAttackType, capitalize, handleCheckboxChange, attackTypeLabels, selectedMysticCode, setSelectedMysticCode }) => {
-  const navigate = useNavigate();
-
-  const handleNext = () => {
-    navigate('/quest-selection');
-  };
-
-  useEffect(() => {
-    const filterServants = () => {
-      let filtered = servants;
-
-      if (selectedRarity.length > 0) {
-        filtered = filtered.filter(servant => selectedRarity.includes(servant.rarity.toString()));
-      }
-      if (selectedClass.length > 0) {
-        filtered = filtered.filter(servant => selectedClass.includes(servant.className.toLowerCase()));
-      }
-      if (selectedNpType.length > 0) {
-        filtered = filtered.filter(servant =>
-          servant.noblePhantasms &&
-          servant.noblePhantasms.some(np => selectedNpType.includes(np.card.toLowerCase()))
-        );
-      }
-      if (selectedAttackType.length > 0) {
-        filtered = filtered.filter(servant =>
-          servant.noblePhantasms &&
-          servant.noblePhantasms.some(np =>
-            np.effectFlags &&
-            np.effectFlags.some(flag => selectedAttackType.includes(flag))
-          )
-        );
-      }
-      if (searchQuery) {
-        filtered = filtered.filter(servant => servant.name.toLowerCase().includes(searchQuery.toLowerCase()));
-      }
-      if (sortOrder) {
-        filtered = filtered.sort((a, b) => a[sortOrder].localeCompare(b[sortOrder]));
-      }
-
-      // Ensure team members are included in the filtered list
-      const teamMembers = servants.filter(servant => team.includes(servant.collectionNo));
-      filtered = [...new Set([...filtered, ...teamMembers])];
-
-      setFilteredServants(filtered);
+    const navigate = useNavigate();
+    
+    const handleNext = () => {
+        navigate('/quest-selection');
     };
-
-    filterServants();
-  }, [selectedRarity, selectedClass, selectedNpType, selectedAttackType, searchQuery, sortOrder, servants, team, setFilteredServants]);
-
-  return (
-    <Container>
-      <Typography variant="h4">Select Your Team</Typography>
-      <Grid container spacing={2}>
+    
+    useEffect(() => {
+        const filterServants = () => {
+            let filtered = servants;
+            
+            if (selectedRarity.length > 0) {
+                filtered = filtered.filter(servant => selectedRarity.includes(servant.rarity.toString()));
+            }
+            if (selectedClass.length > 0) {
+                filtered = filtered.filter(servant => selectedClass.includes(servant.className.toLowerCase()));
+            }
+            if (selectedNpType.length > 0) {
+                filtered = filtered.filter(servant =>
+                    servant.noblePhantasms &&
+                    servant.noblePhantasms.some(np => selectedNpType.includes(np.card.toLowerCase()))
+                );
+            }
+            if (selectedAttackType.length > 0) {
+                filtered = filtered.filter(servant =>
+                    servant.noblePhantasms &&
+                    servant.noblePhantasms.some(np =>
+                        np.effectFlags &&
+                        np.effectFlags.some(flag => selectedAttackType.includes(flag))
+                    )
+                );
+            }
+            if (searchQuery) {
+                filtered = filtered.filter(servant => servant.name.toLowerCase().includes(searchQuery.toLowerCase()));
+            }
+            if (sortOrder) {
+                filtered = filtered.sort((a, b) => a[sortOrder].localeCompare(b[sortOrder]));
+            }
+            
+            // Ensure team members are included in the filtered list
+            const teamMembers = servants.filter(servant => team.includes(servant.collectionNo));
+            filtered = [...new Set([...filtered, ...teamMembers])];
+            
+            setFilteredServants(filtered);
+        };
+        
+        filterServants();
+    }, [selectedRarity, selectedClass, selectedNpType, selectedAttackType, searchQuery, sortOrder, servants, team, setFilteredServants]);
+    
+    return (
+        <Container>
+        <Typography variant="h4">Select Your Team</Typography>
         <div className="filter-common-servants">
-            <div className="filter-common-servants-grid-item">
+            <div className "filter-common-servants-grid-item">
             <FilterSection
             sortOrder={sortOrder}
             setSortOrder={setSortOrder}
@@ -81,8 +80,8 @@ const TeamSelectionPage = ({ team, setTeam, servants, filteredServants, setFilte
             attackTypeLabels={attackTypeLabels}
             />
             </div>
-
-            <div className="filter-common-servants-grid-item">
+        
+            <div classNa-itemme="filter-common-servants-grid-item">
             <CommonServantsGrid
             handleServantClick={handleServantClick}
             />
@@ -94,37 +93,40 @@ const TeamSelectionPage = ({ team, setTeam, servants, filteredServants, setFilte
             />
             </div>
         </div>
-      </Grid>
-      <Box mt={2}>
+        <Box mt={2}>
         <Button variant="contained" color="secondary" onClick={clearTeam}>
-          Clear Team
+        Clear Team
         </Button>
-      </Box>
-      <Grid container spacing={2} mt={2}>
+        </Box>
         <div className="team-mystic-code">
-          <TeamSection
-            team={team}
-            servants={servants}
-            activeServant={null}
-            handleTeamServantClick={handleTeamServantClick}
-            updateServantEffects={updateServantEffects}
-          />
-          <MysticCodeSelection
-            selectedMysticCode={selectedMysticCode}
-            setSelectedMysticCode={setSelectedMysticCode}
-          />
+        <TeamSection
+        team={team}
+        servants={servants}
+        activeServant={null}
+        handleTeamServantClick={handleTeamServantClick}
+        updateServantEffects={updateServantEffects}
+        />
         </div>
-      </Grid>
-      <Box mt={2}>
-        <Button variant="contained" color="primary" onClick={handleNext}>
-          GOTO Quests
+        <div className="mystic-code-selection">
+        <SimpleMysticCodeSelection
+        selectedMysticCode={selectedMysticCode}
+        setSelectedMysticCode={setSelectedMysticCode}
+        />
+        </div>
+        </div>
+        <Box mt={2}>
+        <Button variant="contained" color="primary"GOTO Quests
         </Button>
         <Button variant="contained" color="primary" onClick={handleNext}>
-          GOTO 
+        GOTOlick={handleNext}>
+        GOTO Quests
         </Button>
-      </Box>
-    </Container>
-  );
+        <Button variant="contained" color="primary" onClick={handleNext}>
+        GOTO 
+        </Button>
+        </Box>
+        </Container>
+    );
 };
 
 export default TeamSelectionPage;
