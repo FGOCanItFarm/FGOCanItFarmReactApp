@@ -36,7 +36,7 @@ ul {
   list-style-type: none;
   display: flex;
   align-items: center;
-
+  
   li {
     width: 35px;
     height: 35px;
@@ -46,12 +46,12 @@ ul {
     position: relative;
     transform: translatey(0);
     transition: 0.2s ease-in-out;
-
+    
     &:hover {
       transform: translatey(-0.625rem);
       cursor: pointer;
     }
-
+    
     &::before {
       position: absolute;
       content: "";
@@ -59,7 +59,7 @@ ul {
       height: 100%;
       background: hsl(0deg 0% 6.67% / 20%);
     }
-
+    
     span {
       position: absolute;
       width: 100%;
@@ -74,11 +74,11 @@ ul {
       justify-content: center;
     }
   }
-
+  
   li + li {
     margin-left: -0.625rem;
   }
-
+  
   img {
     width: 100%;
     height: 100%;
@@ -92,133 +92,138 @@ a {
 }
 
 
-  .card {
-    border-radius: 1.2rem;
-    position: relative;
-    height: 6rem;
-    width: 6rem;
 
-    @include mQ(53rem) {
-      border-radius: 1.8rem;
-    }
-
-    p {
-      position: absolute;
-      right: 0;
-      top: -1.25rem;
-
-      a {
-        font-size: 0.9rem;
-        display: inline-block;
-        color: var(--clr-black);
-
-        &:hover {
-          font-weight: 600;
-        }
-      }
-    }
-
-    .card-inner {
-      position: relative;
-      width: 6rem;
-      height: 6rem;
-      border-bottom-right-radius: 0;
-      border-radius: 1rem;
-
-      .box {
-        width: 5rem;
-        height: 5rem;
-        background: transparent;
-        border-radius: 1.2rem;
-        overflow: hidden;
-
-        .imgBox {
-          position: absolute;
-          inset: 0;
-          width: 5rem;
-          height: 5rem;
-          margin: auto auto;
-          img {
-            position: absolute;
-            border-radius: 1rem;
-            width: 5rem;
-            height: 5rem;
-            @include mQ(53rem) {
-              border-radius: 1.6rem;
-            }
-            z-index:1;
-
-          }
-        }
-
-        .tag {
-          position: absolute;
-          bottom: -0.375rem;
-          left: 0;
-          width: 2rem;
-          height: 2rem;
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          background: white;
-          padding: 0.25rem 0.25rem 0.25rem 0.25rem;
-          border-top-right-radius: 1rem;
-          z-index: 3;
-          &::before {
-            position: absolute;
-            content: "";
-            top: -0.888rem;
-            left: 0;
-            background: transparent;
-            width: 1rem;
-            height: 1rem;
-            border-bottom-right-radius: 2rem;
-            box-shadow: 0.313rem 0.313rem 0px 0.313rem var(--clr-white);
-            transform: rotate(90deg);
-            z-index: 2;
-          }
-          &::after {
-            position: absolute;
-            content: "";
-            bottom: 0.375rem;
-            right: -0.888rem;
-            background: transparent;
-            width: 1rem;
-            height: 1rem;
-            border-bottom-right-radius: 1rem;
-            box-shadow: 0.313rem 0.313rem 0px 0.313rem var(--clr-white);
-            transform: rotate(90deg);
-            z-index: 2;
-          }
-
-          a {
-            font-size: 0.8rem;
-            color: var(--clr-black);
-            font-weight: 400;
-            border: 0.125rem solid #c8c8c8;
-            border-radius: 3.125rem;
-            padding: 0.313rem 0.625rem;
-            display: inline-block;
-            cursor: pointer;
-            transition: 0.2s ease-in-out;
-          }
-        }
-
-        .tag .svg {
-          fill: black;
-          color: blue;
-          background-color: green;
-        }
-
-        .tag img {
-          width: 100%;
-          height: 100%;
-          object-fit: cover;
-        }
-
+.TagImage {
+  position: absolute;
+  z-index: 2;
+}
+.card {
+  border-radius: 1.2rem;
+  position: relative;
+  height: 6rem;
+  width: 6rem;
+  
+  @include mQ(53rem) {
+    border-radius: 1.8rem;
+  }
+  
+  p {
+    position: absolute;
+    right: 0;
+    top: -1.25rem;
+    
+    a {
+      font-size: 0.9rem;
+      display: inline-block;
+      color: var(--clr-black);
+      
+      &:hover {
+        font-weight: 600;
       }
     }
   }
+  
+  .card-inner {
+    position: relative;
+    width: 6rem;
+    height: 6rem;
+    border-bottom-right-radius: 0;
+    border-radius: 1rem;
+    
+    .box {
+      width: 5rem;
+      height: 5rem;
+      background: transparent;
+      border-radius: 1.2rem;
+      overflow: hidden;
+      
+      .imgBox {
+        position: absolute;
+        inset: 0;
+        width: 5rem;
+        height: 5rem;
+        margin: auto auto;
+        img {
+          position: absolute;
+          border-radius: 1rem;
+          width: 5rem;
+          height: 5rem;
+          @include mQ(53rem) {
+            border-radius: 1.6rem;
+          }
+          z-index:1;
+          
+        }
+      }
+      
+      .tag {
+        position: absolute;
+        bottom: -0.375rem;
+        left: 0;
+        width: 2rem;
+        height: 2rem;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background: white;
+        padding: 0.25rem 0.25rem 0.25rem 0.25rem;
+        border-top-right-radius: 1rem;
+        z-index: 3;
+        &::before {
+          position: absolute;
+          content: "";
+          top: -0.888rem;
+          left: 0;
+          background: transparent;
+          width: 1rem;
+          height: 1rem;
+          border-bottom-right-radius: 2rem;
+          box-shadow: 0.313rem 0.313rem 0px 0.313rem var(--clr-white);
+          transform: rotate(90deg);
+          z-index: 2;
+        }
+        &::after {
+          position: absolute;
+          content: "";
+          bottom: 0.375rem;
+          right: -0.888rem;
+          background: transparent;
+          width: 1rem;
+          height: 1rem;
+          border-bottom-right-radius: 1rem;
+          box-shadow: 0.313rem 0.313rem 0px 0.313rem var(--clr-white);
+          transform: rotate(90deg);
+          z-index: 2;
+        }
+        
+        a {
+          font-size: 0.8rem;
+          color: var(--clr-black);
+          font-weight: 400;
+          border: 0.125rem solid #c8c8c8;
+          border-radius: 3.125rem;
+          padding: 0.313rem 0.625rem;
+          display: inline-block;
+          cursor: pointer;
+          transition: 0.2s ease-in-out;
+        }
+      }
+      
+      .tag .svg {
+        fill: black;
+        color: blue;
+        background-color: green;
+      }
+      
+      .tag img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+      
+    }
+  }
+}
 .poster {
   position: relative;
   display: inline-flex;

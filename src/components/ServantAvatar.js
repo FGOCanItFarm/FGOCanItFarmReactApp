@@ -57,7 +57,7 @@ const ServantAvatar = ({ bgType, servantFace = "https://static.atlasacademy.io/J
               />
             </div>
             <div className="tag">
-              <TagImage />
+              <TagImage className={"TagImage"} />
             </div>
           </div>
         </div>
