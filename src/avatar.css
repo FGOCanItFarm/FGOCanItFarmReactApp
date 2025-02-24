@@ -95,7 +95,7 @@ a {
 
 .TagImage {
   position: absolute;
-  z-index: 2;
+  z-index: 3;
 }
 .card {
   border-radius: 1.2rem;
