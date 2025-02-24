@@ -1,7 +1,7 @@
 import React from 'react';
 import { Button, Grid, Typography, Box, Container, Modal } from '@mui/material';
 import CommandInputMenu from './CommandInputMenu';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 const CommandInputPage = ({ team, commands, setCommands, selectedQuest, selectedMysticCode, handleSubmit, openModal, handleOpenModal, handleCloseModal }) => {
   return (

@@ -1,13 +1,13 @@
 import React from 'react';
 import { Button, Grid, Typography, Container } from '@mui/material';
 import QuestSelection from './QuestSelection';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 const QuestSelectionPage = ({ selectedQuest, setSelectedQuest }) => {
-  const history = useHistory();
+  const navigate = useNavigate();
 
   const handleNext = () => {
-    history.push('/command-input');
+    navigate('/command-input');
   };
 
   return (

@@ -4,13 +4,13 @@ import FilterSection from './FilterSection';
 import ServantSelection from './ServantSelection';
 import TeamSection from './TeamSection';
 import CommonServantsGrid from './CommonServantsGrid';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 const TeamSelectionPage = ({ team, setTeam, servants, filteredServants, handleServantClick, handleTeamServantClick, updateServantEffects, clearTeam, sortOrder, setSortOrder, searchQuery, setSearchQuery, selectedRarity, setSelectedRarity, selectedClass, setSelectedClass, selectedNpType, setSelectedNpType, selectedAttackType, setSelectedAttackType, capitalize, handleCheckboxChange, attackTypeLabels }) => {
-  const history = useHistory();
+  const navigate = useNavigate();
 
   const handleNext = () => {
-    history.push('/quest-selection');
+    navigate('/quest-selection');
   };
 
   return (
