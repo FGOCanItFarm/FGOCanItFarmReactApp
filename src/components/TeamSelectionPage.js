@@ -106,7 +106,7 @@ const TeamSelectionPage = ({ team, setTeam, servants, filteredServants, setFilte
         handleTeamServantClick={handleTeamServantClick}
         updateServantEffects={updateServantEffects}
         />
-        </div>
+        </Box>
         <div className="mystic-code-selection">
         <SimpleMysticCodeSelection
         selectedMysticCode={selectedMysticCode}
