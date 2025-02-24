@@ -28,7 +28,7 @@ const CommonServantsGrid = ({ handleServantClick }) => {
   }, []);
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', height: '100%', overflowY: 'auto' }}>
+    <div style={{ maxWidth: '14rem', display: 'flex', flexDirection: 'column', alignItems: 'center', height: '100%', overflowY: 'auto' }}>
       <Typography variant="h6" style={{ marginBottom: "1rem" }}>Common Servants</Typography>
       <Grid container spacing={2} style={{ flexDirection: 'column' }}>
         {servants.map((servant, index) => (
