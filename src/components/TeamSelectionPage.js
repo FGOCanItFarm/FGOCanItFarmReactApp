@@ -58,8 +58,8 @@ const TeamSelectionPage = ({ team, setTeam, servants, filteredServants, setFilte
   return (
     <Container>
       <Typography variant="h4">Select Your Team</Typography>
-      <Grid container spacing={2} direction="row">
-        <Grid item xs={12} md={8}>
+      <Grid container spacing={2}>
+        <Grid item xs={12} md={4}>
           <FilterSection
             sortOrder={sortOrder}
             setSortOrder={setSortOrder}
@@ -77,40 +77,38 @@ const TeamSelectionPage = ({ team, setTeam, servants, filteredServants, setFilte
             handleCheckboxChange={handleCheckboxChange}
             attackTypeLabels={attackTypeLabels}
           />
-          <Box>
-            <Button variant="contained" color="secondary" onClick={clearTeam} style={{ marginTop: '20px' }}>
-              Clear Team
-            </Button>
-            <Grid>
-              <TeamSection
-                team={team}
-                servants={servants}
-                activeServant={null}
-                handleTeamServantClick={handleTeamServantClick}
-                updateServantEffects={updateServantEffects}
-              />
-            </Grid>
-          </Box>
         </Grid>
-        <Grid item xs={12} md={4} style={{ display: 'flex', flexDirection: 'row', alignItems: 'flex-start' }}>
-          <Box style={{ width: '30%', marginRight: '1rem' }}>
-            <CommonServantsGrid
-              servants={servants}
-              handleServantClick={handleServantClick}
-              style={{ height: '100%', overflowY: 'auto' }}
-            />
-          </Box>
-          <Box style={{ width: '70%' }}>
-            <ServantSelection
-              servants={filteredServants}
-              handleServantClick={handleServantClick}
-            />
-          </Box>
+        <Grid item xs={12} md={4}>
+          <CommonServantsGrid
+            handleServantClick={handleServantClick}
+          />
+        </Grid>
+        <Grid item xs={12} md={4}>
+          <ServantSelection
+            servants={filteredServants}
+            handleServantClick={handleServantClick}
+          />
         </Grid>
       </Grid>
-      <Button variant="contained" color="primary" onClick={handleNext} style={{ marginTop: '20px' }}>
-        Next
-      </Button>
+      <Box mt={2}>
+        <Button variant="contained" color="secondary" onClick={clearTeam}>
+          Clear Team
+        </Button>
+      </Box>
+      <Box mt={2}>
+        <TeamSection
+          team={team}
+          servants={servants}
+          activeServant={null}
+          handleTeamServantClick={handleTeamServantClick}
+          updateServantEffects={updateServantEffects}
+        />
+      </Box>
+      <Box mt={2}>
+        <Button variant="contained" color="primary" onClick={handleNext}>
+          Next
+        </Button>
+      </Box>
     </Container>
   );
 };
