@@ -210,10 +210,12 @@ const App = () => {
           <Route path="/command-input" element={
             <CommandInputPage
               team={team}
+              setTeam={setTeam} // Pass setTeam as a prop
               commands={commands}
               setCommands={setCommands}
               selectedQuest={selectedQuest}
               selectedMysticCode={selectedMysticCode}
+              setSelectedMysticCode={setSelectedMysticCode} // Pass setSelectedMysticCode as a prop
               handleSubmit={handleSubmit}
               openModal={openModal}
               handleOpenModal={handleOpenModal}

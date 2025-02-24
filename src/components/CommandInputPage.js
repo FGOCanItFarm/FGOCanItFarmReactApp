@@ -5,7 +5,7 @@ import TeamSection from './TeamSection';
 import MysticCodeSelection from './MysticCodeSelection';
 import { useNavigate } from 'react-router-dom';
 
-const CommandInputPage = ({ team, servants, activeServant, setActiveServant, commands, setCommands, selectedQuest, selectedMysticCode, setSelectedMysticCode, handleSubmit, openModal, handleOpenModal, handleCloseModal, updateServantEffects, handleTeamServantClick }) => {
+const CommandInputPage = ({ team, setTeam, servants, activeServant, setActiveServant, commands, setCommands, selectedQuest, selectedMysticCode, setSelectedMysticCode, handleSubmit, openModal, handleOpenModal, handleCloseModal, updateServantEffects, handleTeamServantClick }) => {
   const navigate = useNavigate();
 
   const handleMysticCodeChange = (event) => {
