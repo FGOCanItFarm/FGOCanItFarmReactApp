@@ -6,7 +6,7 @@ const ServantSelection = ({ servants, handleServantClick }) => {
   return (
     <div>
       <Typography variant="h6" style={{ marginBottom: "1rem" }}>Servant Selection</Typography>
-      <Grid container spacing={2} style={{ width: '35rem', height: '50rem', overflowY: 'auto' }}>
+      <Grid container spacing={2} style={{ width: '35rem', height: '35rem', overflowY: 'auto', display: 'flex', flexWrap: 'wrap' }}>
         {servants.map((servant, index) => (
           <Grid
             item

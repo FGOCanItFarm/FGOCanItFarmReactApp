@@ -170,7 +170,7 @@ const App = () => {
     <Router>
       <CssBaseline />
       <Sidebar />
-      <Container style={{ marginLeft: 240, padding: '20px' }}>
+      <Container style={{ marginLeft: 192, padding: '20px' }}>
         <Routes>
           <Route path="/instructions" element={<Instructions />} />
           <Route path="/team-selection" element={

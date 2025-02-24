@@ -13,7 +13,7 @@ const TeamSection = ({ servants, team, activeServant, handleTeamServantClick, up
   return (
     <div>
       <Typography variant="h6" style={{ marginTop: '20px' }}>Team Section</Typography>
-      <Grid container spacing={2} style={{ width: '40rem', height: '25rem', overflowY: 'auto' }}>
+      <Grid container spacing={2} style={{ width: '35rem', height: '30rem', overflowY: 'auto', marginRight: '0.5rem', marginLeft: '0.5rem' }}>
         {Array.from({ length: maxServants }).map((_, index) => {
           const collectionNo = team[index];
           const servant = servants.find(s => s.collectionNo === collectionNo);
