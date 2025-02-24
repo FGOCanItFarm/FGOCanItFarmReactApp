@@ -179,6 +179,7 @@ const App = () => {
               setTeam={setTeam}
               servants={servants}
               filteredServants={filteredServants}
+              setFilteredServants={setFilteredServants}
               handleServantClick={handleServantClick}
               handleTeamServantClick={handleTeamServantClick}
               updateServantEffects={updateServantEffects}
