@@ -4,9 +4,10 @@ import FilterSection from './FilterSection';
 import ServantSelection from './ServantSelection';
 import TeamSection from './TeamSection';
 import CommonServantsGrid from './CommonServantsGrid';
+import MysticCodeSelection from './MysticCodeSelection';
 import { useNavigate } from 'react-router-dom';
 
-const TeamSelectionPage = ({ team, setTeam, servants, filteredServants, setFilteredServants, handleServantClick, handleTeamServantClick, updateServantEffects, clearTeam, sortOrder, setSortOrder, searchQuery, setSearchQuery, selectedRarity, setSelectedRarity, selectedClass, setSelectedClass, selectedNpType, setSelectedNpType, selectedAttackType, setSelectedAttackType, capitalize, handleCheckboxChange, attackTypeLabels }) => {
+const TeamSelectionPage = ({ team, setTeam, servants, filteredServants, setFilteredServants, handleServantClick, handleTeamServantClick, updateServantEffects, clearTeam, sortOrder, setSortOrder, searchQuery, setSearchQuery, selectedRarity, setSelectedRarity, selectedClass, setSelectedClass, selectedNpType, setSelectedNpType, selectedAttackType, setSelectedAttackType, capitalize, handleCheckboxChange, attackTypeLabels, selectedMysticCode, setSelectedMysticCode }) => {
   const navigate = useNavigate();
 
   const handleNext = () => {
@@ -95,15 +96,23 @@ const TeamSelectionPage = ({ team, setTeam, servants, filteredServants, setFilte
           Clear Team
         </Button>
       </Box>
-      <Box mt={2}>
-        <TeamSection
-          team={team}
-          servants={servants}
-          activeServant={null}
-          handleTeamServantClick={handleTeamServantClick}
-          updateServantEffects={updateServantEffects}
-        />
-      </Box>
+      <Grid container spacing={2} mt={2}>
+        <Grid item xs={12} md={8}>
+          <TeamSection
+            team={team}
+            servants={servants}
+            activeServant={null}
+            handleTeamServantClick={handleTeamServantClick}
+            updateServantEffects={updateServantEffects}
+          />
+        </Grid>
+        <Grid item xs={12} md={4}>
+          <MysticCodeSelection
+            selectedMysticCode={selectedMysticCode}
+            setSelectedMysticCode={setSelectedMysticCode}
+          />
+        </Grid>
+      </Grid>
       <Box mt={2}>
         <Button variant="contained" color="primary" onClick={handleNext}>
           Next
