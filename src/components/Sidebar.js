@@ -24,17 +24,17 @@ const Sidebar = () => {
           <ListItemIcon><Home /></ListItemIcon>
           <ListItemText primary="Home" />
         </ListItem>
-        <ListItem button component={Link} to="/teams">
+        <ListItem button component={Link} to="/team-selection">
           <ListItemIcon><Group /></ListItemIcon>
           <ListItemText primary="Teams" />
         </ListItem>
-        <ListItem button component={Link} to="/quests">
+        <ListItem button component={Link} to="/quest-selection">
           <ListItemIcon><Assignment /></ListItemIcon>
           <ListItemText primary="Quests" />
         </ListItem>
-        <ListItem button component={Link} to="/test">
+        <ListItem button component={Link} to="/command-input">
           <ListItemIcon><Assignment /></ListItemIcon>
-          <ListItemText primary="test" />
+          <ListItemText primary="Commands" />
         </ListItem>
       </List>
     </Drawer>
