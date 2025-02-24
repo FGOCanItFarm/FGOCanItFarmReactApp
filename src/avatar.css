@@ -155,7 +155,7 @@ a {
           justify-content: center;
           align-items: center;
           background: white;
-          padding: 0.25rem 0.25rem 0.25rem 0.25rem;
+          padding: 0.125rem 0.125rem 0.125rem 0.125rem;
           border-top-right-radius: 1rem;
           &::before {
             position: absolute;
@@ -166,7 +166,7 @@ a {
             width: 1rem;
             height: 1rem;
             border-bottom-right-radius: 2rem;
-            box-shadow: 0.313rem 0.313rem 0px 0.313rem var(--clr-white);
+            box-shadow: 0.213rem 0.213rem 0px 0.213rem var(--clr-white);
             transform: rotate(90deg);
           }
           &::after {
@@ -178,7 +178,7 @@ a {
             width: 1rem;
             height: 1rem;
             border-bottom-right-radius: 1rem;
-            box-shadow: 0.313rem 0.313rem 0px 0.313rem var(--clr-white);
+            box-shadow: 0.213rem 0.213rem 0px 0.213rem var(--clr-white);
             transform: rotate(90deg);
           }
 
