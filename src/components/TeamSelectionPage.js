@@ -93,14 +93,14 @@ const TeamSelectionPage = ({ team, setTeam, servants, filteredServants, setFilte
           </Box>
         </Grid>
         <Grid item xs={12} md={4} style={{ display: 'flex', flexDirection: 'row', alignItems: 'flex-start' }}>
-          <Box style={{ width: '20%', marginRight: '1rem' }}>
+          <Box style={{ width: '30%', marginRight: '1rem' }}>
             <CommonServantsGrid
               servants={servants}
               handleServantClick={handleServantClick}
               style={{ height: '100%', overflowY: 'auto' }}
             />
           </Box>
-          <Box style={{ width: '80%' }}>
+          <Box style={{ width: '70%' }}>
             <ServantSelection
               servants={filteredServants}
               handleServantClick={handleServantClick}
