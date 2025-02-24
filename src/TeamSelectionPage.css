@@ -1,0 +1,35 @@
+.team-mystic-code {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-top: 2rem;
+}
+
+.filter-common-servants {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.filter-section {
+  flex: 3;
+  margin-right: 1rem;
+}
+
+.common-servants-grid {
+  flex: 1;
+  margin-right: 1rem;
+}
+
+.servant-selection {
+  flex: 3;
+}
+
+.team-section {
+  flex: 2;
+  margin-right: 1rem;
+}
+
+.mystic-code-selection {
+  flex: 1;
+}

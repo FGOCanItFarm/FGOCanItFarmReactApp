@@ -6,6 +6,7 @@ import TeamSection from './TeamSection';
 import CommonServantsGrid from './CommonServantsGrid';
 import MysticCodeSelection from './MysticCodeSelection';
 import { useNavigate } from 'react-router-dom';
+import '../TeamSelectionPage.css';
 
 const TeamSelectionPage = ({ team, setTeam, servants, filteredServants, setFilteredServants, handleServantClick, handleTeamServantClick, updateServantEffects, clearTeam, sortOrder, setSortOrder, searchQuery, setSearchQuery, selectedRarity, setSelectedRarity, selectedClass, setSelectedClass, selectedNpType, setSelectedNpType, selectedAttackType, setSelectedAttackType, capitalize, handleCheckboxChange, attackTypeLabels, selectedMysticCode, setSelectedMysticCode }) => {
   const navigate = useNavigate();
@@ -60,8 +61,8 @@ const TeamSelectionPage = ({ team, setTeam, servants, filteredServants, setFilte
     <Container>
       <Typography variant="h4">Select Your Team</Typography>
       <Grid container spacing={2}>
-        <Grid item xs={12} md={3}>
-          <FilterSection
+        <div className="filter-common-servants">
+            <FilterSection
             sortOrder={sortOrder}
             setSortOrder={setSortOrder}
             searchQuery={searchQuery}
@@ -77,19 +78,15 @@ const TeamSelectionPage = ({ team, setTeam, servants, filteredServants, setFilte
             capitalize={capitalize}
             handleCheckboxChange={handleCheckboxChange}
             attackTypeLabels={attackTypeLabels}
-          />
-        </Grid>
-        <Grid item xs={12} md={1}>
-          <CommonServantsGrid
+            />
+            <CommonServantsGrid
             handleServantClick={handleServantClick}
-          />
-        </Grid>
-        <Grid item xs={12} md={8}>
-          <ServantSelection
+            />
+            <ServantSelection
             servants={filteredServants}
             handleServantClick={handleServantClick}
-          />
-        </Grid>
+            />
+        </div>
       </Grid>
       <Box mt={2}>
         <Button variant="contained" color="secondary" onClick={clearTeam}>
@@ -97,7 +94,7 @@ const TeamSelectionPage = ({ team, setTeam, servants, filteredServants, setFilte
         </Button>
       </Box>
       <Grid container spacing={2} mt={2}>
-        <Grid item xs={12} md={8}>
+        <div className="team-mystic-code">
           <TeamSection
             team={team}
             servants={servants}
@@ -105,13 +102,11 @@ const TeamSelectionPage = ({ team, setTeam, servants, filteredServants, setFilte
             handleTeamServantClick={handleTeamServantClick}
             updateServantEffects={updateServantEffects}
           />
-        </Grid>
-        <Grid item xs={12} md={4}>
           <MysticCodeSelection
             selectedMysticCode={selectedMysticCode}
             setSelectedMysticCode={setSelectedMysticCode}
           />
-        </Grid>
+        </div>
       </Grid>
       <Box mt={2}>
         <Button variant="contained" color="primary" onClick={handleNext}>
