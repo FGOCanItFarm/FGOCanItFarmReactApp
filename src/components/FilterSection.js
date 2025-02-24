@@ -1,9 +1,9 @@
 import React from 'react';
-import { Grid, Typography, FormControl, InputLabel, Select, MenuItem, TextField, Checkbox, FormControlLabel } from '@mui/material';
+import { Grid, Typography, TextField, Checkbox, FormControlLabel } from '@mui/material';
 
 const FilterSection = ({ sortOrder, setSortOrder, searchQuery, setSearchQuery, selectedRarity, setSelectedRarity, selectedClass, setSelectedClass, selectedNpType, setSelectedNpType, selectedAttackType, setSelectedAttackType, capitalize, handleCheckboxChange, attackTypeLabels }) => {
   return (
-    <Grid container spacing={2} style={{ marginBottom: '1rem' }}>
+    <Grid container spacing={2} style={{ marginBottom: '1rem', maxWidth: '32rem' }}>
       <Grid item xs={12} sm={6} md={4}>
         <TextField
           label="Search Servants"
@@ -15,7 +15,7 @@ const FilterSection = ({ sortOrder, setSortOrder, searchQuery, setSearchQuery, s
       </Grid>
       <Grid item xs={12}>
         <Typography variant="h6">Rarity</Typography>
-        <Grid container spacing={1} style={{ width: '20rem'}}>
+        <Grid container spacing={1} style={{ width: '20rem' }}>
           {[5, 4, 3, 2, 1, 0].map(rarity => (
             <Grid item key={rarity}>
               <FormControlLabel
@@ -28,7 +28,7 @@ const FilterSection = ({ sortOrder, setSortOrder, searchQuery, setSearchQuery, s
       </Grid>
       <Grid item xs={12}>
         <Typography variant="h6">Class</Typography>
-        <Grid container spacing={1} style={{ width: '30rem'}} >
+        <Grid container spacing={1} style={{ width: '30rem' }}>
           {['saber', 'archer', 'lancer', 'rider', 'caster', 'assassin', 'berserker', 'shielder', 'ruler', 'avenger', 'alterEgo', 'moonCancer', 'foreigner', 'pretender', 'beast'].map(className => (
             <Grid item key={className}>
               <FormControlLabel

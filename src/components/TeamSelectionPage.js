@@ -92,15 +92,20 @@ const TeamSelectionPage = ({ team, setTeam, servants, filteredServants, setFilte
             </Grid>
           </Box>
         </Grid>
-        <Grid item style={{ backgroundColor: '#ffffff', padding: '1rem' }} md={2} spacing={1}>
-          <ServantSelection
-            servants={filteredServants}
-            handleServantClick={handleServantClick}
-          />
-          <CommonServantsGrid
-            servants={servants}
-            handleServantClick={handleServantClick}
-          />
+        <Grid item xs={12} md={4} style={{ display: 'flex', flexDirection: 'row', alignItems: 'flex-start' }}>
+          <Box style={{ width: '20%', marginRight: '1rem' }}>
+            <CommonServantsGrid
+              servants={servants}
+              handleServantClick={handleServantClick}
+              style={{ height: '100%', overflowY: 'auto' }}
+            />
+          </Box>
+          <Box style={{ width: '80%' }}>
+            <ServantSelection
+              servants={filteredServants}
+              handleServantClick={handleServantClick}
+            />
+          </Box>
         </Grid>
       </Grid>
       <Button variant="contained" color="primary" onClick={handleNext} style={{ marginTop: '20px' }}>
