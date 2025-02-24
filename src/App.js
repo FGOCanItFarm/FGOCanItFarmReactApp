@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import { CssBaseline, Container } from '@mui/material';
 import Sidebar from './components/Sidebar';
 import TeamSelectionPage from './components/TeamSelectionPage';
@@ -118,9 +118,9 @@ const App = () => {
       <CssBaseline />
       <Sidebar />
       <Container style={{ marginLeft: 240, padding: '20px' }}>
-        <Switch>
-          <Route path="/instructions" component={Instructions} />
-          <Route path="/team-selection">
+        <Routes>
+          <Route path="/instructions" element={<Instructions />} />
+          <Route path="/team-selection" element={
             <TeamSelectionPage
               team={team}
               setTeam={setTeam}
@@ -146,14 +146,14 @@ const App = () => {
               handleCheckboxChange={handleCheckboxChange}
               attackTypeLabels={attackTypeLabels}
             />
-          </Route>
-          <Route path="/quest-selection">
+          } />
+          <Route path="/quest-selection" element={
             <QuestSelectionPage
               selectedQuest={selectedQuest}
               setSelectedQuest={setSelectedQuest}
             />
-          </Route>
-          <Route path="/command-input">
+          } />
+          <Route path="/command-input" element={
             <CommandInputPage
               team={team}
               commands={commands}
@@ -165,9 +165,9 @@ const App = () => {
               handleOpenModal={handleOpenModal}
               handleCloseModal={handleCloseModal}
             />
-          </Route>
-          <Route path="/" component={Instructions} />
-        </Switch>
+          } />
+          <Route path="/" element={<Instructions />} />
+        </Routes>
       </Container>
     </Router>
   );
