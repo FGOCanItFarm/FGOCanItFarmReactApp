@@ -3,7 +3,7 @@ import { Grid, Typography, TextField, Box, FormControlLabel, Checkbox, Accordion
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ServantAvatar from './ServantAvatar';
 
-const TeamSection = ({ servants, team, activeServant, handleTeamServantClick, updateServantEffects }) => {
+const TeamSection = ({ team, servants, activeServant, handleTeamServantClick, updateServantEffects, setActiveServant }) => {
   const maxServants = 6;
 
   const handleEffectChange = (index, field, value) => {
@@ -14,9 +14,8 @@ const TeamSection = ({ servants, team, activeServant, handleTeamServantClick, up
     <div>
       <Typography variant="h6" style={{ marginTop: '20px' }}>Team Section</Typography>
       <Grid container spacing={2} style={{ width: '32rem', height: '35rem', overflowY: 'auto', marginRight: '0.5rem', marginLeft: '0.5rem' }}>
-        {Array.from({ length: maxServants }).map((_, index) => {
-          const collectionNo = team[index];
-          const servant = servants.find(s => s.collectionNo === collectionNo);
+        {team.map((servantId, index) => {
+                    const servant = servants.find(s => s.collectionNo === servantId);
 
           const isActive = activeServant?.index === index;
           const borderStyle = isActive ? '2px solid blue' : '1px dashed gray';
@@ -257,7 +256,7 @@ const TeamSection = ({ servants, team, activeServant, handleTeamServantClick, up
             </Grid>
           );
         })}
-      </Grid>
+    </div>
     </div>
   );
 };
