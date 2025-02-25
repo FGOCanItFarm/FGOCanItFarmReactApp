@@ -233,10 +233,10 @@ const CommandInputMenu = ({ activeServant, updateCommands, team }) => {
   };
 
   const renderSpecificButtons = () => {
-    if (!activeServant) return null;
+    if (activeServant === null || activeServant === undefined) return null;
 
-    const servantIndex = activeServant.index;
-    const collectionNo = activeServant.collectionNo;
+    const servantIndex = activeServant;
+    const collectionNo = team[servantIndex]?.collectionNo;
 
     return (
       <Grid container spacing={2}>
@@ -255,7 +255,7 @@ const CommandInputMenu = ({ activeServant, updateCommands, team }) => {
   return (
     <Box mt={4} p={2} border="1px solid gray" bgcolor="#f0f0f0">
       <Typography variant="h6">
-        Menu Options for {activeServant?.name} (Position {activeServant?.index + 1})
+        Menu Options for {team[activeServant]?.name} (Position {activeServant + 1})
       </Typography>
       <Grid className="margin-left-grid" container spacing={2} justifyContent="center">
         {renderSpecificButtons()}
