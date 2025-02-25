@@ -3,6 +3,7 @@ import { Button, Grid, Typography, Box, Container, Modal } from '@mui/material';
 import CommandInputMenu from './CommandInputMenu';
 import TeamSection from './TeamSection';
 import MysticCodeCommand from './MysticCodeCommand';
+import SelectedServantDetails from './SelectedServantDetails';
 import { useNavigate } from 'react-router-dom';
 import '../CommandInputPage.css';
 
@@ -38,7 +39,14 @@ const CommandInputPage = ({ team, servants, setTeam, activeServant, setActiveSer
         </Box>
       </Box>
       <Box className="command-input-menu">
-        <CommandInputMenu updateCommands={setCommands} team={team} activeServant={activeServant} />
+        <Grid container spacing={2}>
+          <Grid item xs={6}>
+            <CommandInputMenu updateCommands={setCommands} team={team} activeServant={activeServant} />
+          </Grid>
+          <Grid item xs={6}>
+            <SelectedServantDetails servant={team[activeServant]} handleEffectChange={updateServantEffects} />
+          </Grid>
+        </Grid>
       </Box>
       <Box mt={4}>
         <Typography variant="h6">Commands</Typography>

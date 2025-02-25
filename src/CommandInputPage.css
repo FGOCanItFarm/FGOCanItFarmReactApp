@@ -1,30 +1,29 @@
 .command-input-container {
   display: flex;
   flex-direction: column;
-  width: 100%;
+  align-items: center;
+  padding: 20px;
 }
 
 .command-input-grid {
   display: flex;
-  flex-direction: row;
+  justify-content: space-between;
+  width: 100%;
+  margin-bottom: 20px;
+}
+
+.team-section, .mystic-code-section {
+  flex: 1;
+  margin: 0 10px;
+}
+
+.command-input-menu {
+  display: flex;
   justify-content: space-between;
   width: 100%;
 }
 
-.team-section {
-  width: 32rem;
-  height: 35rem;
-  overflow-y: auto;
-  margin-right: 1rem;
-  margin-left: 0.5rem;
-  flex: 3;
-}
-
-.mystic-code-section {
+.command-input-menu .MuiGrid-item {
   flex: 1;
-  margin-top: 2rem;
-}
-
-.command-input-menu {
-  margin-top: 2rem;
+  margin: 0 10px;
 }
