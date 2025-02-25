@@ -15,7 +15,7 @@ const TeamSection = ({ team, servants, activeServant, handleTeamServantClick, up
       <Typography variant="h6" style={{ marginTop: '20px' }}>Team Section</Typography>
       <Grid container spacing={2} style={{ width: '32rem', height: '35rem', overflowY: 'auto', marginRight: '0.5rem', marginLeft: '0.5rem' }}>
         {team.map((servantId, index) => {
-                    const servant = servants.find(s => s.collectionNo === servantId);
+          const servant = servants.find(s => s.collectionNo === servantId);
 
           const isActive = activeServant?.index === index;
           const borderStyle = isActive ? '2px solid blue' : '1px dashed gray';
@@ -165,7 +165,7 @@ const TeamSection = ({ team, servants, activeServant, handleTeamServantClick, up
                             label="Quick Damage Up"
                             type="number"
                             title='Acts like Valentines 2025 color boost chocolate or Class Score'
-                            value={servant.artsDamageUp || ''}
+                            value={servant.quickDamageUp || ''}
                             onChange={(e) => handleEffectChange(index, 'quickDamageUp', e.target.value)}
                             fullWidth
                             margin="dense"
@@ -200,7 +200,7 @@ const TeamSection = ({ team, servants, activeServant, handleTeamServantClick, up
                             label="Buster Damage Up"
                             type="number"
                             title='Acts like Valentines 2025 color boost chocolate or Class Score'
-                            value={servant.artsDamageUp || ''}
+                            value={servant.busterDamageUp || ''}
                             onChange={(e) => handleEffectChange(index, 'busterDamageUp', e.target.value)}
                             fullWidth
                             margin="dense"
@@ -256,6 +256,7 @@ const TeamSection = ({ team, servants, activeServant, handleTeamServantClick, up
             </Grid>
           );
         })}
+      </Grid>
     </div>
   );
 };
