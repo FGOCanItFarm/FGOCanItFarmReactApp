@@ -276,15 +276,6 @@ const CommandInputMenu = ({ activeServant, updateCommands, team }) => {
             <Button
               variant="contained"
               color="primary"
-              onClick={() => addCommand('#')}
-            >
-              End Turn
-            </Button>
-          </Grid>
-          <Grid item>
-            <Button
-              variant="contained"
-              color="primary"
               onClick={() => addCommand('4')}
             >
               Use NP (Servant 1)
@@ -307,6 +298,15 @@ const CommandInputMenu = ({ activeServant, updateCommands, team }) => {
             >
               Use NP (Servant 3)
             </Button>
+            <Grid item>
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={() => addCommand('#')}
+            >
+              End Turn
+            </Button>
+            </Grid>
           </Grid>
         </Grid>
       </Box>

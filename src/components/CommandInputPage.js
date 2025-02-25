@@ -16,10 +16,8 @@ const CommandInputPage = ({ team, servants, setTeam, activeServant, setActiveSer
 
   const handleEffectChange = (field, value) => {
     const updatedTeam = [...team];
-    updatedTeam[activeServant] = {
-      ...updatedTeam[activeServant],
-      [field]: value,
-    };
+    const updatedServant = { ...updatedTeam[activeServant], [field]: value };
+    updatedTeam[activeServant] = updatedServant;
     setTeam(updatedTeam);
   };
 

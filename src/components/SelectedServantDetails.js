@@ -35,7 +35,7 @@ const SelectedServantDetails = ({ servant, handleEffectChange }) => {
             label="Attack"
             type="number"
             value={servant.attack || ''}
-            onChange={(e) => handleEffectChange('attack', e.target.value)}
+            onChange={handleChange('attack')}
             fullWidth
             margin="dense"
           />
@@ -45,7 +45,7 @@ const SelectedServantDetails = ({ servant, handleEffectChange }) => {
             label="Atk Up"
             type="number"
             value={servant.atkUp || ''}
-            onChange={(e) => handleEffectChange('atkUp', e.target.value)}
+            onChange={handleChange('atkUp')}
             fullWidth
             margin="dense"
             InputProps={{
@@ -58,7 +58,7 @@ const SelectedServantDetails = ({ servant, handleEffectChange }) => {
             label="Arts Up"
             type="number"
             value={servant.artsUp || ''}
-            onChange={(e) => handleEffectChange('artsUp', e.target.value)}
+            onChange={handleChange('artsUp')}
             fullWidth
             margin="dense"
             InputProps={{
@@ -72,7 +72,7 @@ const SelectedServantDetails = ({ servant, handleEffectChange }) => {
             type="number"
             title='Acts like Valentines 2025 color boost chocolate or Class Score'
             value={servant.artsDamageUp || ''}
-            onChange={(e) => handleEffectChange('artsDamageUp', e.target.value)}
+            onChange={handleChange('artsDamageUp')}
             fullWidth
             margin="dense"
             InputProps={{
@@ -85,7 +85,7 @@ const SelectedServantDetails = ({ servant, handleEffectChange }) => {
             label="Quick Up"
             type="number"
             value={servant.quickUp || ''}
-            onChange={(e) => handleEffectChange('quickUp', e.target.value)}
+            onChange={handleChange('quickUp')}
             fullWidth
             margin="dense"
             InputProps={{
@@ -99,7 +99,7 @@ const SelectedServantDetails = ({ servant, handleEffectChange }) => {
             type="number"
             title='Acts like Valentines 2025 color boost chocolate or Class Score'
             value={servant.quickDamageUp || ''}
-            onChange={(e) => handleEffectChange('quickDamageUp', e.target.value)}
+            onChange={handleChange('quickDamageUp')}
             fullWidth
             margin="dense"
             InputProps={{
@@ -112,7 +112,7 @@ const SelectedServantDetails = ({ servant, handleEffectChange }) => {
             label="Buster Up"
             type="number"
             value={servant.busterUp || ''}
-            onChange={(e) => handleEffectChange('busterUp', e.target.value)}
+            onChange={handleChange('busterUp')}
             fullWidth
             margin="dense"
             InputProps={{
@@ -126,7 +126,7 @@ const SelectedServantDetails = ({ servant, handleEffectChange }) => {
             type="number"
             title='Acts like Valentines 2025 color boost chocolate or Class Score'
             value={servant.busterDamageUp || ''}
-            onChange={(e) => handleEffectChange('busterDamageUp', e.target.value)}
+            onChange={handleChange('busterDamageUp')}
             fullWidth
             margin="dense"
             InputProps={{
@@ -139,7 +139,7 @@ const SelectedServantDetails = ({ servant, handleEffectChange }) => {
             label="NP Up"
             type="number"
             value={servant.npUp || ''}
-            onChange={(e) => handleEffectChange('npUp', e.target.value)}
+            onChange={handleChange('npUp')}
             fullWidth
             margin="dense"
             InputProps={{
@@ -152,7 +152,7 @@ const SelectedServantDetails = ({ servant, handleEffectChange }) => {
             label="Initial Charge"
             type="number"
             value={servant.initialCharge || ''}
-            onChange={(e) => handleEffectChange('initialCharge', e.target.value)}
+            onChange={handleChange('initialCharge')}
             fullWidth
             margin="dense"
             InputProps={{
