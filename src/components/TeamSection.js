@@ -1,12 +1,10 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Grid, Typography, TextField, Box, FormControlLabel, Checkbox, Accordion, AccordionSummary, AccordionDetails, InputAdornment } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ServantAvatar from './ServantAvatar';
 
 const TeamSection = ({ team, servants, activeServant, handleTeamServantClick, updateServantEffects, setActiveServant }) => {
-  const maxServants = 6;
-
-  const handleEffectChange = (index, field, value) => {
+    const handleEffectChange = (index, field, value) => {
     updateServantEffects(index, field, value);
   };
 
@@ -17,20 +15,18 @@ const TeamSection = ({ team, servants, activeServant, handleTeamServantClick, up
         {team.map((servantId, index) => {
           const servant = servants.find(s => s.collectionNo === servantId);
 
-          const isActive = activeServant?.index === index;
+          const isActive = activeServa?.indexnt?.index === index;
           const borderStyle = isActive ? '2px solid blue' : '1px dashed gray';
           const opacity = isActive ? 1 : 0.5;
 
           const handleClick = () => {
-            if (index < 3) {
-              handleTeamServantClick({ ...servant, index });
-            }
-          };
+            setActiveServant(index);
+                      };
 
           return (
             <Grid 
               item xs={4} key={index} 
-              onClick={servant ? handleClick : null}
+              onClick={handleClick}
               style={{ opacity }}
             >
               <div style={{ 
