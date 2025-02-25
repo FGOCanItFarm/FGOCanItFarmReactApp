@@ -5,7 +5,7 @@ import ServantAvatar from './ServantAvatar';
 
 const supportsList = [316, 284, 314, 357, 215];
 
-const CommonServantsGrid = ({ handleServantClick }) => {
+const CommonServantsGrid = ({ handleServantClick, team }) => {
   const [servants, setServants] = useState([]);
 
   useEffect(() => {
@@ -28,15 +28,23 @@ const CommonServantsGrid = ({ handleServantClick }) => {
   }, []);
 
   return (
-    <div style={{ maxWidth: '14rem', display: 'flex', flexDirection: 'column', alignItems: 'center', height: '100%', overflowY: 'auto' }}>
+    <div style={{ maxWidth: '16rem', display: 'flex', flexDirection: 'column', alignItems: 'center', height: '100%', overflowY: 'auto' }}>
       <Typography variant="h6" style={{ marginBottom: "1rem" }}>Common Servants</Typography>
       <Grid container spacing={2} style={{ flexDirection: 'column' }}>
         {servants.map((servant, index) => (
-          <ServantAvatar
-            servantFace={servant.extraAssets?.faces?.ascension?.['4']}
-            bgType={servant.noblePhantasms?.['0']?.card}
-            tagType={servant.noblePhantasms?.['0']?.effectFlags?.['0']}
-          />
+          <Grid
+            item
+            key={index}
+            xs={12}
+            onClick={() => handleServantClick(servant)}
+            style={{ cursor: 'pointer' }}
+          >
+            <ServantAvatar
+              servantFace={servant.extraAssets?.faces?.ascension?.['4']}
+              bgType={servant.noblePhantasms?.['0']?.card}
+              tagType={servant.noblePhantasms?.['0']?.effectFlags?.['0']}
+            />
+          </Grid>
         ))}
       </Grid>
     </div>
