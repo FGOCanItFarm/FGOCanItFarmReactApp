@@ -2,21 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { Typography, Box, Button, TextField, CircularProgress } from '@mui/material';
 import axios from 'axios';
 
-interface SearchPageProps {
-  team: string[];
-  selectedQuest: { id: string } | null;
-}
-
-interface SearchResult {
-  questId: string;
-  success: boolean;
-  details: string;
-}
-
-const SearchPage: React.FC<SearchPageProps> = ({ team, selectedQuest }) => {
+const SearchPage = ({ team, selectedQuest }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(false);
-  const [results, setResults] = useState<SearchResult[]>([]);
+  const [results, setResults] = useState([]);
   const [error, setError] = useState('');
 
   useEffect(() => {
