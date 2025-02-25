@@ -22,7 +22,11 @@
   flex: 3;
   margin-right: 1rem;
 }
-
+.team-selection-buttons {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
 .common-servants-grid {
   min-width: 18rem;
   flex: 1;

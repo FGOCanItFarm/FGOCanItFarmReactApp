@@ -1,43 +1,39 @@
 import React from 'react';
-import { Drawer, List, ListItem, ListItemIcon, ListItemText } from '@mui/material';
-import { Home, Group, Assignment } from '@mui/icons-material';
 import { Link } from 'react-router-dom';
+import { List, ListItem, ListItemText, ListItemIcon } from '@mui/material';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import ErrorIcon from '@mui/icons-material/Error';
 
-const drawerWidth = 176; // Set a fixed width for the drawer
+const Sidebar = ({ team, selectedQuest }) => {
+  const isTeamValid = team.filter(member => member).length >= 3;
+  const isQuestSelected = !!selectedQuest;
 
-const Sidebar = () => {
   return (
-    <Drawer
-      variant="permanent"
-      anchor="left"
-      sx={{
-        width: drawerWidth,
-        flexShrink: 0,
-        '& .MuiDrawer-paper': {
-          width: drawerWidth,
-          boxSizing: 'border-box',
-        },
-      }}
-    >
-      <List sx={{ display: 'flex', flexDirection: 'column' }}>
-        <ListItem button component={Link} to="/">
-          <ListItemIcon><Home /></ListItemIcon>
-          <ListItemText primary="Home" />
+    <div style={{ width: 192, position: 'fixed', top: 0, left: 0, height: '100%', backgroundColor: '#f5f5f5' }}>
+      <List>
+        <ListItem button component={Link} to="/instructions">
+          <ListItemText primary="Instructions" />
         </ListItem>
         <ListItem button component={Link} to="/team-selection">
-          <ListItemIcon><Group /></ListItemIcon>
-          <ListItemText primary="Teams" />
+          <ListItemText primary="Team Selection" />
+          <ListItemIcon>
+            {isTeamValid ? <CheckCircleIcon style={{ color: 'green' }} /> : <ErrorIcon style={{ color: 'red' }} />}
+          </ListItemIcon>
         </ListItem>
         <ListItem button component={Link} to="/quest-selection">
-          <ListItemIcon><Assignment /></ListItemIcon>
-          <ListItemText primary="Quests" />
+          <ListItemText primary="Quest Selection" />
+          <ListItemIcon>
+            {isQuestSelected ? <CheckCircleIcon style={{ color: 'green' }} /> : <ErrorIcon style={{ color: 'red' }} />}
+          </ListItemIcon>
         </ListItem>
         <ListItem button component={Link} to="/command-input">
-          <ListItemIcon><Assignment /></ListItemIcon>
-          <ListItemText primary="Commands" />
+          <ListItemText primary="Command Input" />
+        </ListItem>
+        <ListItem button component={Link} to="/search">
+          <ListItemText primary="Search" />
         </ListItem>
       </List>
-    </Drawer>
+    </div>
   );
 };
 

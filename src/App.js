@@ -1,11 +1,12 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { HashRouter as Router, Route, Routes } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import { CssBaseline, Container } from '@mui/material';
 import Sidebar from './components/Sidebar';
 import TeamSelectionPage from './components/TeamSelectionPage';
 import QuestSelectionPage from './components/QuestSelectionPage';
 import CommandInputPage from './components/CommandInputPage';
 import Instructions from './components/Instructions';
+import SearchPage from './components/SearchPage';
 import axios from 'axios';
 
 const App = () => {
@@ -156,6 +157,7 @@ const App = () => {
       commands
     };
     console.log('Submit team', teamData);
+    setOpenModal(false);
   };
 
   const handleOpenModal = () => {
@@ -169,7 +171,7 @@ const App = () => {
   return (
     <Router>
       <CssBaseline />
-      <Sidebar />
+      <Sidebar team={team} selectedQuest={selectedQuest} />
       <Container style={{ marginLeft: 192, padding: '20px' }}>
         <Routes>
           <Route path="/instructions" element={<Instructions />} />
@@ -199,6 +201,8 @@ const App = () => {
               capitalize={capitalize}
               handleCheckboxChange={handleCheckboxChange}
               attackTypeLabels={attackTypeLabels}
+              selectedMysticCode={selectedMysticCode}
+              setSelectedMysticCode={setSelectedMysticCode}
             />
           } />
           <Route path="/quest-selection" element={
@@ -220,6 +224,12 @@ const App = () => {
               openModal={openModal}
               handleOpenModal={handleOpenModal}
               handleCloseModal={handleCloseModal}
+            />
+          } />
+          <Route path="/search" element={
+            <SearchPage
+              team={team} // Pass the team state to the SearchPage
+              selectedQuest={selectedQuest} // Pass the selectedQuest state to the SearchPage
             />
           } />
           <Route path="/" element={<Instructions />} />
