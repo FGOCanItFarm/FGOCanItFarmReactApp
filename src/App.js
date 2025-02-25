@@ -108,8 +108,8 @@ const App = () => {
     }
   };
 
-  const handleTeamServantClick = (servant) => {
-    setActiveServant(servant);
+  const handleTeamServantClick = (index) => {
+    setActiveServant(index);
   };
 
   const clearTeam = () => {
@@ -215,22 +215,26 @@ const App = () => {
             <CommandInputPage
               team={team}
               servants={servants}
-              setTeam={setTeam} // Pass setTeam as a prop
+              setTeam={setTeam}
+              activeServant={activeServant}
+              setActiveServant={setActiveServant}
               commands={commands}
               setCommands={setCommands}
               selectedQuest={selectedQuest}
               selectedMysticCode={selectedMysticCode}
-              setSelectedMysticCode={setSelectedMysticCode} // Pass setSelectedMysticCode as a prop
+              setSelectedMysticCode={setSelectedMysticCode}
               handleSubmit={handleSubmit}
               openModal={openModal}
               handleOpenModal={handleOpenModal}
               handleCloseModal={handleCloseModal}
+              updateServantEffects={updateServantEffects}
+              handleTeamServantClick={handleTeamServantClick}
             />
           } />
           <Route path="/search" element={
             <SearchPage
-              team={team} // Pass the team state to the SearchPage
-              selectedQuest={selectedQuest} // Pass the selectedQuest state to the SearchPage
+              team={team}
+              selectedQuest={selectedQuest}
             />
           } />
           <Route path="/" element={<Instructions />} />

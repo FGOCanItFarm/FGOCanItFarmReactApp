@@ -54,7 +54,6 @@ const CommandInputPage = ({ team, servants, setTeam, activeServant, setActiveSer
             activeServant={activeServant}
             handleTeamServantClick={handleTeamServantClick}
             updateServantEffects={updateServantEffects}
-            setActiveServant={setActiveServant}
             style={{ height: '100%' }}
           />
           <Box mt={4}>

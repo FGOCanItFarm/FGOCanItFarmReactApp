@@ -20,7 +20,9 @@ const TeamSection = ({ team, servants, activeServant, handleTeamServantClick, up
           const opacity = isActive ? 1 : 0.5;
 
           const handleClick = () => {
-            handleTeamServantClick(index);
+            if (index < 3) { // Only top row servants can be activated
+              handleTeamServantClick(index);
+            }
           };
 
           return (
