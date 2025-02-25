@@ -61,7 +61,10 @@
   flex-wrap: wrap;
   gap: 0.5rem;
 }
-
+.skill-container {
+  display: flex;
+  justify-content: space-between;
+}
 
 .skill-buttons .servant-1 {
   color: white;

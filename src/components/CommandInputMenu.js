@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Box, Button, Typography, Grid } from '@mui/material';
-import '../buttons.css';
+import SelectedServantDetails from './SelectedServantDetails';
+import '../CommandInputMenu.css';
 
 const generateSkillCommand = (servantIndex, skillIndex, targetIndex = null) => {
   const skillLabels = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i'];
@@ -48,7 +49,7 @@ const renderSkillButtons = (servantIndex, skillIndex, addCommand, team) => (
       <Button
         className={`servant-${servantIndex + 1}`}
         onClick={() => addCommand(generateSkillCommand(servantIndex, skillIndex, 0))}
-        title={`On Servant 1 (${team[0]?.collectionNo || 'Empty'})`}
+        title={`On Servant 1 (${team[0]?.name || 'Empty'})`}
         style={{ border: '1px solid lightgray' }}
       >
         S1
@@ -56,7 +57,7 @@ const renderSkillButtons = (servantIndex, skillIndex, addCommand, team) => (
       <Button
         className={`servant-${servantIndex + 1}`}
         onClick={() => addCommand(generateSkillCommand(servantIndex, skillIndex, 1))}
-        title={`On Servant 2 (${team[1]?.collectionNo || 'Empty'})`}
+        title={`On Servant 2 (${team[1]?.name || 'Empty'})`}
         style={{ border: '1px solid lightgray' }}
       >
         S2
@@ -64,7 +65,7 @@ const renderSkillButtons = (servantIndex, skillIndex, addCommand, team) => (
       <Button
         className={`servant-${servantIndex + 1}`}
         onClick={() => addCommand(generateSkillCommand(servantIndex, skillIndex, 2))}
-        title={`On Servant 3 (${team[2]?.collectionNo || 'Empty'})`}
+        title={`On Servant 3 (${team[2]?.name || 'Empty'})`}
         style={{ border: '1px solid lightgray' }}
       >
         S3
@@ -87,7 +88,7 @@ const renderChoiceButtons = (servantIndex, skillIndex, addCommand, team) => (
       <Button
         className={`servant-${servantIndex + 1}`}
         onClick={() => addCommand(generateChoiceCommand(servantIndex, skillIndex, 12))}
-        title={`Choice 1 | 2 On Servant 1 (${team[0]?.collectionNo || 'Empty'})`}
+        title={`Choice 1 | 2 On Servant 1 (${team[0]?.name || 'Empty'})`}
         style={{ border: '1px solid lightgray' }}
       >
         C1|2 S1
@@ -95,7 +96,7 @@ const renderChoiceButtons = (servantIndex, skillIndex, addCommand, team) => (
       <Button
         className={`servant-${servantIndex + 1}`}
         onClick={() => addCommand(generateChoiceCommand(servantIndex, skillIndex, 22))}
-        title={`Choice 2 | 2 On Servant 2 (${team[1]?.collectionNo || 'Empty'})`}
+        title={`Choice 2 | 2 On Servant 2 (${team[1]?.name || 'Empty'})`}
         style={{ border: '1px solid lightgray' }}
       >
         C2|2 S2
@@ -103,7 +104,7 @@ const renderChoiceButtons = (servantIndex, skillIndex, addCommand, team) => (
       <Button
         className={`servant-${servantIndex + 1}`}
         onClick={() => addCommand(generateChoiceCommand(servantIndex, skillIndex, 13))}
-        title={`Choice 1 | 3 On Servant 1 (${team[0]?.collectionNo || 'Empty'})`}
+        title={`Choice 1 | 3 On Servant 1 (${team[0]?.name || 'Empty'})`}
         style={{ border: '1px solid lightgray' }}
       >
         C1|3 S1
@@ -111,7 +112,7 @@ const renderChoiceButtons = (servantIndex, skillIndex, addCommand, team) => (
       <Button
         className={`servant-${servantIndex + 1}`}
         onClick={() => addCommand(generateChoiceCommand(servantIndex, skillIndex, 23))}
-        title={`Choice 2 | 3 On Servant 2 (${team[1]?.collectionNo || 'Empty'})`}
+        title={`Choice 2 | 3 On Servant 2 (${team[1]?.name || 'Empty'})`}
         style={{ border: '1px solid lightgray' }}
       >
         C2|3 S2
@@ -119,7 +120,7 @@ const renderChoiceButtons = (servantIndex, skillIndex, addCommand, team) => (
       <Button
         className={`servant-${servantIndex + 1}`}
         onClick={() => addCommand(generateChoiceCommand(servantIndex, skillIndex, 33))}
-        title={`Choice 3 | 3 On Servant 3 (${team[2]?.collectionNo || 'Empty'})`}
+        title={`Choice 3 | 3 On Servant 3 (${team[2]?.name || 'Empty'})`}
         style={{ border: '1px solid lightgray' }}
       >
         C3|3 S3
@@ -134,7 +135,7 @@ const render2ChoiceTargetButtons = (servantIndex, skillIndex, addCommand, team) 
       <Button
         className={`servant-${servantIndex + 1}`}
         onClick={() => addCommand(generateChoiceTargetCommand(servantIndex, skillIndex, 12, 1))}
-        title={`Choice 1 | 2 On Servant 1 (${team[0]?.collectionNo || 'Empty'})`}
+        title={`Choice 1 | 2 On Servant 1 (${team[0]?.name || 'Empty'})`}
         style={{ border: '1px solid lightgray' }}
       >
         C1|2 S1
@@ -142,7 +143,7 @@ const render2ChoiceTargetButtons = (servantIndex, skillIndex, addCommand, team) 
       <Button
         className={`servant-${servantIndex + 1}`}
         onClick={() => addCommand(generateChoiceTargetCommand(servantIndex, skillIndex, 12, 2))}
-        title={`Choice 1 | 2 On Servant 2 (${team[1]?.collectionNo || 'Empty'})`}
+        title={`Choice 1 | 2 On Servant 2 (${team[1]?.name || 'Empty'})`}
         style={{ border: '1px solid lightgray' }}
       >
         C1|2 S2
@@ -150,7 +151,7 @@ const render2ChoiceTargetButtons = (servantIndex, skillIndex, addCommand, team) 
       <Button
         className={`servant-${servantIndex + 1}`}
         onClick={() => addCommand(generateChoiceTargetCommand(servantIndex, skillIndex, 12, 3))}
-        title={`Choice 1 | 2 On Servant 3 (${team[2]?.collectionNo || 'Empty'})`}
+        title={`Choice 1 | 2 On Servant 3 (${team[2]?.name || 'Empty'})`}
         style={{ border: '1px solid lightgray' }}
       >
         C1|2 S3
@@ -158,7 +159,7 @@ const render2ChoiceTargetButtons = (servantIndex, skillIndex, addCommand, team) 
       <Button
         className={`servant-${servantIndex + 1}`}
         onClick={() => addCommand(generateChoiceTargetCommand(servantIndex, skillIndex, 22, 1))}
-        title={`Choice 2 | 2 On Servant 1 (${team[0]?.collectionNo || 'Empty'})`}
+        title={`Choice 2 | 2 On Servant 1 (${team[0]?.name || 'Empty'})`}
         style={{ border: '1px solid lightgray' }}
       >
         C2|2 S1
@@ -166,7 +167,7 @@ const render2ChoiceTargetButtons = (servantIndex, skillIndex, addCommand, team) 
       <Button
         className={`servant-${servantIndex + 1}`}
         onClick={() => addCommand(generateChoiceTargetCommand(servantIndex, skillIndex, 22, 2))}
-        title={`Choice 2 | 2 On Servant 2 (${team[1]?.collectionNo || 'Empty'})`}
+        title={`Choice 2 | 2 On Servant 2 (${team[1]?.name || 'Empty'})`}
         style={{ border: '1px solid lightgray' }}
       >
         C2|2 S2
@@ -174,7 +175,7 @@ const render2ChoiceTargetButtons = (servantIndex, skillIndex, addCommand, team) 
       <Button
         className={`servant-${servantIndex + 1}`}
         onClick={() => addCommand(generateChoiceTargetCommand(servantIndex, skillIndex, 22, 3))}
-        title={`Choice 2 | 2 On Servant 3 (${team[2]?.collectionNo || 'Empty'})`}
+        title={`Choice 2 | 2 On Servant 3 (${team[2]?.name || 'Empty'})`}
         style={{ border: '1px solid lightgray' }}
       >
         C2|2 S3
@@ -223,9 +224,17 @@ const renderButtonsForServant = (servantIndex, skillIndex, collectionNo, addComm
 };
 
 const CommandInputMenu = ({ activeServant, updateCommands, team }) => {
+  const [selectedServant, setSelectedServant] = useState(null);
 
   const addCommand = (command) => {
     updateCommands((prevCommands) => [...prevCommands, command]);
+  };
+
+  const handleEffectChange = (field, value) => {
+    setSelectedServant((prevServant) => ({
+      ...prevServant,
+      [field]: value,
+    }));
   };
 
   const renderSpecificButtons = () => {
@@ -236,14 +245,18 @@ const CommandInputMenu = ({ activeServant, updateCommands, team }) => {
 
     return (
       <Grid container spacing={2} direction="column">
-        {[1, 2, 3].map((skillIndex) => (
-          <Grid item key={`skill-${skillIndex}`}>
-            <Typography className="skill-text"> {`Skill ${skillIndex}`}</Typography>
-            <Box>
-              {renderButtonsForServant(servantIndex, skillIndex, collectionNo, addCommand, team)}
-            </Box>
-          </Grid>
-        ))}
+        <Grid item>
+          <Box className="skill-container">
+            {[1, 2, 3].map((skillIndex) => (
+              <Box key={`skill-${skillIndex}`}>
+                <Typography className="skill-text"> {`Skill ${skillIndex}`}</Typography>
+                <Box>
+                  {renderButtonsForServant(servantIndex, skillIndex, collectionNo, addCommand, team)}
+                </Box>
+              </Box>
+            ))}
+          </Box>
+        </Grid>
       </Grid>
     );
   };
