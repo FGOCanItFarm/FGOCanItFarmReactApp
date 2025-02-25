@@ -257,7 +257,6 @@ const TeamSection = ({ team, servants, activeServant, handleTeamServantClick, up
           );
         })}
     </div>
-    </div>
   );
 };
 
