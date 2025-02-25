@@ -158,10 +158,6 @@ const render2ChoiceTargetButtons = (servantIndex, skillIndex, addCommand, team) 
       <Button
         className={`servant-${servantIndex + 1}`}
         onClick={() => addCommand(generateChoiceTargetCommand(servantIndex, skillIndex, 22, 1))}
-      </Button>
-      <Button>
-        className={`servant-${servantIndex + 1}`}
-        onClick={() => addCommand(generateChoiceTargetCommand(servantIndex, skillIndex, 22, 1))}
         title={`Choice 2 | 2 On Servant 1 (${team[0]?.collectionNo || 'Empty'})`}
         style={{ border: '1px solid lightgray' }}
       >
