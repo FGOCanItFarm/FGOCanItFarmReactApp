@@ -15,7 +15,7 @@ const TeamSection = ({ team, servants, activeServant, handleTeamServantClick, up
         {team.map((servantId, index) => {
           const servant = servants.find(s => s.collectionNo === servantId);
 
-          const isActive = activeServant === index;
+          const isActive = activeServant !== null && activeServant !== undefined && activeServant === index;
           const borderStyle = isActive ? '2px solid blue' : '1px dashed gray';
           const opacity = isActive ? 1 : 0.5;
 
