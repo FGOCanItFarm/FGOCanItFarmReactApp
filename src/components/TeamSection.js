@@ -83,10 +83,6 @@ const TeamSection = ({ team, servants, activeServant, handleTeamServantClick, up
                             onChange={(e) => handleEffectChange(index, 'attack', e.target.value)}
                             fullWidth
                             margin="dense"
-                            inputProps={{
-                              style: { padding: '4px' },
-                              autoComplete: 'off'
-                            }}
                           />
                         </Grid>
                         <Grid item xs={6}>
@@ -97,10 +93,6 @@ const TeamSection = ({ team, servants, activeServant, handleTeamServantClick, up
                             onChange={(e) => handleEffectChange(index, 'atkUp', e.target.value)}
                             fullWidth
                             margin="dense"
-                            inputProps={{
-                              style: { padding: '4px' },
-                              autoComplete: 'off'
-                            }}
                             InputProps={{
                               endAdornment: <InputAdornment position="end">%</InputAdornment>
                             }}
@@ -114,10 +106,6 @@ const TeamSection = ({ team, servants, activeServant, handleTeamServantClick, up
                             onChange={(e) => handleEffectChange(index, 'artsUp', e.target.value)}
                             fullWidth
                             margin="dense"
-                            inputProps={{
-                              style: { padding: '4px' },
-                              autoComplete: 'off'
-                            }}
                             InputProps={{
                               endAdornment: <InputAdornment position="end">%</InputAdornment>
                             }}
@@ -132,10 +120,6 @@ const TeamSection = ({ team, servants, activeServant, handleTeamServantClick, up
                             onChange={(e) => handleEffectChange(index, 'artsDamageUp', e.target.value)}
                             fullWidth
                             margin="dense"
-                            inputProps={{
-                              style: { padding: '4px' },
-                              autoComplete: 'off'
-                            }}
                             InputProps={{
                               endAdornment: <InputAdornment position="end">%</InputAdornment>
                             }}
@@ -149,10 +133,6 @@ const TeamSection = ({ team, servants, activeServant, handleTeamServantClick, up
                             onChange={(e) => handleEffectChange(index, 'quickUp', e.target.value)}
                             fullWidth
                             margin="dense"
-                            inputProps={{
-                              style: { padding: '4px' },
-                              autoComplete: 'off'
-                            }}
                             InputProps={{
                               endAdornment: <InputAdornment position="end">%</InputAdornment>
                             }}
@@ -167,10 +147,6 @@ const TeamSection = ({ team, servants, activeServant, handleTeamServantClick, up
                             onChange={(e) => handleEffectChange(index, 'quickDamageUp', e.target.value)}
                             fullWidth
                             margin="dense"
-                            inputProps={{
-                              style: { padding: '4px' },
-                              autoComplete: 'off'
-                            }}
                             InputProps={{
                               endAdornment: <InputAdornment position="end">%</InputAdornment>
                             }}
@@ -184,10 +160,6 @@ const TeamSection = ({ team, servants, activeServant, handleTeamServantClick, up
                             onChange={(e) => handleEffectChange(index, 'busterUp', e.target.value)}
                             fullWidth
                             margin="dense"
-                            inputProps={{
-                              style: { padding: '4px' },
-                              autoComplete: 'off'
-                            }}
                             InputProps={{
                               endAdornment: <InputAdornment position="end">%</InputAdornment>
                             }}
@@ -202,10 +174,6 @@ const TeamSection = ({ team, servants, activeServant, handleTeamServantClick, up
                             onChange={(e) => handleEffectChange(index, 'busterDamageUp', e.target.value)}
                             fullWidth
                             margin="dense"
-                            inputProps={{
-                              style: { padding: '4px' },
-                              autoComplete: 'off'
-                            }}
                             InputProps={{
                               endAdornment: <InputAdornment position="end">%</InputAdornment>
                             }}
@@ -219,10 +187,6 @@ const TeamSection = ({ team, servants, activeServant, handleTeamServantClick, up
                             onChange={(e) => handleEffectChange(index, 'npUp', e.target.value)}
                             fullWidth
                             margin="dense"
-                            inputProps={{
-                              style: { padding: '4px' },
-                              autoComplete: 'off'
-                            }}
                             InputProps={{
                               endAdornment: <InputAdornment position="end">%</InputAdornment>
                             }}
@@ -236,10 +200,6 @@ const TeamSection = ({ team, servants, activeServant, handleTeamServantClick, up
                             onChange={(e) => handleEffectChange(index, 'initialCharge', e.target.value)}
                             fullWidth
                             margin="dense"
-                            inputProps={{
-                              style: { padding: '4px' },
-                              autoComplete: 'off'
-                            }}
                             InputProps={{
                               endAdornment: <InputAdornment position="end">%</InputAdornment>
                             }}
