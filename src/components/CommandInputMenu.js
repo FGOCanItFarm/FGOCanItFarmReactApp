@@ -44,7 +44,7 @@ const generateChoiceTargetCommand = (servantIndex, skillIndex, choice, targetInd
 
 const renderSkillButtons = (servantIndex, skillIndex, addCommand, team) => (
   <Box className="skill-buttons">
-    <Grid>
+    <Grid container direction="column">
       <Button
         className={`servant-${servantIndex + 1}`}
         onClick={() => addCommand(generateSkillCommand(servantIndex, skillIndex, 0))}
@@ -69,21 +69,21 @@ const renderSkillButtons = (servantIndex, skillIndex, addCommand, team) => (
       >
         S3
       </Button>
+      <Button
+        className={`servant-${servantIndex + 1}`}
+        onClick={() => addCommand(generateSkillCommand(servantIndex, skillIndex))}
+        title="No Target"
+        style={{ border: '1px solid lightgray' }}
+      >
+        None
+      </Button>
     </Grid>
-    <Button
-      className={`servant-${servantIndex + 1}`}
-      onClick={() => addCommand(generateSkillCommand(servantIndex, skillIndex))}
-      title="No Target"
-      style={{ border: '1px solid lightgray' }}
-    >
-      None
-    </Button>
   </Box>
 );
 
 const renderChoiceButtons = (servantIndex, skillIndex, addCommand, team) => (
   <Box className="choice-skill-buttons">
-    <Grid>
+    <Grid container direction="column">
       <Button
         className={`servant-${servantIndex + 1}`}
         onClick={() => addCommand(generateChoiceCommand(servantIndex, skillIndex, 12))}
@@ -100,8 +100,6 @@ const renderChoiceButtons = (servantIndex, skillIndex, addCommand, team) => (
       >
         C2|2 S2
       </Button>
-    </Grid>
-    <Grid>
       <Button
         className={`servant-${servantIndex + 1}`}
         onClick={() => addCommand(generateChoiceCommand(servantIndex, skillIndex, 13))}
@@ -132,7 +130,7 @@ const renderChoiceButtons = (servantIndex, skillIndex, addCommand, team) => (
 
 const render2ChoiceTargetButtons = (servantIndex, skillIndex, addCommand, team) => (
   <Box className="choice-skill-buttons">
-    <Grid>
+    <Grid container direction="column">
       <Button
         className={`servant-${servantIndex + 1}`}
         onClick={() => addCommand(generateChoiceTargetCommand(servantIndex, skillIndex, 12, 1))}
@@ -157,9 +155,11 @@ const render2ChoiceTargetButtons = (servantIndex, skillIndex, addCommand, team) 
       >
         C1|2 S3
       </Button>
-    </Grid>
-    <Grid>
       <Button
+        className={`servant-${servantIndex + 1}`}
+        onClick={() => addCommand(generateChoiceTargetCommand(servantIndex, skillIndex, 22, 1))}
+      </Button>
+      <Button>
         className={`servant-${servantIndex + 1}`}
         onClick={() => addCommand(generateChoiceTargetCommand(servantIndex, skillIndex, 22, 1))}
         title={`Choice 2 | 2 On Servant 1 (${team[0]?.collectionNo || 'Empty'})`}
@@ -239,7 +239,7 @@ const CommandInputMenu = ({ activeServant, updateCommands, team }) => {
     const collectionNo = team[servantIndex]?.collectionNo;
 
     return (
-      <Grid container spacing={2}>
+      <Grid container spacing={2} direction="column">
         {[1, 2, 3].map((skillIndex) => (
           <Grid item key={`skill-${skillIndex}`}>
             <Typography className="skill-text"> {`Skill ${skillIndex}`}</Typography>
@@ -253,7 +253,7 @@ const CommandInputMenu = ({ activeServant, updateCommands, team }) => {
   };
 
   return (
-    <Box mt={4} p={2} border="1px solid gray" bgcolor="#f0f0f0">
+    <Box mt={4} p={2} border="1px solid gray" bgcolor="#f0f0f0" minHeight="400px">
       <Typography variant="h6">
         Menu Options for {team[activeServant]?.name} (Position {activeServant + 1})
       </Typography>
