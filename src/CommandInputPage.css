@@ -27,3 +27,13 @@
   flex: 1;
   margin: 0 10px;
 }
+
+.selected-servant-details {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.selected-servant-details .MuiGrid-item {
+  flex: 1 1 50%;
+  max-width: 50%;
+}

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Button, Grid, Typography, Box, Container, Modal } from '@mui/material';
 import CommandInputMenu from './CommandInputMenu';
 import TeamSection from './TeamSection';
@@ -12,6 +12,15 @@ const CommandInputPage = ({ team, servants, setTeam, activeServant, setActiveSer
 
   const handleTeamServantClick = (index) => {
     setActiveServant(index);
+  };
+
+  const handleEffectChange = (field, value) => {
+    const updatedTeam = [...team];
+    updatedTeam[activeServant] = {
+      ...updatedTeam[activeServant],
+      [field]: value,
+    };
+    setTeam(updatedTeam);
   };
 
   return (
@@ -44,7 +53,7 @@ const CommandInputPage = ({ team, servants, setTeam, activeServant, setActiveSer
             <CommandInputMenu updateCommands={setCommands} team={team} activeServant={activeServant} />
           </Grid>
           <Grid item xs={6}>
-            <SelectedServantDetails servant={team[activeServant]} handleEffectChange={updateServantEffects} />
+            <SelectedServantDetails servant={team[activeServant]} handleEffectChange={handleEffectChange} />
           </Grid>
         </Grid>
       </Box>

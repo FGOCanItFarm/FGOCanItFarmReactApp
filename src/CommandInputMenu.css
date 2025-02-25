@@ -33,26 +33,14 @@
 }
 
 .skill-container {
-  margin-bottom: 1rem;
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem; /* Add a gap to control the minimum space between items */
 }
 
-
-
-.servant-1 {
-  background-color: hsl(0, 80%, 50%);
-}
-
-.servant-2 {
-  background-color: hsl(36, 80%, 50%);
-}
-
-.servant-3 {
-  background-color: hsl(72, 80%, 50%);
-}
-
-.skill-text {
-  font-size: 2rem;
-  padding-top: 1rem;
+.skill-container > * {
+  flex-grow: 1;
+  max-width: calc(33.33% - 1rem); /* Ensure each item takes up a third of the container minus the gap */
 }
 
 .skill-buttons {
@@ -61,59 +49,34 @@
   flex-wrap: wrap;
   gap: 0.5rem;
 }
-.skill-container {
-  display: flex;
-  justify-content: space-between;
-}
 
-.skill-buttons .servant-1 {
-  color: white;
-  background-color: #9a3269;
-  border-radius: 0.25rem;
-  outline: 1px solid black; /* Add this line to apply an outline */
-  font-size: 0.75rem;
-}
-
-.skill-buttons .servant-2 {
-  color: white;
-  background-color: #184FA1;
-  border-radius: 0.25rem;
-  outline: 1px solid black; /* Add this line to apply an outline */
-  font-size: 0.75rem;
-}
-
-.skill-buttons .servant-3 {
-  color: white;
-  background-color: #E26769;
-  border-radius: 0.25rem;
-  outline: 1px solid black; /* Add this line to apply an outline */
-  font-size: 0.75rem;
-}
-
-.choice-skill-buttons .servant-1 {
-  color: white;
-  background-color: #9a3269;
-  border-radius: 0.25rem;
-  outline: 1px solid black; /* Add this line to apply an outline */
-  font-size: 0.75rem;
-}
-
-.choice-skill-buttons .servant-2 {
-  color: white;
-  background-color: #184FA1;
-  border-radius: 0.25rem;
-  outline: 1px solid black; /* Add this line to apply an outline */
-  font-size: 0.75rem;
-}
-
+.skill-buttons .servant-1,
+.skill-buttons .servant-2,
+.skill-buttons .servant-3,
+.choice-skill-buttons .servant-1,
+.choice-skill-buttons .servant-2,
 .choice-skill-buttons .servant-3 {
   color: white;
-  background-color: #E26769;
   border-radius: 0.25rem;
-  outline: 1px solid black; /* Add this line to apply an outline */
+  outline: 1px solid black;
   font-size: 0.75rem;
+}
+
+.skill-buttons .servant-1,
+.choice-skill-buttons .servant-1 {
+  background-color: #9a3269;
+}
+
+.skill-buttons .servant-2,
+.choice-skill-buttons .servant-2 {
+  background-color: #184FA1;
+}
+
+.skill-buttons .servant-3,
+.choice-skill-buttons .servant-3 {
+  background-color: #E26769;
 }
 
 .margin-left-grid {
-  margin-left:1rem !important;
+  margin-left: 1rem !important;
 }

@@ -4,6 +4,10 @@ import { Box, Typography, Grid, TextField, FormControlLabel, Checkbox, InputAdor
 const SelectedServantDetails = ({ servant, handleEffectChange }) => {
   if (!servant) return null;
 
+  const handleChange = (field) => (event) => {
+    handleEffectChange(field, event.target.value);
+  };
+
   return (
     <Box mt={2} style={{ minHeight: '300px' }}>
       <Typography variant="h6">{servant.name}</Typography>
@@ -156,7 +160,38 @@ const SelectedServantDetails = ({ servant, handleEffectChange }) => {
             }}
           />
         </Grid>
-        {/* Add more fields as needed */}
+        <Grid item xs={6}>
+          <TextField
+            label="Effect 1"
+            value={servant.effect1 || ''}
+            onChange={handleChange('effect1')}
+            fullWidth
+          />
+        </Grid>
+        <Grid item xs={6}>
+          <TextField
+            label="Effect 2"
+            value={servant.effect2 || ''}
+            onChange={handleChange('effect2')}
+            fullWidth
+          />
+        </Grid>
+        <Grid item xs={6}>
+          <TextField
+            label="Effect 3"
+            value={servant.effect3 || ''}
+            onChange={handleChange('effect3')}
+            fullWidth
+          />
+        </Grid>
+        <Grid item xs={6}>
+          <TextField
+            label="Effect 4"
+            value={servant.effect4 || ''}
+            onChange={handleChange('effect4')}
+            fullWidth
+          />
+        </Grid>
       </Grid>
     </Box>
   );
