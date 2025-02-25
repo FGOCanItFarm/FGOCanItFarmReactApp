@@ -2,6 +2,7 @@ import React from 'react';
 import { Grid, Typography, TextField, Box, FormControlLabel, Checkbox, Accordion, AccordionSummary, AccordionDetails, InputAdornment } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ServantAvatar from './ServantAvatar';
+import '../TeamSection.css'
 
 const TeamSection = ({ team, servants, activeServant, handleTeamServantClick, updateServantEffects }) => {
   const handleEffectChange = (index, field, value) => {
@@ -11,7 +12,7 @@ const TeamSection = ({ team, servants, activeServant, handleTeamServantClick, up
   return (
     <div>
       <Typography variant="h6" style={{ marginTop: '20px' }}>Team Section</Typography>
-      <Grid container spacing={2} style={{ width: '32rem', height: '35rem', overflowY: 'auto', marginRight: '0.5rem', marginLeft: '0.5rem' }}>
+      <Grid container spacing={2} className="team-section" >
         {team.map((servantId, index) => {
           const servant = servants.find(s => s.collectionNo === servantId);
 

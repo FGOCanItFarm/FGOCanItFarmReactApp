@@ -8,7 +8,7 @@ import SimpleMysticCodeSelection from './SimpleMysticCodeSelection';
 import { useNavigate } from 'react-router-dom';
 import '../TeamSelectionPage.css';
 
-const TeamSelectionPage = ({ team, setTeam, servants, filteredServants, setFilteredServants, handleServantClick, handleTeamServantClick, updateServantEffects, clearTeam, sortOrder, setSortOrder, searchQuery, setSearchQuery, selectedRarity, setSelectedRarity, selectedClass, setSelectedClass, selectedNpType, setSelectedNpType, selectedAttackType, setSelectedAttackType, capitalize, handleCheckboxChange, attackTypeLabels, selectedMysticCode, setSelectedMysticCode }) => {
+const TeamSelectionPage = ({ team, setTeam, servants, filteredServants, setFilteredServants, handleServantClick, handleTeamServantClick, updateServantEffects, clearTeam, sortOrder, setSortOrder, searchQuery, setSearchQuery, selectedRarity, setSelectedRarity, selectedClass, setSelectedClass, selectedNpType, setSelectedNpType, selectedAttackType, setSelectedAttackType, capitalize, handleCheckboxChange, attackTypeLabels, selectedMysticCode, setSelectedMysticCode}) => {
   const navigate = useNavigate();
 
   const handleGotoQuest = () => {
@@ -109,6 +109,7 @@ const TeamSelectionPage = ({ team, setTeam, servants, filteredServants, setFilte
             activeServant={null}
             handleTeamServantClick={handleTeamServantClick}
             updateServantEffects={updateServantEffects}
+            pageType="team-selection-page"
           />
         </div>
         <div className="mystic-code-selection">

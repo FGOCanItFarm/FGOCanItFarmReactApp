@@ -3,7 +3,6 @@
   justify-content: space-between;
   align-items: flex-start;
   margin-top: 1rem;
-  background-color: #CCCCC5;
 }
 
 .filter-common-servants {
@@ -12,21 +11,25 @@
   align-items: flex-start;
   height: 44rem;
 }
+
 .filter-common-servants-grid-item {
-    height: 42.5rem;
-    align-items: center;
-    margin: 0.5rem;
-    padding: 0.5rem;
+  height: 42.5rem;
+  align-items: center;
+  margin: 0.5rem;
+  padding: 0.5rem;
 }
+
 .filter-section {
   flex: 3;
   margin-right: 1rem;
 }
+
 .team-selection-buttons {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
 }
+
 .common-servants-grid {
   min-width: 18rem;
   flex: 1;
