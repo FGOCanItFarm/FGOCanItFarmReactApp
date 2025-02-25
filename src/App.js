@@ -214,6 +214,7 @@ const App = () => {
           <Route path="/command-input" element={
             <CommandInputPage
               team={team}
+              servants={servants}
               setTeam={setTeam} // Pass setTeam as a prop
               commands={commands}
               setCommands={setCommands}
