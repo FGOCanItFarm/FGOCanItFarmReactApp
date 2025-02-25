@@ -2,7 +2,6 @@ import React from 'react';
 import { Grid, Typography, TextField, Box, FormControlLabel, Checkbox, Accordion, AccordionSummary, AccordionDetails, InputAdornment } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ServantAvatar from './ServantAvatar';
-import '../TeamSection.css'
 
 const TeamSection = ({ team, servants, activeServant, handleTeamServantClick, updateServantEffects }) => {
   const handleEffectChange = (index, field, value) => {
