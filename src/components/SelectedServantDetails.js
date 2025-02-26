@@ -6,7 +6,8 @@ const SelectedServantDetails = ({ servant, handleEffectChange }) => {
   if (!servant) return null;
 
   const handleChange = (field) => (event) => {
-    handleEffectChange(field, event.target.value);
+    const value = Math.max(0, event.target.value); // Ensure value is not below 0
+    handleEffectChange(field, value);
   };
 
   return (
@@ -37,9 +38,8 @@ const SelectedServantDetails = ({ servant, handleEffectChange }) => {
             type="number"
             value={servant.attack || ''}
             onChange={handleChange('attack')}
-            InputProps={{
-              endAdornment: <InputAdornment position="end">%</InputAdornment>
-            }}
+            autoComplete="off"
+            inputProps={{ min: 0 }}
           />
         </div>
         <div className="detail-item">
@@ -48,6 +48,8 @@ const SelectedServantDetails = ({ servant, handleEffectChange }) => {
             type="number"
             value={servant.atkUp || ''}
             onChange={handleChange('atkUp')}
+            autoComplete="off"
+            inputProps={{ min: 0 }}
             InputProps={{
               endAdornment: <InputAdornment position="end">%</InputAdornment>
             }}
@@ -59,6 +61,8 @@ const SelectedServantDetails = ({ servant, handleEffectChange }) => {
             type="number"
             value={servant.artsUp || ''}
             onChange={handleChange('artsUp')}
+            autoComplete="off"
+            inputProps={{ min: 0 }}
             InputProps={{
               endAdornment: <InputAdornment position="end">%</InputAdornment>
             }}
@@ -71,6 +75,8 @@ const SelectedServantDetails = ({ servant, handleEffectChange }) => {
             title='Acts like Valentines 2025 color boost chocolate or Class Score'
             value={servant.artsDamageUp || ''}
             onChange={handleChange('artsDamageUp')}
+            autoComplete="off"
+            inputProps={{ min: 0 }}
             InputProps={{
               endAdornment: <InputAdornment position="end">%</InputAdornment>
             }}
@@ -82,6 +88,8 @@ const SelectedServantDetails = ({ servant, handleEffectChange }) => {
             type="number"
             value={servant.quickUp || ''}
             onChange={handleChange('quickUp')}
+            autoComplete="off"
+            inputProps={{ min: 0 }}
             InputProps={{
               endAdornment: <InputAdornment position="end">%</InputAdornment>
             }}
@@ -94,6 +102,8 @@ const SelectedServantDetails = ({ servant, handleEffectChange }) => {
             title='Acts like Valentines 2025 color boost chocolate or Class Score'
             value={servant.quickDamageUp || ''}
             onChange={handleChange('quickDamageUp')}
+            autoComplete="off"
+            inputProps={{ min: 0 }}
             InputProps={{
               endAdornment: <InputAdornment position="end">%</InputAdornment>
             }}
@@ -105,6 +115,8 @@ const SelectedServantDetails = ({ servant, handleEffectChange }) => {
             type="number"
             value={servant.busterUp || ''}
             onChange={handleChange('busterUp')}
+            autoComplete="off"
+            inputProps={{ min: 0 }}
             InputProps={{
               endAdornment: <InputAdornment position="end">%</InputAdornment>
             }}
@@ -117,6 +129,8 @@ const SelectedServantDetails = ({ servant, handleEffectChange }) => {
             title='Acts like Valentines 2025 color boost chocolate or Class Score'
             value={servant.busterDamageUp || ''}
             onChange={handleChange('busterDamageUp')}
+            autoComplete="off"
+            inputProps={{ min: 0 }}
             InputProps={{
               endAdornment: <InputAdornment position="end">%</InputAdornment>
             }}
@@ -128,6 +142,8 @@ const SelectedServantDetails = ({ servant, handleEffectChange }) => {
             type="number"
             value={servant.npUp || ''}
             onChange={handleChange('npUp')}
+            autoComplete="off"
+            inputProps={{ min: 0 }}
             InputProps={{
               endAdornment: <InputAdornment position="end">%</InputAdornment>
             }}
@@ -139,39 +155,14 @@ const SelectedServantDetails = ({ servant, handleEffectChange }) => {
             type="number"
             value={servant.initialCharge || ''}
             onChange={handleChange('initialCharge')}
+            autoComplete="off"
+            inputProps={{ min: 0 }}
             InputProps={{
               endAdornment: <InputAdornment position="end">%</InputAdornment>
             }}
           />
         </div>
-        <div className="detail-item">
-          <label>Effect 1</label>
-          <TextField
-            value={servant.effect1 || ''}
-            onChange={handleChange('effect1')}
-          />
-        </div>
-        <div className="detail-item">
-          <label>Effect 2</label>
-          <TextField
-            value={servant.effect2 || ''}
-            onChange={handleChange('effect2')}
-          />
-        </div>
-        <div className="detail-item">
-          <label>Effect 3</label>
-          <TextField
-            value={servant.effect3 || ''}
-            onChange={handleChange('effect3')}
-          />
-        </div>
-        <div className="detail-item">
-          <label>Effect 4</label>
-          <TextField
-            value={servant.effect4 || ''}
-            onChange={handleChange('effect4')}
-          />
-        </div>
+        
       </div>
     </Box>
   );
