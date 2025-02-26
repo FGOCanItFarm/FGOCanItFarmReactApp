@@ -244,30 +244,7 @@ const CommandInputMenu = ({ activeServant, updateCommands, team }) => {
     updateCommands((prevCommands) => [...prevCommands, command]);
   };
 
-  const renderSpecificButtons = () => {
-    if (activeServant === null || activeServant === undefined) return null;
-
-    const servantIndex = activeServant;
-    const collectionNo = team[servantIndex]?.collectionNo;
-    const isDisabled = servantIndex >= 3; // Disable buttons for servants in row 2 (index 3, 4, 5)
-
-    return (
-      <Grid container spacing={2} direction="column">
-        <Grid item>
-          <Box className="skill-container">
-            {[1, 2, 3].map((skillIndex) => (
-              <Box key={`skill-${skillIndex}`}>
-                <Typography className="skill-text"> {`Skill ${skillIndex}`}</Typography>
-                <Box>
-                  {renderButtonsForServant(servantIndex, skillIndex, collectionNo, addCommand, team, isDisabled)}
-                </Box>
-              </Box>
-            ))}
-          </Box>
-        </Grid>
-      </Grid>
-    );
-  };
+  const isDisabled = activeServant >= 3; // Disable buttons for servants in row 2 (index 3, 4, 5)
 
   return (
     <Box mt={4} p={2} border="1px solid gray" bgcolor="#f0f0f0" minHeight="400px">
@@ -275,16 +252,34 @@ const CommandInputMenu = ({ activeServant, updateCommands, team }) => {
         Menu Options for {team[activeServant]?.name} (Position {activeServant + 1})
       </Typography>
       <Grid className="margin-left-grid" container spacing={2} justifyContent="center">
-        {renderSpecificButtons()}
+        {[1, 2, 3].map((skillIndex) => (
+          <Box key={`skill-${skillIndex}`}>
+            <Typography className="skill-text"> {`Skill ${skillIndex}`}</Typography>
+            <Box>
+              {renderButtonsForServant(activeServant, skillIndex, team[activeServant]?.collectionNo, addCommand, team, isDisabled)}
+            </Box>
+          </Box>
+        ))}
       </Grid>
       <Box mt={4} p={2} border="1px solid gray" bgcolor="#e0e0e0">
         <Typography variant="h6">General Commands</Typography>
         <Grid container spacing={2} justifyContent="center">
-                    <Grid item>
+          <Grid item>
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={() => addCommand('#')}
+              disabled={isDisabled}
+            >
+              End Turn
+            </Button>
+          </Grid>
+          <Grid item>
             <Button
               variant="contained"
               color="primary"
               onClick={() => addCommand('4')}
+              disabled={isDisabled}
             >
               Use NP (Servant 1)
             </Button>
@@ -294,6 +289,7 @@ const CommandInputMenu = ({ activeServant, updateCommands, team }) => {
               variant="contained"
               color="primary"
               onClick={() => addCommand('5')}
+              disabled={isDisabled}
             >
               Use NP (Servant 2)
             </Button>
@@ -303,18 +299,10 @@ const CommandInputMenu = ({ activeServant, updateCommands, team }) => {
               variant="contained"
               color="primary"
               onClick={() => addCommand('6')}
+              disabled={isDisabled}
             >
               Use NP (Servant 3)
             </Button>
-<Grid item>
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={() => addCommand('#')}
-            >
-              End Turn
-            </Button>
-            </Grid>
           </Grid>
         </Grid>
       </Box>

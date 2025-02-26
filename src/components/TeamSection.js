@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
-import { Grid, Typography, Box, Accordion, AccordionSummary, AccordionDetails, TextField, FormControlLabel, Checkbox, InputAdornment } from '@mui/material';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import { Grid, Typography, Box } from '@mui/material';
 import ServantAvatar from './ServantAvatar';
 
 const TeamSection = ({ team, servants, activeServant, handleTeamServantClick, updateServantEffects, pageType }) => {
@@ -18,8 +17,8 @@ const TeamSection = ({ team, servants, activeServant, handleTeamServantClick, up
     <div className={`${pageType} team-section`}>
       <Typography variant="h6">Team Section</Typography>
       <Grid container spacing={2}>
-        {team.map((servantId, index) => {
-          const servant = servants.find(s => s.collectionNo === servantId);
+        {team.map((servantObj, index) => {
+          const servant = servants.find(s => s.collectionNo === servantObj.collectionNo);
 
           const isActive = activeServant !== null && activeServant !== undefined && activeServant === index;
           const borderStyle = isActive ? '2px solid blue' : '1px dashed gray';
@@ -57,7 +56,6 @@ const TeamSection = ({ team, servants, activeServant, handleTeamServantClick, up
           );
         })}
       </Grid>
-
     </div>
   );
 };

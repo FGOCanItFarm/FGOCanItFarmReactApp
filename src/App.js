@@ -10,7 +10,7 @@ import SearchPage from './components/SearchPage';
 import axios from 'axios';
 
 const App = () => {
-  const [team, setTeam] = useState(Array(6).fill(''));
+  const [team, setTeam] = useState(Array(6).fill({ collectionNo: '' }));
   const [servants, setServants] = useState([]);
   const [filteredServants, setFilteredServants] = useState([]);
   const [sortOrder, setSortOrder] = useState('');
@@ -94,11 +94,11 @@ const App = () => {
 
   const handleServantClick = (servant) => {
     const newTeam = [...team];
-    const count = newTeam.filter(s => s === servant.collectionNo).length;
+    const count = newTeam.filter(s => s.collectionNo === servant.collectionNo).length;
     if (count < 2) {
-      const emptyIndex = newTeam.findIndex(s => s === '');
+      const emptyIndex = newTeam.findIndex(s => s.collectionNo === '');
       if (emptyIndex !== -1) {
-        newTeam[emptyIndex] = servant.collectionNo;
+        newTeam[emptyIndex] = { collectionNo: servant.collectionNo };
         setTeam(newTeam);
       } else {
         alert('Your team is full.');
@@ -113,7 +113,7 @@ const App = () => {
   };
 
   const clearTeam = () => {
-    setTeam(Array(6).fill(''));
+    setTeam(Array(6).fill({ collectionNo: '' }));
   };
 
   const handleCheckboxChange = (event, setState, state) => {
@@ -142,12 +142,19 @@ const App = () => {
       [field]: value
     };
     setServantEffects(newEffects);
+
+    const newTeam = [...team];
+    newTeam[index] = {
+      ...newTeam[index],
+      [field]: value
+    };
+    setTeam(newTeam);
   };
 
   const handleSubmit = () => {
     const teamData = {
-      team: team.map((collectionNo, index) => ({
-        servant_id: collectionNo,
+      team: team.map((servant, index) => ({
+        servant_id: servant.collectionNo,
         append_2: servantEffects[index].append_2 || false,
         append_5: servantEffects[index].append_5 || false,
         ...servantEffects[index]
