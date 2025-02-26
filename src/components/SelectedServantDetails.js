@@ -32,6 +32,16 @@ const SelectedServantDetails = ({ servant, handleEffectChange }) => {
         label="Append 5"
       />
       <div className="detail-item-container">
+      <div className="detail-item">
+          <label>Level</label>
+          <TextField
+            type="number"
+            value={servant.level || ''}
+            onChange={handleChange('level')}
+            autoComplete="off"
+            inputProps={{ min: 0, max: 120 }}
+          />
+        </div>
         <div className="detail-item">
           <label>Attack</label>
           <TextField
