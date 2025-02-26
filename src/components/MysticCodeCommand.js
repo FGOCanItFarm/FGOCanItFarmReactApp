@@ -65,7 +65,7 @@ const MysticCodeCommand = ({ team, setTeam, updateCommands, selectedMysticCode, 
               <MenuItem value="">Select Top Servant</MenuItem>
               {team.slice(0, 3).map((servant, index) => (
                 <MenuItem key={index} value={index}>
-                  {servant.name}
+                  {servant.collectionNo}
                 </MenuItem>
               ))}
             </Select>
@@ -77,9 +77,9 @@ const MysticCodeCommand = ({ team, setTeam, updateCommands, selectedMysticCode, 
               style={{ marginBottom: '20px', minWidth: '200px' }}
             >
               <MenuItem value="">Select Bottom Servant</MenuItem>
-              {team.slice(3, 6).map((servant, index) => (
+              {team.slice(3, 6).filter(servant => servant.collectionNo !== "").map((servant, index) => (
                 <MenuItem key={index} value={index + 3}>
-                  {servant.name}
+                  {servant.collectionNo}
                 </MenuItem>
               ))}
             </Select>
