@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { Box, Button, Typography, Grid } from '@mui/material';
-import SelectedServantDetails from './SelectedServantDetails';
 import '../CommandInputMenu.css';
 
 const generateSkillCommand = (servantIndex, skillIndex, targetIndex = null) => {
@@ -43,7 +42,7 @@ const generateChoiceTargetCommand = (servantIndex, skillIndex, choice, targetInd
   return command;
 };
 
-const renderSkillButtons = (servantIndex, skillIndex, addCommand, team) => (
+const renderSkillButtons = (servantIndex, skillIndex, addCommand, team, isDisabled) => (
   <Box className="skill-buttons">
     <Grid container direction="column">
       <Button
@@ -51,6 +50,7 @@ const renderSkillButtons = (servantIndex, skillIndex, addCommand, team) => (
         onClick={() => addCommand(generateSkillCommand(servantIndex, skillIndex, 0))}
         title={`On Servant 1 (${team[0]?.name || 'Empty'})`}
         style={{ border: '1px solid lightgray' }}
+        disabled={isDisabled}
       >
         S1
       </Button>
@@ -59,6 +59,7 @@ const renderSkillButtons = (servantIndex, skillIndex, addCommand, team) => (
         onClick={() => addCommand(generateSkillCommand(servantIndex, skillIndex, 1))}
         title={`On Servant 2 (${team[1]?.name || 'Empty'})`}
         style={{ border: '1px solid lightgray' }}
+        disabled={isDisabled}
       >
         S2
       </Button>
@@ -67,6 +68,7 @@ const renderSkillButtons = (servantIndex, skillIndex, addCommand, team) => (
         onClick={() => addCommand(generateSkillCommand(servantIndex, skillIndex, 2))}
         title={`On Servant 3 (${team[2]?.name || 'Empty'})`}
         style={{ border: '1px solid lightgray' }}
+        disabled={isDisabled}
       >
         S3
       </Button>
@@ -75,6 +77,7 @@ const renderSkillButtons = (servantIndex, skillIndex, addCommand, team) => (
         onClick={() => addCommand(generateSkillCommand(servantIndex, skillIndex))}
         title="No Target"
         style={{ border: '1px solid lightgray' }}
+        disabled={isDisabled}
       >
         None
       </Button>
@@ -82,7 +85,7 @@ const renderSkillButtons = (servantIndex, skillIndex, addCommand, team) => (
   </Box>
 );
 
-const renderChoiceButtons = (servantIndex, skillIndex, addCommand, team) => (
+const renderChoiceButtons = (servantIndex, skillIndex, addCommand, team, isDisabled) => (
   <Box className="choice-skill-buttons">
     <Grid container direction="column">
       <Button
@@ -90,6 +93,7 @@ const renderChoiceButtons = (servantIndex, skillIndex, addCommand, team) => (
         onClick={() => addCommand(generateChoiceCommand(servantIndex, skillIndex, 12))}
         title={`Choice 1 | 2 On Servant 1 (${team[0]?.name || 'Empty'})`}
         style={{ border: '1px solid lightgray' }}
+        disabled={isDisabled}
       >
         C1|2 S1
       </Button>
@@ -98,6 +102,7 @@ const renderChoiceButtons = (servantIndex, skillIndex, addCommand, team) => (
         onClick={() => addCommand(generateChoiceCommand(servantIndex, skillIndex, 22))}
         title={`Choice 2 | 2 On Servant 2 (${team[1]?.name || 'Empty'})`}
         style={{ border: '1px solid lightgray' }}
+        disabled={isDisabled}
       >
         C2|2 S2
       </Button>
@@ -106,6 +111,7 @@ const renderChoiceButtons = (servantIndex, skillIndex, addCommand, team) => (
         onClick={() => addCommand(generateChoiceCommand(servantIndex, skillIndex, 13))}
         title={`Choice 1 | 3 On Servant 1 (${team[0]?.name || 'Empty'})`}
         style={{ border: '1px solid lightgray' }}
+        disabled={isDisabled}
       >
         C1|3 S1
       </Button>
@@ -114,6 +120,7 @@ const renderChoiceButtons = (servantIndex, skillIndex, addCommand, team) => (
         onClick={() => addCommand(generateChoiceCommand(servantIndex, skillIndex, 23))}
         title={`Choice 2 | 3 On Servant 2 (${team[1]?.name || 'Empty'})`}
         style={{ border: '1px solid lightgray' }}
+        disabled={isDisabled}
       >
         C2|3 S2
       </Button>
@@ -122,6 +129,7 @@ const renderChoiceButtons = (servantIndex, skillIndex, addCommand, team) => (
         onClick={() => addCommand(generateChoiceCommand(servantIndex, skillIndex, 33))}
         title={`Choice 3 | 3 On Servant 3 (${team[2]?.name || 'Empty'})`}
         style={{ border: '1px solid lightgray' }}
+        disabled={isDisabled}
       >
         C3|3 S3
       </Button>
@@ -129,7 +137,7 @@ const renderChoiceButtons = (servantIndex, skillIndex, addCommand, team) => (
   </Box>
 );
 
-const render2ChoiceTargetButtons = (servantIndex, skillIndex, addCommand, team) => (
+const render2ChoiceTargetButtons = (servantIndex, skillIndex, addCommand, team, isDisabled) => (
   <Box className="choice-skill-buttons">
     <Grid container direction="column">
       <Button
@@ -137,6 +145,7 @@ const render2ChoiceTargetButtons = (servantIndex, skillIndex, addCommand, team) 
         onClick={() => addCommand(generateChoiceTargetCommand(servantIndex, skillIndex, 12, 1))}
         title={`Choice 1 | 2 On Servant 1 (${team[0]?.name || 'Empty'})`}
         style={{ border: '1px solid lightgray' }}
+        disabled={isDisabled}
       >
         C1|2 S1
       </Button>
@@ -145,6 +154,7 @@ const render2ChoiceTargetButtons = (servantIndex, skillIndex, addCommand, team) 
         onClick={() => addCommand(generateChoiceTargetCommand(servantIndex, skillIndex, 12, 2))}
         title={`Choice 1 | 2 On Servant 2 (${team[1]?.name || 'Empty'})`}
         style={{ border: '1px solid lightgray' }}
+        disabled={isDisabled}
       >
         C1|2 S2
       </Button>
@@ -153,6 +163,7 @@ const render2ChoiceTargetButtons = (servantIndex, skillIndex, addCommand, team) 
         onClick={() => addCommand(generateChoiceTargetCommand(servantIndex, skillIndex, 12, 3))}
         title={`Choice 1 | 2 On Servant 3 (${team[2]?.name || 'Empty'})`}
         style={{ border: '1px solid lightgray' }}
+        disabled={isDisabled}
       >
         C1|2 S3
       </Button>
@@ -161,6 +172,7 @@ const render2ChoiceTargetButtons = (servantIndex, skillIndex, addCommand, team) 
         onClick={() => addCommand(generateChoiceTargetCommand(servantIndex, skillIndex, 22, 1))}
         title={`Choice 2 | 2 On Servant 1 (${team[0]?.name || 'Empty'})`}
         style={{ border: '1px solid lightgray' }}
+        disabled={isDisabled}
       >
         C2|2 S1
       </Button>
@@ -169,6 +181,7 @@ const render2ChoiceTargetButtons = (servantIndex, skillIndex, addCommand, team) 
         onClick={() => addCommand(generateChoiceTargetCommand(servantIndex, skillIndex, 22, 2))}
         title={`Choice 2 | 2 On Servant 2 (${team[1]?.name || 'Empty'})`}
         style={{ border: '1px solid lightgray' }}
+        disabled={isDisabled}
       >
         C2|2 S2
       </Button>
@@ -177,6 +190,7 @@ const render2ChoiceTargetButtons = (servantIndex, skillIndex, addCommand, team) 
         onClick={() => addCommand(generateChoiceTargetCommand(servantIndex, skillIndex, 22, 3))}
         title={`Choice 2 | 2 On Servant 3 (${team[2]?.name || 'Empty'})`}
         style={{ border: '1px solid lightgray' }}
+        disabled={isDisabled}
       >
         C2|2 S3
       </Button>
@@ -184,25 +198,25 @@ const render2ChoiceTargetButtons = (servantIndex, skillIndex, addCommand, team) 
   </Box>
 );
 
-const renderButtonsForServant = (servantIndex, skillIndex, collectionNo, addCommand, team) => {
-  let buttons = renderSkillButtons(servantIndex, skillIndex, addCommand, team);
+const renderButtonsForServant = (servantIndex, skillIndex, collectionNo, addCommand, team, isDisabled) => {
+  let buttons = renderSkillButtons(servantIndex, skillIndex, addCommand, team, isDisabled);
   
   switch (collectionNo) {
     case 373:
       if (skillIndex === 1 || skillIndex === 3) {
-        buttons = renderChoiceButtons(servantIndex, skillIndex, addCommand, team);
+        buttons = renderChoiceButtons(servantIndex, skillIndex, addCommand, team, isDisabled);
       } else {
-        buttons = render2ChoiceTargetButtons(servantIndex, skillIndex, addCommand, team);
+        buttons = render2ChoiceTargetButtons(servantIndex, skillIndex, addCommand, team, isDisabled);
       }
       break;
     case 428:
       if (skillIndex === 1) {
-        buttons = renderChoiceButtons(servantIndex, skillIndex, addCommand, team);
+        buttons = renderChoiceButtons(servantIndex, skillIndex, addCommand, team, isDisabled);
       }
       break;
     case 268:
       if (skillIndex === 2) {
-        buttons = renderChoiceButtons(servantIndex, skillIndex, addCommand, team);
+        buttons = renderChoiceButtons(servantIndex, skillIndex, addCommand, team, isDisabled);
       }
       break;
     case 421:
@@ -213,7 +227,7 @@ const renderButtonsForServant = (servantIndex, skillIndex, collectionNo, addComm
     case 414:
     case 259:
       if (skillIndex === 3) {
-        buttons = renderChoiceButtons(servantIndex, skillIndex, addCommand, team);
+        buttons = renderChoiceButtons(servantIndex, skillIndex, addCommand, team, isDisabled);
       }
       break;
     default:
@@ -230,18 +244,12 @@ const CommandInputMenu = ({ activeServant, updateCommands, team }) => {
     updateCommands((prevCommands) => [...prevCommands, command]);
   };
 
-  const handleEffectChange = (field, value) => {
-    setSelectedServant((prevServant) => ({
-      ...prevServant,
-      [field]: value,
-    }));
-  };
-
   const renderSpecificButtons = () => {
     if (activeServant === null || activeServant === undefined) return null;
 
     const servantIndex = activeServant;
     const collectionNo = team[servantIndex]?.collectionNo;
+    const isDisabled = servantIndex >= 3; // Disable buttons for servants in row 2 (index 3, 4, 5)
 
     return (
       <Grid container spacing={2} direction="column">
@@ -251,7 +259,7 @@ const CommandInputMenu = ({ activeServant, updateCommands, team }) => {
               <Box key={`skill-${skillIndex}`}>
                 <Typography className="skill-text"> {`Skill ${skillIndex}`}</Typography>
                 <Box>
-                  {renderButtonsForServant(servantIndex, skillIndex, collectionNo, addCommand, team)}
+                  {renderButtonsForServant(servantIndex, skillIndex, collectionNo, addCommand, team, isDisabled)}
                 </Box>
               </Box>
             ))}
@@ -272,7 +280,7 @@ const CommandInputMenu = ({ activeServant, updateCommands, team }) => {
       <Box mt={4} p={2} border="1px solid gray" bgcolor="#e0e0e0">
         <Typography variant="h6">General Commands</Typography>
         <Grid container spacing={2} justifyContent="center">
-          <Grid item>
+                    <Grid item>
             <Button
               variant="contained"
               color="primary"
@@ -298,7 +306,7 @@ const CommandInputMenu = ({ activeServant, updateCommands, team }) => {
             >
               Use NP (Servant 3)
             </Button>
-            <Grid item>
+<Grid item>
             <Button
               variant="contained"
               color="primary"

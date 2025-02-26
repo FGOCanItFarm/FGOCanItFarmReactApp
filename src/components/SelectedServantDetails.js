@@ -1,5 +1,6 @@
 import React from 'react';
-import { Box, Typography, Grid, TextField, FormControlLabel, Checkbox, InputAdornment } from '@mui/material';
+import { Box, Typography, TextField, FormControlLabel, Checkbox, InputAdornment } from '@mui/material';
+import '../SelectedServantDetail.css';
 
 const SelectedServantDetails = ({ servant, handleEffectChange }) => {
   if (!servant) return null;
@@ -29,18 +30,21 @@ const SelectedServantDetails = ({ servant, handleEffectChange }) => {
         }
         label="Append 5"
       />
-      <Grid container spacing={2}>
-        <Grid item xs={6}>
+      <div className="detail-item-container">
+        <div className="detail-item">
+          <label>Attack</label>
           <TextField
-            label="Attack"
             type="number"
             value={servant.attack || ''}
             onChange={handleChange('attack')}
+            InputProps={{
+              endAdornment: <InputAdornment position="end">%</InputAdornment>
+            }}
           />
-        </Grid>
-        <Grid item xs={6}>
+        </div>
+        <div className="detail-item">
+          <label>Atk Up</label>
           <TextField
-            label="Atk Up"
             type="number"
             value={servant.atkUp || ''}
             onChange={handleChange('atkUp')}
@@ -48,10 +52,10 @@ const SelectedServantDetails = ({ servant, handleEffectChange }) => {
               endAdornment: <InputAdornment position="end">%</InputAdornment>
             }}
           />
-        </Grid>
-        <Grid item xs={6}>
+        </div>
+        <div className="detail-item">
+          <label>Arts Up</label>
           <TextField
-            label="Arts Up"
             type="number"
             value={servant.artsUp || ''}
             onChange={handleChange('artsUp')}
@@ -59,10 +63,10 @@ const SelectedServantDetails = ({ servant, handleEffectChange }) => {
               endAdornment: <InputAdornment position="end">%</InputAdornment>
             }}
           />
-        </Grid>
-        <Grid item xs={6}>
+        </div>
+        <div className="detail-item">
+          <label>Arts Damage Up</label>
           <TextField
-            label="Arts Damage Up"
             type="number"
             title='Acts like Valentines 2025 color boost chocolate or Class Score'
             value={servant.artsDamageUp || ''}
@@ -71,10 +75,10 @@ const SelectedServantDetails = ({ servant, handleEffectChange }) => {
               endAdornment: <InputAdornment position="end">%</InputAdornment>
             }}
           />
-        </Grid>
-        <Grid item xs={6}>
+        </div>
+        <div className="detail-item">
+          <label>Quick Up</label>
           <TextField
-            label="Quick Up"
             type="number"
             value={servant.quickUp || ''}
             onChange={handleChange('quickUp')}
@@ -82,10 +86,10 @@ const SelectedServantDetails = ({ servant, handleEffectChange }) => {
               endAdornment: <InputAdornment position="end">%</InputAdornment>
             }}
           />
-        </Grid>
-        <Grid item xs={6}>
+        </div>
+        <div className="detail-item">
+          <label>Quick Damage Up</label>
           <TextField
-            label="Quick Damage Up"
             type="number"
             title='Acts like Valentines 2025 color boost chocolate or Class Score'
             value={servant.quickDamageUp || ''}
@@ -94,10 +98,10 @@ const SelectedServantDetails = ({ servant, handleEffectChange }) => {
               endAdornment: <InputAdornment position="end">%</InputAdornment>
             }}
           />
-        </Grid>
-        <Grid item xs={6}>
+        </div>
+        <div className="detail-item">
+          <label>Buster Up</label>
           <TextField
-            label="Buster Up"
             type="number"
             value={servant.busterUp || ''}
             onChange={handleChange('busterUp')}
@@ -105,10 +109,10 @@ const SelectedServantDetails = ({ servant, handleEffectChange }) => {
               endAdornment: <InputAdornment position="end">%</InputAdornment>
             }}
           />
-        </Grid>
-        <Grid item xs={6}>
+        </div>
+        <div className="detail-item">
+          <label>Buster Damage Up</label>
           <TextField
-            label="Buster Damage Up"
             type="number"
             title='Acts like Valentines 2025 color boost chocolate or Class Score'
             value={servant.busterDamageUp || ''}
@@ -117,10 +121,10 @@ const SelectedServantDetails = ({ servant, handleEffectChange }) => {
               endAdornment: <InputAdornment position="end">%</InputAdornment>
             }}
           />
-        </Grid>
-        <Grid item xs={6}>
+        </div>
+        <div className="detail-item">
+          <label>NP Up</label>
           <TextField
-            label="NP Up"
             type="number"
             value={servant.npUp || ''}
             onChange={handleChange('npUp')}
@@ -128,10 +132,10 @@ const SelectedServantDetails = ({ servant, handleEffectChange }) => {
               endAdornment: <InputAdornment position="end">%</InputAdornment>
             }}
           />
-        </Grid>
-        <Grid item xs={6}>
+        </div>
+        <div className="detail-item">
+          <label>Initial Charge</label>
           <TextField
-            label="Initial Charge"
             type="number"
             value={servant.initialCharge || ''}
             onChange={handleChange('initialCharge')}
@@ -139,9 +143,36 @@ const SelectedServantDetails = ({ servant, handleEffectChange }) => {
               endAdornment: <InputAdornment position="end">%</InputAdornment>
             }}
           />
-        </Grid>
-
-      </Grid>
+        </div>
+        <div className="detail-item">
+          <label>Effect 1</label>
+          <TextField
+            value={servant.effect1 || ''}
+            onChange={handleChange('effect1')}
+          />
+        </div>
+        <div className="detail-item">
+          <label>Effect 2</label>
+          <TextField
+            value={servant.effect2 || ''}
+            onChange={handleChange('effect2')}
+          />
+        </div>
+        <div className="detail-item">
+          <label>Effect 3</label>
+          <TextField
+            value={servant.effect3 || ''}
+            onChange={handleChange('effect3')}
+          />
+        </div>
+        <div className="detail-item">
+          <label>Effect 4</label>
+          <TextField
+            value={servant.effect4 || ''}
+            onChange={handleChange('effect4')}
+          />
+        </div>
+      </div>
     </Box>
   );
 };

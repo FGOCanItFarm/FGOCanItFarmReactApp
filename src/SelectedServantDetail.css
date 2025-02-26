@@ -1,0 +1,24 @@
+.detail-item-container {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+}
+
+.detail-item {
+  display: flex;
+  flex-direction: column;
+}
+
+.detail-item input {
+  width: 100%;
+  padding: 0.5rem;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.detail-item label {
+  margin-bottom: 0.5rem;
+  font-size: 0.875rem;
+  color: #333;
+}
