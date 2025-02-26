@@ -32,11 +32,29 @@ const MysticCodeCommand = ({ team, setTeam, updateCommands, selectedMysticCode, 
   };
 
   const renderButtons = (mysticCodeId) => {
+
     switch (mysticCodeId) {
-      case 20: // Chaldea Combat Uniform
+      case 20 || 210: // Chaldea Combat Uniform
         return (
           <div>
-            <Button onClick={() => addCommand('Swap Servants')}>Swap Servants</Button>
+            <Box>
+              <Typography variant="h6">Skill 1</Typography>
+              <Grid>
+                <Button size="small" style={{ border: '1px solid lightgray' }} onClick={() => addCommand(`j1`)} title={`Use Skill 1 on Servant 1: ${team[0]?.name}`}>1</Button>
+                <Button size="small" style={{ border: '1px solid lightgray' }} onClick={() => addCommand(`j2`)} title={`Use Skill 1 on Servant 2: ${team[1]?.name}`}>2</Button>
+                <Button size="small" style={{ border: '1px solid lightgray' }} onClick={() => addCommand(`j3`)} title={`Use Skill 1 on Servant 3: ${team[2]?.name}`}>3</Button>
+              </Grid>
+              <Button size="small" style={{ border: '1px solid lightgray' }} onClick={() => addCommand(`j`)} title={`Use Skill on Self/Team`}>None</Button>
+            </Box>
+            <Box>
+              <Typography variant="h6">Skill 2</Typography>
+              <Grid>
+                <Button size="small" style={{ border: '1px solid lightgray' }} onClick={() => addCommand(`k1`)} title={`Use Skill 2 on Servant 1 ${team[0]?.name}`}>1</Button>
+                <Button size="small" style={{ border: '1px solid lightgray' }} onClick={() => addCommand(`k2`)} title={`Use Skill 2 on Servant 2 ${team[1]?.name}`}>2</Button>
+                <Button size="small" style={{ border: '1px solid lightgray' }} onClick={() => addCommand(`k3`)} title={`Use Skill 2 on Servant 3 ${team[2]?.name}`}>3</Button>
+              </Grid>
+              <Button size="small" style={{ border: '1px solid lightgray' }} onClick={() => addCommand(`k`)} title={`Use Skill 2 on Self/Team`}>None</Button>
+            </Box>
             <Select
               value={selectedTop}
               onChange={(e) => setSelectedTop(e.target.value)}
@@ -44,7 +62,7 @@ const MysticCodeCommand = ({ team, setTeam, updateCommands, selectedMysticCode, 
               fullWidth
               style={{ marginBottom: '20px', minWidth: '200px' }}
             >
-              <MenuItem value="" disabled>Select Top Servant</MenuItem>
+              <MenuItem value="">Select Top Servant</MenuItem>
               {team.map((servant, index) => (
                 <MenuItem key={index} value={index}>
                   {servant.name}
@@ -58,7 +76,7 @@ const MysticCodeCommand = ({ team, setTeam, updateCommands, selectedMysticCode, 
               fullWidth
               style={{ marginBottom: '20px', minWidth: '200px' }}
             >
-              <MenuItem value="" disabled>Select Bottom Servant</MenuItem>
+              <MenuItem value="">Select Bottom Servant</MenuItem>
               {team.map((servant, index) => (
                 <MenuItem key={index} value={index}>
                   {servant.name}
@@ -68,7 +86,7 @@ const MysticCodeCommand = ({ team, setTeam, updateCommands, selectedMysticCode, 
             <Button
               variant="contained"
               color="primary"
-              onClick={() => { handleSwap(); addCommand(`x${selectedTop}${selectedBottom}`); }}
+              onClick={() => { handleSwap(); addCommand(`x${selectedTop+1}${selectedBottom+1}`); }}
               disabled={selectedTop === null || selectedBottom === null || !team[selectedTop] || !team[selectedBottom]}
             >
               Swap
