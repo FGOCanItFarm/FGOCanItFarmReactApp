@@ -10,6 +10,14 @@ const SelectedServantDetails = ({ servant, handleEffectChange }) => {
     handleEffectChange(field, value);
   };
 
+  const handleCheckboxChange = (field) => (event) => {
+    const checked = event.target.checked;
+    handleEffectChange(field, checked);
+    if (field === 'append_2' && checked) {
+      handleEffectChange('initialCharge', Math.max(servant.initialCharge, 20));
+    }
+  };
+
   return (
     <Box mt={2} style={{ minHeight: '300px' }}>
       <Typography variant="h6">{servant.name}</Typography>
@@ -17,7 +25,7 @@ const SelectedServantDetails = ({ servant, handleEffectChange }) => {
         control={
           <Checkbox
             checked={servant.append_2 || false}
-            onChange={(e) => handleEffectChange('append_2', e.target.checked)}
+            onChange={handleCheckboxChange('append_2')}
           />
         }
         label="Append 2"
@@ -32,34 +40,34 @@ const SelectedServantDetails = ({ servant, handleEffectChange }) => {
         label="Append 5"
       />
       <div className="detail-item-container">
-      <div className="detail-item">
+        <div className="detail-item">
           <label>Level</label>
           <TextField
             type="number"
-            value={servant.level || ''}
+            value={servant.level || 90}
             onChange={handleChange('level')}
             autoComplete="off"
-            inputProps={{ min: 0, max: 120 }}
+            inputProps={{ min: 1,max: 120 }}
           />
         </div>
         <div className="detail-item">
           <label>Attack</label>
           <TextField
             type="number"
-            value={servant.attack || ''}
+            value={servant.attack || 0}
             onChange={handleChange('attack')}
             autoComplete="off"
             inputProps={{ min: 0 }}
           />
         </div>
         <div className="detail-item">
-          <label>Initial Charge</label>
+          <label>Starting Charge</label>
           <TextField
             type="number"
-            value={servant.initialCharge || ''}
+            value={servant.initialCharge || 0}
             onChange={handleChange('initialCharge')}
             autoComplete="off"
-            inputProps={{ min: 0 }}
+            inputProps={{ min: servant.append_2 ? 20 : 0 }}
             InputProps={{
               endAdornment: <InputAdornment position="end">%</InputAdornment>
             }}
@@ -69,7 +77,7 @@ const SelectedServantDetails = ({ servant, handleEffectChange }) => {
           <label>Atk Up</label>
           <TextField
             type="number"
-            value={servant.atkUp || ''}
+            value={servant.atkUp || 0}
             onChange={handleChange('atkUp')}
             autoComplete="off"
             inputProps={{ min: 0 }}
@@ -82,7 +90,7 @@ const SelectedServantDetails = ({ servant, handleEffectChange }) => {
           <label>Arts Up</label>
           <TextField
             type="number"
-            value={servant.artsUp || ''}
+            value={servant.artsUp || 0}
             onChange={handleChange('artsUp')}
             autoComplete="off"
             inputProps={{ min: 0 }}
@@ -96,7 +104,7 @@ const SelectedServantDetails = ({ servant, handleEffectChange }) => {
           <TextField
             type="number"
             title='Acts like Valentines 2025 color boost chocolate or Class Score'
-            value={servant.artsDamageUp || ''}
+            value={servant.artsDamageUp || 0}
             onChange={handleChange('artsDamageUp')}
             autoComplete="off"
             inputProps={{ min: 0 }}
@@ -109,7 +117,7 @@ const SelectedServantDetails = ({ servant, handleEffectChange }) => {
           <label>Quick Up</label>
           <TextField
             type="number"
-            value={servant.quickUp || ''}
+            value={servant.quickUp || 0}
             onChange={handleChange('quickUp')}
             autoComplete="off"
             inputProps={{ min: 0 }}
@@ -123,7 +131,7 @@ const SelectedServantDetails = ({ servant, handleEffectChange }) => {
           <TextField
             type="number"
             title='Acts like Valentines 2025 color boost chocolate or Class Score'
-            value={servant.quickDamageUp || ''}
+            value={servant.quickDamageUp || 0}
             onChange={handleChange('quickDamageUp')}
             autoComplete="off"
             inputProps={{ min: 0 }}
@@ -136,7 +144,7 @@ const SelectedServantDetails = ({ servant, handleEffectChange }) => {
           <label>Buster Up</label>
           <TextField
             type="number"
-            value={servant.busterUp || ''}
+            value={servant.busterUp || 0}
             onChange={handleChange('busterUp')}
             autoComplete="off"
             inputProps={{ min: 0 }}
@@ -150,7 +158,7 @@ const SelectedServantDetails = ({ servant, handleEffectChange }) => {
           <TextField
             type="number"
             title='Acts like Valentines 2025 color boost chocolate or Class Score'
-            value={servant.busterDamageUp || ''}
+            value={servant.busterDamageUp || 0}
             onChange={handleChange('busterDamageUp')}
             autoComplete="off"
             inputProps={{ min: 0 }}
@@ -163,7 +171,7 @@ const SelectedServantDetails = ({ servant, handleEffectChange }) => {
           <label>NP Up</label>
           <TextField
             type="number"
-            value={servant.npUp || ''}
+            value={servant.npUp || 0}
             onChange={handleChange('npUp')}
             autoComplete="off"
             inputProps={{ min: 0 }}
@@ -176,7 +184,7 @@ const SelectedServantDetails = ({ servant, handleEffectChange }) => {
           <label>Generic Damage Up</label>
           <TextField
             type="number"
-            value={servant.damageUp || ''}
+            value={servant.damageUp || 0}
             onChange={handleChange('damageUp')}
             autoComplete="off"
             inputProps={{ min: 0 }}
@@ -185,8 +193,6 @@ const SelectedServantDetails = ({ servant, handleEffectChange }) => {
             }}
           />
         </div>
-        
-        
       </div>
     </Box>
   );
