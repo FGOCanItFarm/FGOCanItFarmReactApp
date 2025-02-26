@@ -63,7 +63,7 @@ const MysticCodeCommand = ({ team, setTeam, updateCommands, selectedMysticCode, 
               style={{ marginBottom: '20px', minWidth: '200px' }}
             >
               <MenuItem value="">Select Top Servant</MenuItem>
-              {team.map((servant, index) => (
+              {team.slice(0, 3).map((servant, index) => (
                 <MenuItem key={index} value={index}>
                   {servant.name}
                 </MenuItem>
@@ -77,8 +77,8 @@ const MysticCodeCommand = ({ team, setTeam, updateCommands, selectedMysticCode, 
               style={{ marginBottom: '20px', minWidth: '200px' }}
             >
               <MenuItem value="">Select Bottom Servant</MenuItem>
-              {team.map((servant, index) => (
-                <MenuItem key={index} value={index}>
+              {team.slice(3, 6).map((servant, index) => (
+                <MenuItem key={index} value={index + 3}>
                   {servant.name}
                 </MenuItem>
               ))}
@@ -86,7 +86,7 @@ const MysticCodeCommand = ({ team, setTeam, updateCommands, selectedMysticCode, 
             <Button
               variant="contained"
               color="primary"
-              onClick={() => { handleSwap(); addCommand(`x${selectedTop+1}${selectedBottom+1}`); }}
+              onClick={() => { handleSwap(); addCommand(`x${selectedTop + 1}${selectedBottom + 1}`); }}
               disabled={selectedTop === null || selectedBottom === null || !team[selectedTop] || !team[selectedBottom]}
             >
               Swap
