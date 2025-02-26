@@ -36,8 +36,6 @@ const SelectedServantDetails = ({ servant, handleEffectChange }) => {
             type="number"
             value={servant.attack || ''}
             onChange={handleChange('attack')}
-            fullWidth
-            margin="dense"
           />
         </Grid>
         <Grid item xs={6}>
@@ -46,8 +44,6 @@ const SelectedServantDetails = ({ servant, handleEffectChange }) => {
             type="number"
             value={servant.atkUp || ''}
             onChange={handleChange('atkUp')}
-            fullWidth
-            margin="dense"
             InputProps={{
               endAdornment: <InputAdornment position="end">%</InputAdornment>
             }}
@@ -59,8 +55,6 @@ const SelectedServantDetails = ({ servant, handleEffectChange }) => {
             type="number"
             value={servant.artsUp || ''}
             onChange={handleChange('artsUp')}
-            fullWidth
-            margin="dense"
             InputProps={{
               endAdornment: <InputAdornment position="end">%</InputAdornment>
             }}
@@ -73,8 +67,6 @@ const SelectedServantDetails = ({ servant, handleEffectChange }) => {
             title='Acts like Valentines 2025 color boost chocolate or Class Score'
             value={servant.artsDamageUp || ''}
             onChange={handleChange('artsDamageUp')}
-            fullWidth
-            margin="dense"
             InputProps={{
               endAdornment: <InputAdornment position="end">%</InputAdornment>
             }}
@@ -86,8 +78,6 @@ const SelectedServantDetails = ({ servant, handleEffectChange }) => {
             type="number"
             value={servant.quickUp || ''}
             onChange={handleChange('quickUp')}
-            fullWidth
-            margin="dense"
             InputProps={{
               endAdornment: <InputAdornment position="end">%</InputAdornment>
             }}
@@ -100,8 +90,6 @@ const SelectedServantDetails = ({ servant, handleEffectChange }) => {
             title='Acts like Valentines 2025 color boost chocolate or Class Score'
             value={servant.quickDamageUp || ''}
             onChange={handleChange('quickDamageUp')}
-            fullWidth
-            margin="dense"
             InputProps={{
               endAdornment: <InputAdornment position="end">%</InputAdornment>
             }}
@@ -113,8 +101,6 @@ const SelectedServantDetails = ({ servant, handleEffectChange }) => {
             type="number"
             value={servant.busterUp || ''}
             onChange={handleChange('busterUp')}
-            fullWidth
-            margin="dense"
             InputProps={{
               endAdornment: <InputAdornment position="end">%</InputAdornment>
             }}
@@ -127,8 +113,6 @@ const SelectedServantDetails = ({ servant, handleEffectChange }) => {
             title='Acts like Valentines 2025 color boost chocolate or Class Score'
             value={servant.busterDamageUp || ''}
             onChange={handleChange('busterDamageUp')}
-            fullWidth
-            margin="dense"
             InputProps={{
               endAdornment: <InputAdornment position="end">%</InputAdornment>
             }}
@@ -140,8 +124,6 @@ const SelectedServantDetails = ({ servant, handleEffectChange }) => {
             type="number"
             value={servant.npUp || ''}
             onChange={handleChange('npUp')}
-            fullWidth
-            margin="dense"
             InputProps={{
               endAdornment: <InputAdornment position="end">%</InputAdornment>
             }}
@@ -153,45 +135,12 @@ const SelectedServantDetails = ({ servant, handleEffectChange }) => {
             type="number"
             value={servant.initialCharge || ''}
             onChange={handleChange('initialCharge')}
-            fullWidth
-            margin="dense"
             InputProps={{
               endAdornment: <InputAdornment position="end">%</InputAdornment>
             }}
           />
         </Grid>
-        <Grid item xs={6}>
-          <TextField
-            label="Effect 1"
-            value={servant.effect1 || ''}
-            onChange={handleChange('effect1')}
-            fullWidth
-          />
-        </Grid>
-        <Grid item xs={6}>
-          <TextField
-            label="Effect 2"
-            value={servant.effect2 || ''}
-            onChange={handleChange('effect2')}
-            fullWidth
-          />
-        </Grid>
-        <Grid item xs={6}>
-          <TextField
-            label="Effect 3"
-            value={servant.effect3 || ''}
-            onChange={handleChange('effect3')}
-            fullWidth
-          />
-        </Grid>
-        <Grid item xs={6}>
-          <TextField
-            label="Effect 4"
-            value={servant.effect4 || ''}
-            onChange={handleChange('effect4')}
-            fullWidth
-          />
-        </Grid>
+
       </Grid>
     </Box>
   );
