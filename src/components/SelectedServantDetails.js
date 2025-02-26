@@ -53,6 +53,19 @@ const SelectedServantDetails = ({ servant, handleEffectChange }) => {
           />
         </div>
         <div className="detail-item">
+          <label>Initial Charge</label>
+          <TextField
+            type="number"
+            value={servant.initialCharge || ''}
+            onChange={handleChange('initialCharge')}
+            autoComplete="off"
+            inputProps={{ min: 0 }}
+            InputProps={{
+              endAdornment: <InputAdornment position="end">%</InputAdornment>
+            }}
+          />
+        </div>
+        <div className="detail-item">
           <label>Atk Up</label>
           <TextField
             type="number"
@@ -172,19 +185,7 @@ const SelectedServantDetails = ({ servant, handleEffectChange }) => {
             }}
           />
         </div>
-        <div className="detail-item">
-          <label>Initial Charge</label>
-          <TextField
-            type="number"
-            value={servant.initialCharge || ''}
-            onChange={handleChange('initialCharge')}
-            autoComplete="off"
-            inputProps={{ min: 0 }}
-            InputProps={{
-              endAdornment: <InputAdornment position="end">%</InputAdornment>
-            }}
-          />
-        </div>
+        
         
       </div>
     </Box>
