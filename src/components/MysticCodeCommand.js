@@ -32,9 +32,9 @@ const MysticCodeCommand = ({ team, setTeam, updateCommands, selectedMysticCode, 
   };
 
   const renderButtons = (mysticCodeId) => {
-
-    switch (mysticCodeId) {
-      case 20 || 210: // Chaldea Combat Uniform
+    const isSwapMC = mysticCodeId === 20 || mysticCodeId === 210;
+    switch (isSwapMC) {
+      case true: // Chaldea Combat Uniform
         return (
           <div>
             <Box>
