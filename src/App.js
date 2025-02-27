@@ -155,8 +155,8 @@ const App = () => {
     const teamData = {
       team: team.map((servant, index) => ({
         servant_id: servant.collectionNo,
-        append_2: servantEffects[index].append_2 || false,
-        append_5: servantEffects[index].append_5 || false,
+        append2: servantEffects[index].append2 || false,
+        append5: servantEffects[index].append5 || false,
         ...servantEffects[index]
       })),
       mc_id: selectedMysticCode,

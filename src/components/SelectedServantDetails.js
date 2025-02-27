@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, Typography, TextField, FormControlLabel, Checkbox, InputAdornment } from '@mui/material';
+import { Box, Typography, TextField, FormControlLabel, Checkbox, InputAdornment, Select, MenuItem } from '@mui/material';
 import '../SelectedServantDetail.css';
 
 const SelectedServantDetails = ({ servant, handleEffectChange }) => {
@@ -13,7 +13,7 @@ const SelectedServantDetails = ({ servant, handleEffectChange }) => {
   const handleCheckboxChange = (field) => (event) => {
     const checked = event.target.checked;
     handleEffectChange(field, checked);
-    if (field === 'append_2' && checked) {
+    if (field === 'append2' && checked) {
       handleEffectChange('initialCharge', Math.max(servant.initialCharge, 20));
     }
   };
@@ -24,8 +24,8 @@ const SelectedServantDetails = ({ servant, handleEffectChange }) => {
       <FormControlLabel
         control={
           <Checkbox
-            checked={servant.append_2 || false}
-            onChange={handleCheckboxChange('append_2')}
+            checked={servant.append2 || false}
+            onChange={handleCheckboxChange('append2')}
           />
         }
         label="Append 2"
@@ -34,10 +34,27 @@ const SelectedServantDetails = ({ servant, handleEffectChange }) => {
         control={
           <Checkbox
             checked={servant.append_5 || false}
-            onChange={(e) => handleEffectChange('append_5', e.target.checked)}
+            onChange={(e) => handleEffectChange('append5', e.target.checked)}
           />
         }
         label="Append 5"
+      />
+      <FormControlLabel
+        control={
+          <Select
+            value={servant.npLevel || 1}
+            onChange={handleChange('npLevel')}
+            displayEmpty
+            fullWidth
+          >
+            {[1, 2, 3, 4, 5].map((level) => (
+              <MenuItem key={level} value={level}>
+                {level}
+              </MenuItem>
+            ))}
+          </Select>
+        }
+        label="NP Level"
       />
       <div className="detail-item-container">
         <div className="detail-item">
@@ -47,7 +64,7 @@ const SelectedServantDetails = ({ servant, handleEffectChange }) => {
             value={servant.level || 90}
             onChange={handleChange('level')}
             autoComplete="off"
-            inputProps={{ min: 1,max: 120 }}
+            inputProps={{ min: 1, max: 120 }}
           />
         </div>
         <div className="detail-item">
@@ -67,7 +84,7 @@ const SelectedServantDetails = ({ servant, handleEffectChange }) => {
             value={servant.initialCharge || 0}
             onChange={handleChange('initialCharge')}
             autoComplete="off"
-            inputProps={{ min: servant.append_2 ? 20 : 0 }}
+            inputProps={{ min: servant.append2 ? 20 : 0 }}
             InputProps={{
               endAdornment: <InputAdornment position="end">%</InputAdornment>
             }}
