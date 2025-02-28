@@ -86,7 +86,7 @@ const MysticCodeCommand = ({ team, setTeam, updateCommands, selectedMysticCode, 
             <Button
               variant="contained"
               color="primary"
-              onClick={() => { handleSwap(); addCommand(`x${selectedTop + 1}${selectedBottom + 1}`); }}
+              onClick={() => { handleSwap(); addCommand(`x${selectedTop + 1}${selectedBottom + 1 - 3}`); }}
               disabled={selectedTop === null || selectedBottom === null || !team[selectedTop] || !team[selectedBottom]}
             >
               Swap
