@@ -95,7 +95,7 @@ const renderChoiceButtons = (servantIndex, skillIndex, addCommand, team, isDisab
         style={{ border: '1px solid lightgray' }}
         disabled={isDisabled}
       >
-        C1|2 S1
+        C1|2 on Servant 1
       </Button>
       <Button
         className={`servant-${servantIndex + 1}`}
@@ -104,35 +104,127 @@ const renderChoiceButtons = (servantIndex, skillIndex, addCommand, team, isDisab
         style={{ border: '1px solid lightgray' }}
         disabled={isDisabled}
       >
-        C2|2 S2
+        C1|2 on Servant 2
+      </Button>
+            <Button
+        className={`servant-${servantIndex + 1}`}
+        onClick={() => addCommand(generateChoiceCommand(servantIndex, skillIndex, 22))}
+        title={`Choice 2 | 2 On Servant 2 (${team[1]?.name || 'Empty'})`}
+        style={{ border: '1px solid lightgray' }}
+        disabled={isDisabled}
+      >
+        C1|2 on Servant 3
       </Button>
       <Button
         className={`servant-${servantIndex + 1}`}
-        onClick={() => addCommand(generateChoiceCommand(servantIndex, skillIndex, 13))}
+        onClick={() => addCommand(generateChoiceCommand(servantIndex, skillIndex, 12))}
+        title={`Choice 1 | 2 On Servant 1 (${team[0]?.name || 'Empty'})`}
+        style={{ border: '1px solid lightgray' }}
+        disabled={isDisabled}
+      >
+        C2|2 on Servant 1
+      </Button>
+      <Button
+        className={`servant-${servantIndex + 1}`}
+        onClick={() => addCommand(generateChoiceCommand(servantIndex, skillIndex, 22))}
+        title={`Choice 2 | 2 On Servant 2 (${team[1]?.name || 'Empty'})`}
+        style={{ border: '1px solid lightgray' }}
+        disabled={isDisabled}
+      >
+        C2|2 on Servant 2
+      </Button>
+            <Button
+        className={`servant-${servantIndex + 1}`}
+        onClick={() => addCommand(generateChoiceCommand(servantIndex, skillIndex, 22))}
+        title={`Choice 2 | 2 On Servant 2 (${team[1]?.name || 'Empty'})`}
+        style={{ border: '1px solid lightgray' }}
+        disabled={isDisabled}
+      >
+        C2|2 on Servant 3
+      </Button>
+
+      <Button
+        className={`servant-${servantIndex + 1}`}
+        onClick={() => addCommand(generateChoiceCommand(servantIndex, skillIndex, 11))}
         title={`Choice 1 | 3 On Servant 1 (${team[0]?.name || 'Empty'})`}
         style={{ border: '1px solid lightgray' }}
         disabled={isDisabled}
       >
-        C1|3 S1
+        C1|3 on Servant 1
+      </Button>
+      <Button
+        className={`servant-${servantIndex + 1}`}
+        onClick={() => addCommand(generateChoiceCommand(servantIndex, skillIndex, 12))}
+        title={`Choice 1 | 3 On Servant 2 (${team[0]?.name || 'Empty'})`}
+        style={{ border: '1px solid lightgray' }}
+        disabled={isDisabled}
+      >
+        C1|3 on Servant 2
+      </Button>
+      <Button
+        className={`servant-${servantIndex + 1}`}
+        onClick={() => addCommand(generateChoiceCommand(servantIndex, skillIndex, 13))}
+        title={`Choice 1 | 3 On Servant 3 (${team[0]?.name || 'Empty'})`}
+        style={{ border: '1px solid lightgray' }}
+        disabled={isDisabled}
+      >
+        C1|3 on Servant 3
+      </Button>
+      <Button
+        className={`servant-${servantIndex + 1}`}
+        onClick={() => addCommand(generateChoiceCommand(servantIndex, skillIndex, 21))}
+        title={`Choice 2 | 3 On Servant 1 (${team[0]?.name || 'Empty'})`}
+        style={{ border: '1px solid lightgray' }}
+        disabled={isDisabled}
+      >
+        C2|3 on Servant 1
+      </Button>
+      <Button
+        className={`servant-${servantIndex + 1}`}
+        onClick={() => addCommand(generateChoiceCommand(servantIndex, skillIndex, 22))}
+        title={`Choice 2 | 3 On Servant 2 (${team[0]?.name || 'Empty'})`}
+        style={{ border: '1px solid lightgray' }}
+        disabled={isDisabled}
+      >
+        C2|3 on Servant 2
       </Button>
       <Button
         className={`servant-${servantIndex + 1}`}
         onClick={() => addCommand(generateChoiceCommand(servantIndex, skillIndex, 23))}
-        title={`Choice 2 | 3 On Servant 2 (${team[1]?.name || 'Empty'})`}
+        title={`Choice 2 | 3 On Servant 3 (${team[0]?.name || 'Empty'})`}
         style={{ border: '1px solid lightgray' }}
         disabled={isDisabled}
       >
-        C2|3 S2
+        C2|3 on Servant 3
+      </Button>
+      <Button
+        className={`servant-${servantIndex + 1}`}
+        onClick={() => addCommand(generateChoiceCommand(servantIndex, skillIndex, 31))}
+        title={`Choice 3 | 3 On Servant 1 (${team[0]?.name || 'Empty'})`}
+        style={{ border: '1px solid lightgray' }}
+        disabled={isDisabled}
+      >
+        C3|3 on Servant 1
+      </Button>
+      <Button
+        className={`servant-${servantIndex + 1}`}
+        onClick={() => addCommand(generateChoiceCommand(servantIndex, skillIndex, 32))}
+        title={`Choice 3 | 3 On Servant 2 (${team[0]?.name || 'Empty'})`}
+        style={{ border: '1px solid lightgray' }}
+        disabled={isDisabled}
+      >
+        C3|3 on Servant 2
       </Button>
       <Button
         className={`servant-${servantIndex + 1}`}
         onClick={() => addCommand(generateChoiceCommand(servantIndex, skillIndex, 33))}
-        title={`Choice 3 | 3 On Servant 3 (${team[2]?.name || 'Empty'})`}
+        title={`Choice 3 | 3 On Servant 3 (${team[0]?.name || 'Empty'})`}
         style={{ border: '1px solid lightgray' }}
         disabled={isDisabled}
       >
-        C3|3 S3
+        C3|3 on Servant 3
       </Button>
+
     </Grid>
   </Box>
 );
