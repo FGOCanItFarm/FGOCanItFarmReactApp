@@ -151,7 +151,7 @@ const App = () => {
     setTeam(newTeam);
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     const teamData = {
       team: team.map((servant, index) => ({
         servant_id: servant.collectionNo,
@@ -163,7 +163,12 @@ const App = () => {
       quest_id: selectedQuest?.id,
       commands
     };
-    console.log('Submit team', teamData);
+    try {
+      await axios.post('/api/submit-team', teamData); // Adjust endpoint if needed
+      console.log('Team submitted successfully');
+    } catch (error) {
+      console.error('Error submitting team:', error);
+    }
     setOpenModal(false);
   };
 
