@@ -1,6 +1,21 @@
-# Getting Started with Create React App
+# FGO Can It Farm React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+
+## 🚀 New Domain & Migration
+
+**⚠️ Important: This app is migrating to a new domain!**
+
+- **New URL:** https://fgocif.jjbly.uk
+- **Old URL:** https://fgocanitfarm.github.io/FGOCanItFarmReactApp/ (deprecated)
+
+### Migration Status
+- ✅ Cloudflare Pages CI/CD configured
+- ✅ Custom domain setup ready
+- ✅ Build issues fixed
+- 📋 Framework migration options prepared (Vue.js & Astro)
+
+For detailed migration instructions, see [MIGRATION_GUIDE.md](./MIGRATION_GUIDE.md).
 
 ## Available Scripts
 

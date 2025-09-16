@@ -112,7 +112,7 @@ const TeamSelection = () => {
     };
 
     filterServants();
-  }, [selectedRarity, selectedClass, selectedNpType, selectedAttackType, searchQuery, sortOrder, servants, team]);
+  }, [selectedRarity, selectedClass, selectedNpType, selectedAttackType, searchQuery, sortOrder, servants, team, filteredServants]);
 
   const handleTeamServantClick = (servant) => {
     setActiveServant(servant);

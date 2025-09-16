@@ -1,7 +1,3 @@
-import React, { useEffect, useState } from 'react';
-import axios from 'axios';
-import { Grid, Typography, Card, CardMedia, CardContent } from '@mui/material';
-
 const MysticCodesComponent = () => {
 //   const [mysticCodes, setMysticCodes] = useState([]);
 

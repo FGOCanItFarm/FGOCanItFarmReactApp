@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import { Box, Typography, Select, MenuItem, FormControl, InputLabel } from '@mui/material';
 
@@ -22,7 +22,7 @@ const QuestSelection = () => {
     fetchWarLongNames();
   }, []);
 
-  const fetchQuests = async () => {
+  const fetchQuests = useCallback(async () => {
     try {
       const response = await axios.get('/api/quests', {
         params: {
@@ -35,13 +35,13 @@ const QuestSelection = () => {
     } catch (error) {
       console.error('Error fetching quests', error);
     }
-  };
+  }, [selectedWarLongName, recommendLv]);
 
   useEffect(() => {
     if (selectedWarLongName) {
       fetchQuests();
     }
-  }, [selectedWarLongName, recommendLv]);
+  }, [selectedWarLongName, recommendLv, fetchQuests]);
 
   return (
     <Box>

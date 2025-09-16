@@ -1,5 +1,5 @@
 import React from 'react';
-import { Grid, Typography, FormControl, InputLabel, Select, MenuItem, TextField, Checkbox, FormControlLabel } from '@mui/material';
+import { Grid, Typography, TextField, Checkbox, FormControlLabel } from '@mui/material';
 
 const FilterSection = ({ sortOrder, setSortOrder, searchQuery, setSearchQuery, selectedRarity, setSelectedRarity, selectedClass, setSelectedClass, selectedNpType, setSelectedNpType, selectedAttackType, setSelectedAttackType, capitalize, handleCheckboxChange, attackTypeLabels }) => {
   return (
