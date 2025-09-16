@@ -1,0 +1,116 @@
+/* UI Variables for FGO Team Builder App
+ * Contains spacing, color, and layout variables for consistent design
+ */
+
+:root {
+  /* Spacing variables */
+  --spacing-xs: 0.25rem;
+  --spacing-sm: 0.5rem;
+  --spacing-md: 1rem;
+  --spacing-lg: 1.5rem;
+  --spacing-xl: 2rem;
+  --spacing-xxl: 3rem;
+
+  /* Border radius */
+  --border-radius-sm: 0.25rem;
+  --border-radius-md: 0.5rem;
+  --border-radius-lg: 0.75rem;
+
+  /* Color palette */
+  --color-primary: #1976d2;
+  --color-secondary: #9c27b0;
+  --color-background: #f5f5f5;
+  --color-surface: #ffffff;
+  --color-surface-variant: #e0e0e0;
+  --color-on-surface: #000000;
+  --color-on-surface-variant: #666666;
+  --color-border: #cccccc;
+  --color-border-light: #e0e0e0;
+
+  /* Servant colors (preserve existing color scheme) */
+  --color-servant-1: #9a3269;
+  --color-servant-2: #184FA1;
+  --color-servant-3: #E26769;
+  --color-servant-hover: rgba(0, 0, 0, 0.1);
+  --color-servant-focus: rgba(0, 0, 0, 0.2);
+
+  /* Command panel colors */
+  --color-command-bg: #f0f0f0;
+  --color-command-border: #cccccc;
+  --color-command-preview: #e8f5e8;
+  --color-command-invalid: #ffebee;
+  --color-command-valid: #e8f5e8;
+
+  /* Layout dimensions */
+  --command-panel-min-height: 400px;
+  --servant-card-width: 280px;
+  --skill-button-min-width: 60px;
+  --skill-button-height: 36px;
+
+  /* Typography */
+  --font-size-xs: 0.75rem;
+  --font-size-sm: 0.875rem;
+  --font-size-md: 1rem;
+  --font-size-lg: 1.125rem;
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-bold: 700;
+
+  /* Shadows */
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.12);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.12);
+  --shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.15);
+
+  /* Transitions */
+  --transition-fast: 0.15s ease-in-out;
+  --transition-normal: 0.3s ease-in-out;
+  --transition-slow: 0.5s ease-in-out;
+}
+
+/* Utility classes */
+.fgo-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-md);
+  padding: var(--spacing-md);
+  box-shadow: var(--shadow-sm);
+  transition: box-shadow var(--transition-fast);
+}
+
+.fgo-card:hover {
+  box-shadow: var(--shadow-md);
+}
+
+.fgo-button {
+  border-radius: var(--border-radius-sm);
+  transition: all var(--transition-fast);
+  font-weight: var(--font-weight-medium);
+  min-height: var(--skill-button-height);
+}
+
+.fgo-button:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-sm);
+}
+
+.fgo-button:active {
+  transform: translateY(0);
+}
+
+.fgo-grid {
+  display: grid;
+  gap: var(--spacing-md);
+}
+
+.fgo-flex {
+  display: flex;
+  gap: var(--spacing-md);
+}
+
+.fgo-text-xs { font-size: var(--font-size-xs); }
+.fgo-text-sm { font-size: var(--font-size-sm); }
+.fgo-text-md { font-size: var(--font-size-md); }
+.fgo-text-lg { font-size: var(--font-size-lg); }
+
+.fgo-font-medium { font-weight: var(--font-weight-medium); }
+.fgo-font-bold { font-weight: var(--font-weight-bold); }

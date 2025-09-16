@@ -1,33 +1,143 @@
+/* CommandInputPage.css - Enhanced styles for improved command input interface */
+
+/* Import UI variables */
+@import url('./ui-vars.css');
+
 .command-input-container {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 20px;
+  padding: var(--spacing-xl);
+  min-height: 100vh;
+  background: var(--color-background);
 }
 
 .command-input-grid {
-  display: flex;
-  justify-content: space-between;
   width: 100%;
-  margin-bottom: 20px;
+  margin-bottom: var(--spacing-xl);
 }
 
 .team-section, .mystic-code-section {
-  flex: 1;
-  margin: 0 10px;
+  background: var(--color-surface);
+  border-radius: var(--border-radius-lg);
+  padding: var(--spacing-lg);
+  box-shadow: var(--shadow-sm);
+  transition: box-shadow var(--transition-fast);
+}
+
+.team-section:hover, .mystic-code-section:hover {
+  box-shadow: var(--shadow-md);
 }
 
 .command-input-menu {
-  display: flex;
-  justify-content: space-between;
   width: 100%;
+  margin-bottom: var(--spacing-xl);
 }
 
-.command-input-menu .MuiGrid-item {
-  flex: 1;
-  margin: 0 10px;
+.commands-section {
+  width: 100%;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-lg);
+  padding: var(--spacing-lg);
 }
 
+.commands-header {
+  border-bottom: 1px solid var(--color-border-light);
+  padding-bottom: var(--spacing-md);
+}
+
+.command-actions {
+  display: flex;
+  gap: var(--spacing-xs);
+}
+
+.command-chips-container {
+  min-height: 80px;
+  background: var(--color-surface-variant);
+  border-radius: var(--border-radius-md);
+  border: 2px dashed var(--color-border);
+  transition: border-color var(--transition-fast);
+}
+
+.command-chips-container:hover {
+  border-color: var(--color-primary);
+}
+
+.command-edit-mode {
+  background: var(--color-surface);
+  border-radius: var(--border-radius-md);
+  padding: var(--spacing-md);
+}
+
+.edit-actions {
+  display: flex;
+  gap: var(--spacing-sm);
+  flex-wrap: wrap;
+}
+
+.action-buttons {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  gap: var(--spacing-md);
+  flex-wrap: wrap;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--spacing-sm);
+  flex-wrap: wrap;
+}
+
+/* Enhanced responsive design */
+@media (max-width: 1200px) {
+  .command-input-menu .MuiGrid-container {
+    flex-direction: column;
+  }
+}
+
+@media (max-width: 768px) {
+  .command-input-container {
+    padding: var(--spacing-md);
+  }
+  
+  .command-input-grid {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+  }
+  
+  .team-section, .mystic-code-section {
+    margin: 0;
+    padding: var(--spacing-md);
+  }
+  
+  .edit-actions {
+    justify-content: center;
+  }
+  
+  .action-buttons {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+
+@media (max-width: 480px) {
+  .commands-header {
+    flex-direction: column;
+    gap: var(--spacing-sm);
+    align-items: flex-start;
+  }
+  
+  .command-actions {
+    align-self: stretch;
+    justify-content: flex-end;
+  }
+}
+
+/* Legacy compatibility styles */
 .selected-servant-details {
   display: flex;
   flex-wrap: wrap;
@@ -36,4 +146,31 @@
 .selected-servant-details .MuiGrid-item {
   flex: 1 1 50%;
   max-width: 50%;
+}
+
+/* Animation for token chips */
+@keyframes chipAppear {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.command-chips-container .MuiChip-root {
+  animation: chipAppear var(--transition-fast) ease-out;
+}
+
+/* Focus and accessibility improvements */
+.command-chips-container:focus-within {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+.fgo-button:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
 }
