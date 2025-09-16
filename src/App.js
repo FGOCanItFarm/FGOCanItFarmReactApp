@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import { HashRouter as Router, Route, Routes } from 'react-router-dom';
 import { CssBaseline, Container } from '@mui/material';
 import Sidebar from './components/Sidebar';
 import TeamSelectionPage from './components/TeamSelectionPage';
