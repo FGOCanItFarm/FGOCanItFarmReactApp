@@ -51,9 +51,15 @@ const TeamSelectionPage = ({ team, setTeam, servants, filteredServants, setFilte
         filtered = filtered.sort((a, b) => a[sortOrder].localeCompare(b[sortOrder]));
       }
 
-      // Ensure team members are included in the filtered list
-      const teamMembers = servants.filter(servant => team.includes(servant.collectionNo));
-      filtered = [...new Set([...filtered, ...teamMembers])];
+      // By default do NOT force-include team members into the filtered list.
+      // Previously we always merged team members which caused them to show
+      // regardless of active filters. Make this behavior optional via
+      // `includeTeamMembers` so it can be enabled deliberately if desired.
+      const includeTeamMembers = false; // set to true to preserve old behavior
+      if (includeTeamMembers) {
+        const teamMembers = servants.filter(servant => team.includes(servant.collectionNo));
+        filtered = [...new Set([...filtered, ...teamMembers])];
+      }
 
       setFilteredServants(filtered);
     };
