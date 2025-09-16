@@ -1,51 +1,155 @@
-.team-mystic-code {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  margin-top: 1rem;
+/* TeamSelectionPage.css - Enhanced styles for improved team selection interface */
+
+/* Import UI variables */
+@import url('./ui-vars.css');
+
+.team-selection-container {
+  padding: var(--spacing-xl);
+  background: var(--color-background);
+  min-height: 100vh;
+}
+
+.filter-controls-header {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-md);
+  box-shadow: var(--shadow-sm);
+  transition: box-shadow var(--transition-fast);
+}
+
+.filter-controls-header:hover {
+  box-shadow: var(--shadow-md);
 }
 
 .filter-common-servants {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  height: 44rem;
+  min-height: 42.5rem;
+  gap: var(--spacing-md);
 }
 
+.filter-section,
+.common-servants-grid,
+.servant-selection {
+  background: var(--color-surface);
+  border-radius: var(--border-radius-lg);
+  padding: var(--spacing-lg);
+  box-shadow: var(--shadow-sm);
+  overflow: auto;
+}
+
+.filter-section {
+  min-width: 280px;
+}
+
+.common-servants-grid {
+  min-width: 180px;
+}
+
+.servant-selection {
+  flex: 1;
+}
+
+.team-mystic-code {
+  gap: var(--spacing-lg);
+}
+
+.team-section {
+  background: var(--color-surface);
+  border-radius: var(--border-radius-lg);
+  padding: var(--spacing-lg);
+  box-shadow: var(--shadow-sm);
+}
+
+.mystic-code-selection {
+  background: var(--color-surface);
+  border-radius: var(--border-radius-lg);
+  padding: var(--spacing-lg);
+  box-shadow: var(--shadow-sm);
+}
+
+.team-selection-buttons {
+  display: flex;
+  justify-content: center;
+  gap: var(--spacing-md);
+  flex-wrap: wrap;
+}
+
+/* Responsive design improvements */
+@media (max-width: 1200px) {
+  .filter-common-servants {
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto auto;
+  }
+  
+  .filter-section {
+    grid-column: 1 / -1;
+  }
+  
+  .common-servants-grid {
+    grid-column: 1;
+  }
+  
+  .servant-selection {
+    grid-column: 2;
+  }
+}
+
+@media (max-width: 768px) {
+  .team-selection-container {
+    padding: var(--spacing-md);
+  }
+  
+  .filter-common-servants {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto auto;
+    gap: var(--spacing-md);
+  }
+  
+  .filter-section,
+  .common-servants-grid,
+  .servant-selection {
+    grid-column: 1;
+    padding: var(--spacing-md);
+  }
+  
+  .team-mystic-code {
+    grid-template-columns: 1fr;
+  }
+  
+  .filter-controls-header {
+    flex-direction: column;
+    gap: var(--spacing-sm);
+    align-items: stretch;
+  }
+}
+
+/* Animation improvements */
+.filter-section,
+.common-servants-grid,
+.servant-selection,
+.team-section,
+.mystic-code-selection {
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.filter-section:hover,
+.common-servants-grid:hover,
+.servant-selection:hover,
+.team-section:hover,
+.mystic-code-selection:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+/* Focus and accessibility */
+.fgo-button:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+/* Legacy compatibility styles */
 .filter-common-servants-grid-item {
   height: 42.5rem;
   align-items: center;
   margin: 0.5rem;
   padding: 0.5rem;
-}
-
-.filter-section {
-  flex: 3;
-  margin-right: 1rem;
-}
-
-.team-selection-buttons {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-}
-
-.common-servants-grid {
-  min-width: 18rem;
-  flex: 1;
-  margin-right: 1rem;
-}
-
-.servant-selection {
-  flex: 3;
-}
-
-.team-section {
-  flex: 2;
-  margin-right: 1rem;
-  margin-top: 2rem;
-}
-
-.mystic-code-selection {
-  flex: 1;
 }

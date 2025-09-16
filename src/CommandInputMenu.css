@@ -1,4 +1,144 @@
-/* Add this CSS to your stylesheet */
+/* CommandInputMenu.css - Enhanced styles for redesigned FGO-style interface */
+
+/* Import UI variables */
+@import url('./ui-vars.css');
+
+/* Updated styles for 3-column layout */
+.command-input-redesign {
+  padding: var(--spacing-md);
+  background: var(--color-background);
+  border-radius: var(--border-radius-lg);
+  min-height: var(--command-panel-min-height);
+}
+
+.command-header {
+  border-bottom: 1px solid var(--color-border-light);
+  padding-bottom: var(--spacing-md);
+}
+
+.command-preview {
+  border-left: 4px solid var(--color-primary);
+  font-family: 'Roboto Mono', monospace;
+}
+
+.test-mode-panel {
+  background: var(--color-surface-variant);
+  border: 2px dashed var(--color-border);
+}
+
+.active-servant-card {
+  min-height: 300px;
+  background: linear-gradient(135deg, var(--color-surface) 0%, #f8f9fa 100%);
+}
+
+.skill-groups-section {
+  height: 100%;
+}
+
+.skill-group {
+  background: var(--color-surface);
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.skill-group:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.skill-buttons-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-xs);
+}
+
+.contextual-commands-section {
+  height: 100%;
+}
+
+.command-group {
+  background: var(--color-surface);
+}
+
+/* Enhanced button styles */
+.fgo-button.servant-1 {
+  background-color: var(--color-servant-1);
+  color: white;
+  border: 1px solid var(--color-servant-1);
+}
+
+.fgo-button.servant-1:hover {
+  background-color: var(--color-servant-1);
+  opacity: 0.9;
+  box-shadow: var(--shadow-sm);
+}
+
+.fgo-button.servant-2 {
+  background-color: var(--color-servant-2);
+  color: white;
+  border: 1px solid var(--color-servant-2);
+}
+
+.fgo-button.servant-2:hover {
+  background-color: var(--color-servant-2);
+  opacity: 0.9;
+  box-shadow: var(--shadow-sm);
+}
+
+.fgo-button.servant-3 {
+  background-color: var(--color-servant-3);
+  color: white;
+  border: 1px solid var(--color-servant-3);
+}
+
+.fgo-button.servant-3:hover {
+  background-color: var(--color-servant-3);
+  opacity: 0.9;
+  box-shadow: var(--shadow-sm);
+}
+
+.fgo-button.choice-button {
+  background-color: var(--color-secondary);
+  color: white;
+  border: 2px solid var(--color-secondary);
+}
+
+.fgo-button.choice-button:hover {
+  background-color: var(--color-secondary);
+  opacity: 0.9;
+  transform: scale(1.05);
+}
+
+/* Responsive design */
+@media (max-width: 960px) {
+  .command-main-grid {
+    flex-direction: column;
+  }
+  
+  .active-servant-card {
+    min-height: auto;
+  }
+  
+  .skill-buttons-container {
+    justify-content: center;
+  }
+}
+
+@media (max-width: 600px) {
+  .command-input-redesign {
+    padding: var(--spacing-sm);
+  }
+  
+  .skill-group {
+    margin-bottom: var(--spacing-sm);
+  }
+  
+  .fgo-button {
+    min-width: 50px;
+    font-size: var(--font-size-xs);
+  }
+}
+
+/* Legacy styles preserved for compatibility */
 .group-box {
   margin: 0.5rem;
   padding: 0.375rem;
@@ -26,7 +166,6 @@
   background-color: #DADD98;
 }
 
-/* Add new CSS for smaller text and alignment */
 .command-text {
   font-size: 12px;
   line-height: 1.2;
@@ -35,12 +174,12 @@
 .skill-container {
   display: flex;
   justify-content: space-between;
-  gap: 1rem; /* Add a gap to control the minimum space between items */
+  gap: 1rem;
 }
 
 .skill-container > * {
   flex-grow: 1;
-  max-width: calc(33.33% - 1rem); /* Ensure each item takes up a third of the container minus the gap */
+  max-width: calc(33.33% - 1rem);
 }
 
 .skill-buttons {

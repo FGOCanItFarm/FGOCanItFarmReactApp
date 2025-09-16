@@ -1,12 +1,48 @@
-import React from 'react';
-import { Box, Typography, TextField, FormControlLabel, Checkbox, InputAdornment, Select, MenuItem } from '@mui/material';
+/* SelectedServantDetails.js - Enhanced servant configuration interface
+ * UI Changes: Improved layout with better grouping and visual hierarchy
+ */
+import React, { useMemo } from 'react';
+import { Box, Typography, TextField, FormControlLabel, Checkbox, InputAdornment, Select, MenuItem, Grid, Paper } from '@mui/material';
 import '../SelectedServantDetail.css';
+import '../ui-vars.css';
 
 const SelectedServantDetails = ({ servant, handleEffectChange }) => {
-  if (!servant) return null;
+  const basicFields = useMemo(() => [
+    { field: 'level', label: 'Level', min: 1, max: 120, defaultValue: 90 },
+    { field: 'attack', label: 'Attack', min: 0, defaultValue: 0 },
+    { field: 'initialCharge', label: 'Starting Charge', min: servant?.append2 ? 20 : 0, defaultValue: 0, unit: '%' }
+  ], [servant?.append2]);
+
+  const buffFields = useMemo(() => [
+    { field: 'atkUp', label: 'Atk Up', unit: '%' },
+    { field: 'artsUp', label: 'Arts Up', unit: '%' },
+    { field: 'artsDamageUp', label: 'Arts Damage Up', unit: '%', tooltip: 'Acts like Valentines 2025 color boost chocolate or Class Score' },
+    { field: 'quickUp', label: 'Quick Up', unit: '%' },
+    { field: 'quickDamageUp', label: 'Quick Damage Up', unit: '%', tooltip: 'Acts like Valentines 2025 color boost chocolate or Class Score' },
+    { field: 'busterUp', label: 'Buster Up', unit: '%' },
+    { field: 'busterDamageUp', label: 'Buster Damage Up', unit: '%', tooltip: 'Acts like Valentines 2025 color boost chocolate or Class Score' },
+    { field: 'npUp', label: 'NP Up', unit: '%' },
+    { field: 'damageUp', label: 'Generic Damage Up', unit: '%' }
+  ], []);
+
+  if (!servant) {
+    return (
+      <Box className="servant-details-empty fgo-card" sx={{ 
+        minHeight: 300, 
+        display: 'flex', 
+        alignItems: 'center', 
+        justifyContent: 'center',
+        backgroundColor: 'var(--color-surface-variant)'
+      }}>
+        <Typography variant="body2" color="text.secondary" className="fgo-text-md">
+          Select a servant to configure
+        </Typography>
+      </Box>
+    );
+  }
 
   const handleChange = (field) => (event) => {
-    const value = Math.max(0, event.target.value); // Ensure value is not below 0
+    const value = Math.max(0, event.target.value);
     handleEffectChange(field, value);
   };
 
@@ -19,198 +55,107 @@ const SelectedServantDetails = ({ servant, handleEffectChange }) => {
   };
 
   return (
-    <Box mt={2} style={{ minHeight: '300px' }}>
-      <Typography variant="h6">{servant.name}</Typography>
-      <FormControlLabel
-        control={
-          <Checkbox
-            checked={servant.append2 || false}
-            onChange={handleCheckboxChange('append2')}
+    <Box className="servant-details-container fgo-card" sx={{ minHeight: 300 }}>
+      <Typography variant="h6" className="fgo-font-bold" sx={{ mb: 3 }}>
+        {servant.name || 'Servant Configuration'}
+      </Typography>
+
+      {/* Basic Configuration */}
+      <Paper elevation={1} sx={{ p: 2, mb: 2, backgroundColor: 'var(--color-surface-variant)' }}>
+        <Typography variant="subtitle2" className="fgo-font-medium" sx={{ mb: 2 }}>
+          Basic Configuration
+        </Typography>
+        
+        {/* Append Skills */}
+        <Box sx={{ mb: 2, display: 'flex', gap: 2, flexWrap: 'wrap' }}>
+          <FormControlLabel
+            control={
+              <Checkbox
+                checked={servant.append2 || false}
+                onChange={handleCheckboxChange('append2')}
+                size="small"
+              />
+            }
+            label="Append 2"
           />
-        }
-        label="Append 2"
-      />
-      <FormControlLabel
-        control={
-          <Checkbox
-            checked={servant.append_5 || false}
-            onChange={(e) => handleEffectChange('append5', e.target.checked)}
+          <FormControlLabel
+            control={
+              <Checkbox
+                checked={servant.append_5 || false}
+                onChange={(e) => handleEffectChange('append5', e.target.checked)}
+                size="small"
+              />
+            }
+            label="Append 5"
           />
-        }
-        label="Append 5"
-      />
-      <FormControlLabel
-        control={
+        </Box>
+
+        {/* NP Level */}
+        <Box sx={{ mb: 2 }}>
+          <Typography variant="caption" sx={{ mb: 1, display: 'block' }}>
+            NP Level
+          </Typography>
           <Select
             value={servant.npLevel || 1}
             onChange={handleChange('npLevel')}
-            displayEmpty
-            fullWidth
+            size="small"
+            sx={{ minWidth: 120 }}
           >
             {[1, 2, 3, 4, 5].map((level) => (
               <MenuItem key={level} value={level}>
-                {level}
+                NP{level}
               </MenuItem>
             ))}
           </Select>
-        }
-        label="NP Level"
-      />
-      <div className="detail-item-container">
-        <div className="detail-item">
-          <label>Level</label>
-          <TextField
-            type="number"
-            value={servant.level || 90}
-            onChange={handleChange('level')}
-            autoComplete="off"
-            inputProps={{ min: 1, max: 120 }}
-          />
-        </div>
-        <div className="detail-item">
-          <label>Attack</label>
-          <TextField
-            type="number"
-            value={servant.attack || 0}
-            onChange={handleChange('attack')}
-            autoComplete="off"
-            inputProps={{ min: 0 }}
-          />
-        </div>
-        <div className="detail-item">
-          <label>Starting Charge</label>
-          <TextField
-            type="number"
-            value={servant.initialCharge || 0}
-            onChange={handleChange('initialCharge')}
-            autoComplete="off"
-            inputProps={{ min: servant.append2 ? 20 : 0 }}
-            InputProps={{
-              endAdornment: <InputAdornment position="end">%</InputAdornment>
-            }}
-          />
-        </div>
-        <div className="detail-item">
-          <label>Atk Up</label>
-          <TextField
-            type="number"
-            value={servant.atkUp || 0}
-            onChange={handleChange('atkUp')}
-            autoComplete="off"
-            inputProps={{ min: 0 }}
-            InputProps={{
-              endAdornment: <InputAdornment position="end">%</InputAdornment>
-            }}
-          />
-        </div>
-        <div className="detail-item">
-          <label>Arts Up</label>
-          <TextField
-            type="number"
-            value={servant.artsUp || 0}
-            onChange={handleChange('artsUp')}
-            autoComplete="off"
-            inputProps={{ min: 0 }}
-            InputProps={{
-              endAdornment: <InputAdornment position="end">%</InputAdornment>
-            }}
-          />
-        </div>
-        <div className="detail-item">
-          <label>Arts Damage Up</label>
-          <TextField
-            type="number"
-            title='Acts like Valentines 2025 color boost chocolate or Class Score'
-            value={servant.artsDamageUp || 0}
-            onChange={handleChange('artsDamageUp')}
-            autoComplete="off"
-            inputProps={{ min: 0 }}
-            InputProps={{
-              endAdornment: <InputAdornment position="end">%</InputAdornment>
-            }}
-          />
-        </div>
-        <div className="detail-item">
-          <label>Quick Up</label>
-          <TextField
-            type="number"
-            value={servant.quickUp || 0}
-            onChange={handleChange('quickUp')}
-            autoComplete="off"
-            inputProps={{ min: 0 }}
-            InputProps={{
-              endAdornment: <InputAdornment position="end">%</InputAdornment>
-            }}
-          />
-        </div>
-        <div className="detail-item">
-          <label>Quick Damage Up</label>
-          <TextField
-            type="number"
-            title='Acts like Valentines 2025 color boost chocolate or Class Score'
-            value={servant.quickDamageUp || 0}
-            onChange={handleChange('quickDamageUp')}
-            autoComplete="off"
-            inputProps={{ min: 0 }}
-            InputProps={{
-              endAdornment: <InputAdornment position="end">%</InputAdornment>
-            }}
-          />
-        </div>
-        <div className="detail-item">
-          <label>Buster Up</label>
-          <TextField
-            type="number"
-            value={servant.busterUp || 0}
-            onChange={handleChange('busterUp')}
-            autoComplete="off"
-            inputProps={{ min: 0 }}
-            InputProps={{
-              endAdornment: <InputAdornment position="end">%</InputAdornment>
-            }}
-          />
-        </div>
-        <div className="detail-item">
-          <label>Buster Damage Up</label>
-          <TextField
-            type="number"
-            title='Acts like Valentines 2025 color boost chocolate or Class Score'
-            value={servant.busterDamageUp || 0}
-            onChange={handleChange('busterDamageUp')}
-            autoComplete="off"
-            inputProps={{ min: 0 }}
-            InputProps={{
-              endAdornment: <InputAdornment position="end">%</InputAdornment>
-            }}
-          />
-        </div>
-        <div className="detail-item">
-          <label>NP Up</label>
-          <TextField
-            type="number"
-            value={servant.npUp || 0}
-            onChange={handleChange('npUp')}
-            autoComplete="off"
-            inputProps={{ min: 0 }}
-            InputProps={{
-              endAdornment: <InputAdornment position="end">%</InputAdornment>
-            }}
-          />
-        </div>
-        <div className="detail-item">
-          <label>Generic Damage Up</label>
-          <TextField
-            type="number"
-            value={servant.damageUp || 0}
-            onChange={handleChange('damageUp')}
-            autoComplete="off"
-            inputProps={{ min: 0 }}
-            InputProps={{
-              endAdornment: <InputAdornment position="end">%</InputAdornment>
-            }}
-          />
-        </div>
-      </div>
+        </Box>
+
+        {/* Basic Stats */}
+        <Grid container spacing={2}>
+          {basicFields.map(({ field, label, min, max, defaultValue, unit }) => (
+            <Grid item xs={12} sm={6} key={field}>
+              <TextField
+                label={label}
+                type="number"
+                size="small"
+                fullWidth
+                value={servant[field] || defaultValue}
+                onChange={handleChange(field)}
+                inputProps={{ min, max }}
+                InputProps={unit ? {
+                  endAdornment: <InputAdornment position="end">{unit}</InputAdornment>
+                } : undefined}
+              />
+            </Grid>
+          ))}
+        </Grid>
+      </Paper>
+
+      {/* Buff Configuration */}
+      <Paper elevation={1} sx={{ p: 2, backgroundColor: 'var(--color-surface-variant)' }}>
+        <Typography variant="subtitle2" className="fgo-font-medium" sx={{ mb: 2 }}>
+          Buffs & Effects
+        </Typography>
+        
+        <Grid container spacing={2}>
+          {buffFields.map(({ field, label, unit, tooltip }) => (
+            <Grid item xs={12} sm={6} key={field}>
+              <TextField
+                label={label}
+                type="number"
+                size="small"
+                fullWidth
+                title={tooltip}
+                value={servant[field] || 0}
+                onChange={handleChange(field)}
+                inputProps={{ min: 0 }}
+                InputProps={unit ? {
+                  endAdornment: <InputAdornment position="end">{unit}</InputAdornment>
+                } : undefined}
+              />
+            </Grid>
+          ))}
+        </Grid>
+      </Paper>
     </Box>
   );
 };
