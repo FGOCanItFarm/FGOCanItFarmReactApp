@@ -29,6 +29,10 @@ body {
 .container {
   width: 8rem !important;
   height: 8rem !important;
+  line-height: 0; /* Remove baseline gaps from inline images */
+  box-sizing: border-box;
+  padding-right: 4px; /* Reduced from default */
+  padding-bottom: 4px; /* Reduced from default */
 }
 /* ul {
   padding: 0;
@@ -102,6 +106,7 @@ a {
   position: relative;
   height: 6rem;
   width: 6rem;
+  box-sizing: border-box; /* Include padding in width/height calculations */
   
   @include mQ(53rem) {
     border-radius: 1.8rem;
@@ -148,6 +153,8 @@ a {
           border-radius: 1rem;
           width: 5rem;
           height: 5rem;
+          display: block; /* Remove default inline image gaps */
+          object-fit: contain; /* Maintain aspect ratio */
           @include mQ(53rem) {
             border-radius: 1.6rem;
           }

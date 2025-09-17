@@ -1,5 +1,6 @@
 import React from 'react';
-import { Box, Button, Typography, Grid, Tooltip } from '@mui/material';
+import { Box, Button, Typography, Grid } from '@mui/material';
+import HintButton from './HintButton';
 import '../CommandInputMenu.css';
 import '../ui-vars.css';
 
@@ -46,98 +47,62 @@ const generateChoiceTargetCommand = (servantIndex, skillIndex, choice, targetInd
 const renderSkillButtons = (servantIndex, skillIndex, addCommand, team, isDisabled) => (
   <Box className="skill-buttons">
     <Grid container direction="column">
-      <Tooltip 
-        title={`On Servant 1 (${team[0]?.name || 'Empty'})`}
-        enterDelay={300}
-        leaveDelay={200}
-        PopperProps={{ 
-          strategy: 'fixed',
-          modifiers: [{ name: 'preventOverflow', enabled: true }]
+      <HintButton
+        className={`servant-${servantIndex + 1}`}
+        onClick={() => addCommand(generateSkillCommand(servantIndex, skillIndex, 0))}
+        style={{ 
+          border: '1px solid lightgray',
+          minWidth: 'var(--btn-small-min-width)',
+          minHeight: 'var(--btn-small-min-height)'
         }}
+        disabled={isDisabled}
+        aria-label={`Use skill ${skillIndex} on Servant 1`}
+        hint={`On Servant 1 (${team[0]?.name || 'Empty'})`}
       >
-        <Button
-          className={`servant-${servantIndex + 1}`}
-          onClick={() => addCommand(generateSkillCommand(servantIndex, skillIndex, 0))}
-          style={{ 
-            border: '1px solid lightgray',
-            minWidth: 'var(--btn-small-min-width)',
-            minHeight: 'var(--btn-small-min-height)'
-          }}
-          disabled={isDisabled}
-          aria-label={`Use skill ${skillIndex} on Servant 1`}
-        >
-          S1
-        </Button>
-      </Tooltip>
-      <Tooltip 
-        title={`On Servant 2 (${team[1]?.name || 'Empty'})`}
-        enterDelay={300}
-        leaveDelay={200}
-        PopperProps={{ 
-          strategy: 'fixed',
-          modifiers: [{ name: 'preventOverflow', enabled: true }]
+        S1
+      </HintButton>
+      <HintButton
+        className={`servant-${servantIndex + 1}`}
+        onClick={() => addCommand(generateSkillCommand(servantIndex, skillIndex, 1))}
+        style={{ 
+          border: '1px solid lightgray',
+          minWidth: 'var(--btn-small-min-width)',
+          minHeight: 'var(--btn-small-min-height)'
         }}
+        disabled={isDisabled}
+        aria-label={`Use skill ${skillIndex} on Servant 2`}
+        hint={`On Servant 2 (${team[1]?.name || 'Empty'})`}
       >
-        <Button
-          className={`servant-${servantIndex + 1}`}
-          onClick={() => addCommand(generateSkillCommand(servantIndex, skillIndex, 1))}
-          style={{ 
-            border: '1px solid lightgray',
-            minWidth: 'var(--btn-small-min-width)',
-            minHeight: 'var(--btn-small-min-height)'
-          }}
-          disabled={isDisabled}
-          aria-label={`Use skill ${skillIndex} on Servant 2`}
-        >
-          S2
-        </Button>
-      </Tooltip>
-      <Tooltip 
-        title={`On Servant 3 (${team[2]?.name || 'Empty'})`}
-        enterDelay={300}
-        leaveDelay={200}
-        PopperProps={{ 
-          strategy: 'fixed',
-          modifiers: [{ name: 'preventOverflow', enabled: true }]
+        S2
+      </HintButton>
+      <HintButton
+        className={`servant-${servantIndex + 1}`}
+        onClick={() => addCommand(generateSkillCommand(servantIndex, skillIndex, 2))}
+        style={{ 
+          border: '1px solid lightgray',
+          minWidth: 'var(--btn-small-min-width)',
+          minHeight: 'var(--btn-small-min-height)'
         }}
+        disabled={isDisabled}
+        aria-label={`Use skill ${skillIndex} on Servant 3`}
+        hint={`On Servant 3 (${team[2]?.name || 'Empty'})`}
       >
-        <Button
-          className={`servant-${servantIndex + 1}`}
-          onClick={() => addCommand(generateSkillCommand(servantIndex, skillIndex, 2))}
-          style={{ 
-            border: '1px solid lightgray',
-            minWidth: 'var(--btn-small-min-width)',
-            minHeight: 'var(--btn-small-min-height)'
-          }}
-          disabled={isDisabled}
-          aria-label={`Use skill ${skillIndex} on Servant 3`}
-        >
-          S3
-        </Button>
-      </Tooltip>
-      <Tooltip 
-        title="No Target"
-        enterDelay={300}
-        leaveDelay={200}
-        PopperProps={{ 
-          strategy: 'fixed',
-          modifiers: [{ name: 'preventOverflow', enabled: true }]
+        S3
+      </HintButton>
+      <HintButton
+        className={`servant-${servantIndex + 1}`}
+        onClick={() => addCommand(generateSkillCommand(servantIndex, skillIndex))}
+        style={{ 
+          border: '1px solid lightgray',
+          minWidth: 'var(--btn-small-min-width)',
+          minHeight: 'var(--btn-small-min-height)'
         }}
+        disabled={isDisabled}
+        aria-label={`Use skill ${skillIndex} with no target`}
+        hint="No Target"
       >
-        <Button
-          className={`servant-${servantIndex + 1}`}
-          onClick={() => addCommand(generateSkillCommand(servantIndex, skillIndex))}
-          style={{ 
-            border: '1px solid lightgray',
-            minWidth: 'var(--btn-small-min-width)',
-            minHeight: 'var(--btn-small-min-height)'
-          }}
-          disabled={isDisabled}
-          aria-label={`Use skill ${skillIndex} with no target`}
-        >
-          None
-        </Button>
-      </Tooltip>
+        None
+      </HintButton>
     </Grid>
   </Box>
 );
@@ -148,7 +113,6 @@ const renderChoiceButtons = (servantIndex, skillIndex, addCommand, team, isDisab
       <Button
         className={`servant-${servantIndex + 1}`}
         onClick={() => addCommand(generateChoiceCommand(servantIndex, skillIndex, 12))}
-        title={`Choice 1 | 2 On Servant 1 (${team[0]?.name || 'Empty'})`}
         style={{ border: '1px solid lightgray' }}
         disabled={isDisabled}
       >
@@ -157,7 +121,6 @@ const renderChoiceButtons = (servantIndex, skillIndex, addCommand, team, isDisab
       <Button
         className={`servant-${servantIndex + 1}`}
         onClick={() => addCommand(generateChoiceCommand(servantIndex, skillIndex, 22))}
-        title={`Choice 2 | 2 On Servant 2 (${team[1]?.name || 'Empty'})`}
         style={{ border: '1px solid lightgray' }}
         disabled={isDisabled}
       >
@@ -166,7 +129,6 @@ const renderChoiceButtons = (servantIndex, skillIndex, addCommand, team, isDisab
             <Button
         className={`servant-${servantIndex + 1}`}
         onClick={() => addCommand(generateChoiceCommand(servantIndex, skillIndex, 22))}
-        title={`Choice 2 | 2 On Servant 2 (${team[1]?.name || 'Empty'})`}
         style={{ border: '1px solid lightgray' }}
         disabled={isDisabled}
       >
@@ -175,7 +137,6 @@ const renderChoiceButtons = (servantIndex, skillIndex, addCommand, team, isDisab
       <Button
         className={`servant-${servantIndex + 1}`}
         onClick={() => addCommand(generateChoiceCommand(servantIndex, skillIndex, 12))}
-        title={`Choice 1 | 2 On Servant 1 (${team[0]?.name || 'Empty'})`}
         style={{ border: '1px solid lightgray' }}
         disabled={isDisabled}
       >
@@ -184,7 +145,6 @@ const renderChoiceButtons = (servantIndex, skillIndex, addCommand, team, isDisab
       <Button
         className={`servant-${servantIndex + 1}`}
         onClick={() => addCommand(generateChoiceCommand(servantIndex, skillIndex, 22))}
-        title={`Choice 2 | 2 On Servant 2 (${team[1]?.name || 'Empty'})`}
         style={{ border: '1px solid lightgray' }}
         disabled={isDisabled}
       >
@@ -193,7 +153,6 @@ const renderChoiceButtons = (servantIndex, skillIndex, addCommand, team, isDisab
             <Button
         className={`servant-${servantIndex + 1}`}
         onClick={() => addCommand(generateChoiceCommand(servantIndex, skillIndex, 22))}
-        title={`Choice 2 | 2 On Servant 2 (${team[1]?.name || 'Empty'})`}
         style={{ border: '1px solid lightgray' }}
         disabled={isDisabled}
       >
@@ -203,7 +162,6 @@ const renderChoiceButtons = (servantIndex, skillIndex, addCommand, team, isDisab
       <Button
         className={`servant-${servantIndex + 1}`}
         onClick={() => addCommand(generateChoiceCommand(servantIndex, skillIndex, 11))}
-        title={`Choice 1 | 3 On Servant 1 (${team[0]?.name || 'Empty'})`}
         style={{ border: '1px solid lightgray' }}
         disabled={isDisabled}
       >
@@ -212,7 +170,6 @@ const renderChoiceButtons = (servantIndex, skillIndex, addCommand, team, isDisab
       <Button
         className={`servant-${servantIndex + 1}`}
         onClick={() => addCommand(generateChoiceCommand(servantIndex, skillIndex, 12))}
-        title={`Choice 1 | 3 On Servant 2 (${team[0]?.name || 'Empty'})`}
         style={{ border: '1px solid lightgray' }}
         disabled={isDisabled}
       >
@@ -221,7 +178,6 @@ const renderChoiceButtons = (servantIndex, skillIndex, addCommand, team, isDisab
       <Button
         className={`servant-${servantIndex + 1}`}
         onClick={() => addCommand(generateChoiceCommand(servantIndex, skillIndex, 13))}
-        title={`Choice 1 | 3 On Servant 3 (${team[0]?.name || 'Empty'})`}
         style={{ border: '1px solid lightgray' }}
         disabled={isDisabled}
       >
@@ -230,7 +186,6 @@ const renderChoiceButtons = (servantIndex, skillIndex, addCommand, team, isDisab
       <Button
         className={`servant-${servantIndex + 1}`}
         onClick={() => addCommand(generateChoiceCommand(servantIndex, skillIndex, 21))}
-        title={`Choice 2 | 3 On Servant 1 (${team[0]?.name || 'Empty'})`}
         style={{ border: '1px solid lightgray' }}
         disabled={isDisabled}
       >
@@ -239,7 +194,6 @@ const renderChoiceButtons = (servantIndex, skillIndex, addCommand, team, isDisab
       <Button
         className={`servant-${servantIndex + 1}`}
         onClick={() => addCommand(generateChoiceCommand(servantIndex, skillIndex, 22))}
-        title={`Choice 2 | 3 On Servant 2 (${team[0]?.name || 'Empty'})`}
         style={{ border: '1px solid lightgray' }}
         disabled={isDisabled}
       >
@@ -248,7 +202,6 @@ const renderChoiceButtons = (servantIndex, skillIndex, addCommand, team, isDisab
       <Button
         className={`servant-${servantIndex + 1}`}
         onClick={() => addCommand(generateChoiceCommand(servantIndex, skillIndex, 23))}
-        title={`Choice 2 | 3 On Servant 3 (${team[0]?.name || 'Empty'})`}
         style={{ border: '1px solid lightgray' }}
         disabled={isDisabled}
       >
@@ -257,7 +210,6 @@ const renderChoiceButtons = (servantIndex, skillIndex, addCommand, team, isDisab
       <Button
         className={`servant-${servantIndex + 1}`}
         onClick={() => addCommand(generateChoiceCommand(servantIndex, skillIndex, 31))}
-        title={`Choice 3 | 3 On Servant 1 (${team[0]?.name || 'Empty'})`}
         style={{ border: '1px solid lightgray' }}
         disabled={isDisabled}
       >
@@ -266,7 +218,6 @@ const renderChoiceButtons = (servantIndex, skillIndex, addCommand, team, isDisab
       <Button
         className={`servant-${servantIndex + 1}`}
         onClick={() => addCommand(generateChoiceCommand(servantIndex, skillIndex, 32))}
-        title={`Choice 3 | 3 On Servant 2 (${team[0]?.name || 'Empty'})`}
         style={{ border: '1px solid lightgray' }}
         disabled={isDisabled}
       >
@@ -275,7 +226,6 @@ const renderChoiceButtons = (servantIndex, skillIndex, addCommand, team, isDisab
       <Button
         className={`servant-${servantIndex + 1}`}
         onClick={() => addCommand(generateChoiceCommand(servantIndex, skillIndex, 33))}
-        title={`Choice 3 | 3 On Servant 3 (${team[0]?.name || 'Empty'})`}
         style={{ border: '1px solid lightgray' }}
         disabled={isDisabled}
       >
@@ -292,7 +242,6 @@ const render2ChoiceTargetButtons = (servantIndex, skillIndex, addCommand, team, 
       <Button
         className={`servant-${servantIndex + 1}`}
         onClick={() => addCommand(generateChoiceTargetCommand(servantIndex, skillIndex, 12, 1))}
-        title={`Choice 1 | 2 On Servant 1 (${team[0]?.name || 'Empty'})`}
         style={{ border: '1px solid lightgray' }}
         disabled={isDisabled}
       >
@@ -301,7 +250,6 @@ const render2ChoiceTargetButtons = (servantIndex, skillIndex, addCommand, team, 
       <Button
         className={`servant-${servantIndex + 1}`}
         onClick={() => addCommand(generateChoiceTargetCommand(servantIndex, skillIndex, 12, 2))}
-        title={`Choice 1 | 2 On Servant 2 (${team[1]?.name || 'Empty'})`}
         style={{ border: '1px solid lightgray' }}
         disabled={isDisabled}
       >
@@ -310,7 +258,6 @@ const render2ChoiceTargetButtons = (servantIndex, skillIndex, addCommand, team, 
       <Button
         className={`servant-${servantIndex + 1}`}
         onClick={() => addCommand(generateChoiceTargetCommand(servantIndex, skillIndex, 12, 3))}
-        title={`Choice 1 | 2 On Servant 3 (${team[2]?.name || 'Empty'})`}
         style={{ border: '1px solid lightgray' }}
         disabled={isDisabled}
       >
@@ -319,7 +266,6 @@ const render2ChoiceTargetButtons = (servantIndex, skillIndex, addCommand, team, 
       <Button
         className={`servant-${servantIndex + 1}`}
         onClick={() => addCommand(generateChoiceTargetCommand(servantIndex, skillIndex, 22, 1))}
-        title={`Choice 2 | 2 On Servant 1 (${team[0]?.name || 'Empty'})`}
         style={{ border: '1px solid lightgray' }}
         disabled={isDisabled}
       >
@@ -328,7 +274,6 @@ const render2ChoiceTargetButtons = (servantIndex, skillIndex, addCommand, team, 
       <Button
         className={`servant-${servantIndex + 1}`}
         onClick={() => addCommand(generateChoiceTargetCommand(servantIndex, skillIndex, 22, 2))}
-        title={`Choice 2 | 2 On Servant 2 (${team[1]?.name || 'Empty'})`}
         style={{ border: '1px solid lightgray' }}
         disabled={isDisabled}
       >
@@ -337,7 +282,6 @@ const render2ChoiceTargetButtons = (servantIndex, skillIndex, addCommand, team, 
       <Button
         className={`servant-${servantIndex + 1}`}
         onClick={() => addCommand(generateChoiceTargetCommand(servantIndex, skillIndex, 22, 3))}
-        title={`Choice 2 | 2 On Servant 3 (${team[2]?.name || 'Empty'})`}
         style={{ border: '1px solid lightgray' }}
         disabled={isDisabled}
       >
@@ -412,104 +356,68 @@ const CommandInputMenu = ({ activeServant, updateCommands, team }) => {
         <Typography variant="h6">General Commands</Typography>
         <Grid container spacing={2} justifyContent="center">
           <Grid item>
-            <Tooltip 
-              title="End Turn - Token: #"
-              enterDelay={300}
-              leaveDelay={200}
-              PopperProps={{ 
-                strategy: 'fixed',
-                modifiers: [{ name: 'preventOverflow', enabled: true }]
+            <HintButton
+              variant="contained"
+              color="primary"
+              onClick={() => addCommand('#')}
+              disabled={isDisabled}
+              style={{
+                minWidth: 'var(--btn-min-width)',
+                minHeight: 'var(--btn-min-height)'
               }}
+              aria-label="End turn command"
+              hint="End Turn - Token: #"
             >
-              <Button
-                variant="contained"
-                color="primary"
-                onClick={() => addCommand('#')}
-                disabled={isDisabled}
-                style={{
-                  minWidth: 'var(--btn-min-width)',
-                  minHeight: 'var(--btn-min-height)'
-                }}
-                aria-label="End turn command"
-              >
-                End Turn
-              </Button>
-            </Tooltip>
+              End Turn
+            </HintButton>
           </Grid>
           <Grid item>
-            <Tooltip 
-              title="Use NP (Servant 1) - Token: 4"
-              enterDelay={300}
-              leaveDelay={200}
-              PopperProps={{ 
-                strategy: 'fixed',
-                modifiers: [{ name: 'preventOverflow', enabled: true }]
+            <HintButton
+              variant="contained"
+              color="primary"
+              onClick={() => addCommand('4')}
+              disabled={isDisabled}
+              style={{
+                minWidth: 'var(--btn-min-width)',
+                minHeight: 'var(--btn-min-height)'
               }}
+              aria-label="Use Noble Phantasm for Servant 1"
+              hint="Use NP (Servant 1) - Token: 4"
             >
-              <Button
-                variant="contained"
-                color="primary"
-                onClick={() => addCommand('4')}
-                disabled={isDisabled}
-                style={{
-                  minWidth: 'var(--btn-min-width)',
-                  minHeight: 'var(--btn-min-height)'
-                }}
-                aria-label="Use Noble Phantasm for Servant 1"
-              >
-                Use NP (Servant 1)
-              </Button>
-            </Tooltip>
+              Use NP (Servant 1)
+            </HintButton>
           </Grid>
           <Grid item>
-            <Tooltip 
-              title="Use NP (Servant 2) - Token: 5"
-              enterDelay={300}
-              leaveDelay={200}
-              PopperProps={{ 
-                strategy: 'fixed',
-                modifiers: [{ name: 'preventOverflow', enabled: true }]
+            <HintButton
+              variant="contained"
+              color="primary"
+              onClick={() => addCommand('5')}
+              disabled={isDisabled}
+              style={{
+                minWidth: 'var(--btn-min-width)',
+                minHeight: 'var(--btn-min-height)'
               }}
+              aria-label="Use Noble Phantasm for Servant 2"
+              hint="Use NP (Servant 2) - Token: 5"
             >
-              <Button
-                variant="contained"
-                color="primary"
-                onClick={() => addCommand('5')}
-                disabled={isDisabled}
-                style={{
-                  minWidth: 'var(--btn-min-width)',
-                  minHeight: 'var(--btn-min-height)'
-                }}
-                aria-label="Use Noble Phantasm for Servant 2"
-              >
-                Use NP (Servant 2)
-              </Button>
-            </Tooltip>
+              Use NP (Servant 2)
+            </HintButton>
           </Grid>
           <Grid item>
-            <Tooltip 
-              title="Use NP (Servant 3) - Token: 6"
-              enterDelay={300}
-              leaveDelay={200}
-              PopperProps={{ 
-                strategy: 'fixed',
-                modifiers: [{ name: 'preventOverflow', enabled: true }]
+            <HintButton
+              variant="contained"
+              color="primary"
+              onClick={() => addCommand('6')}
+              disabled={isDisabled}
+              style={{
+                minWidth: 'var(--btn-min-width)',
+                minHeight: 'var(--btn-min-height)'
               }}
+              aria-label="Use Noble Phantasm for Servant 3"
+              hint="Use NP (Servant 3) - Token: 6"
             >
-              <Button
-                variant="contained"
-                color="primary"
-                onClick={() => addCommand('6')}
-                disabled={isDisabled}
-                style={{
-                  minWidth: 'var(--btn-min-width)',
-                  minHeight: 'var(--btn-min-height)'
-                }}
-                aria-label="Use Noble Phantasm for Servant 3"
-              >
-                Use NP (Servant 3)
-              </Button>
-            </Tooltip>
+              Use NP (Servant 3)
+            </HintButton>
           </Grid>
         </Grid>
       </Box>
