@@ -7,7 +7,9 @@ import QuestSelectionPage from './components/QuestSelectionPage';
 import CommandInputPage from './components/CommandInputPage';
 import Instructions from './components/Instructions';
 import SearchPage from './components/SearchPage';
+import StickyTeamBar from './components/StickyTeamBar';
 import axios from 'axios';
+import './ui-vars.css';
 
 const App = () => {
   const [team, setTeam] = useState(Array(6).fill({ collectionNo: '' }));
@@ -252,6 +254,14 @@ const App = () => {
           <Route path="/" element={<Instructions />} />
         </Routes>
       </Container>
+      
+      {/* Sticky Team Bar - always visible */}
+      <StickyTeamBar 
+        team={team}
+        servants={servants}
+        selectedMysticCode={selectedMysticCode}
+        selectedQuest={selectedQuest}
+      />
     </Router>
   );
 };

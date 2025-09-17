@@ -1,0 +1,28 @@
+/* UI Variables for consistent spacing and sizing */
+:root {
+  /* Button sizing */
+  --btn-min-width: 80px;
+  --btn-min-height: 36px;
+  --btn-small-min-width: 60px;
+  --btn-small-min-height: 32px;
+  
+  /* Spacing */
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 16px;
+  --spacing-lg: 24px;
+  --spacing-xl: 32px;
+  
+  /* Sticky team bar */
+  --sticky-team-height: 80px;
+  --sticky-team-expanded-height: 120px;
+  --sticky-team-width: 100%;
+  --sticky-team-max-width: 480px;
+  --servant-compact-size: 48px;
+  
+  /* Z-index layers */
+  --z-sticky: 1000;
+  --z-tooltip: 1100;
+  --z-popover: 1200;
+  --z-modal: 1300;
+}

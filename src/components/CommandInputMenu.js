@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { Box, Button, Typography, Grid } from '@mui/material';
+import { Box, Button, Typography, Grid, Tooltip } from '@mui/material';
 import '../CommandInputMenu.css';
+import '../ui-vars.css';
 
 const generateSkillCommand = (servantIndex, skillIndex, targetIndex = null) => {
   const skillLabels = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i'];
@@ -45,42 +46,98 @@ const generateChoiceTargetCommand = (servantIndex, skillIndex, choice, targetInd
 const renderSkillButtons = (servantIndex, skillIndex, addCommand, team, isDisabled) => (
   <Box className="skill-buttons">
     <Grid container direction="column">
-      <Button
-        className={`servant-${servantIndex + 1}`}
-        onClick={() => addCommand(generateSkillCommand(servantIndex, skillIndex, 0))}
+      <Tooltip 
         title={`On Servant 1 (${team[0]?.name || 'Empty'})`}
-        style={{ border: '1px solid lightgray' }}
-        disabled={isDisabled}
+        enterDelay={300}
+        leaveDelay={200}
+        PopperProps={{ 
+          strategy: 'fixed',
+          modifiers: [{ name: 'preventOverflow', enabled: true }]
+        }}
       >
-        S1
-      </Button>
-      <Button
-        className={`servant-${servantIndex + 1}`}
-        onClick={() => addCommand(generateSkillCommand(servantIndex, skillIndex, 1))}
+        <Button
+          className={`servant-${servantIndex + 1}`}
+          onClick={() => addCommand(generateSkillCommand(servantIndex, skillIndex, 0))}
+          style={{ 
+            border: '1px solid lightgray',
+            minWidth: 'var(--btn-small-min-width)',
+            minHeight: 'var(--btn-small-min-height)'
+          }}
+          disabled={isDisabled}
+          aria-label={`Use skill ${skillIndex} on Servant 1`}
+        >
+          S1
+        </Button>
+      </Tooltip>
+      <Tooltip 
         title={`On Servant 2 (${team[1]?.name || 'Empty'})`}
-        style={{ border: '1px solid lightgray' }}
-        disabled={isDisabled}
+        enterDelay={300}
+        leaveDelay={200}
+        PopperProps={{ 
+          strategy: 'fixed',
+          modifiers: [{ name: 'preventOverflow', enabled: true }]
+        }}
       >
-        S2
-      </Button>
-      <Button
-        className={`servant-${servantIndex + 1}`}
-        onClick={() => addCommand(generateSkillCommand(servantIndex, skillIndex, 2))}
+        <Button
+          className={`servant-${servantIndex + 1}`}
+          onClick={() => addCommand(generateSkillCommand(servantIndex, skillIndex, 1))}
+          style={{ 
+            border: '1px solid lightgray',
+            minWidth: 'var(--btn-small-min-width)',
+            minHeight: 'var(--btn-small-min-height)'
+          }}
+          disabled={isDisabled}
+          aria-label={`Use skill ${skillIndex} on Servant 2`}
+        >
+          S2
+        </Button>
+      </Tooltip>
+      <Tooltip 
         title={`On Servant 3 (${team[2]?.name || 'Empty'})`}
-        style={{ border: '1px solid lightgray' }}
-        disabled={isDisabled}
+        enterDelay={300}
+        leaveDelay={200}
+        PopperProps={{ 
+          strategy: 'fixed',
+          modifiers: [{ name: 'preventOverflow', enabled: true }]
+        }}
       >
-        S3
-      </Button>
-      <Button
-        className={`servant-${servantIndex + 1}`}
-        onClick={() => addCommand(generateSkillCommand(servantIndex, skillIndex))}
+        <Button
+          className={`servant-${servantIndex + 1}`}
+          onClick={() => addCommand(generateSkillCommand(servantIndex, skillIndex, 2))}
+          style={{ 
+            border: '1px solid lightgray',
+            minWidth: 'var(--btn-small-min-width)',
+            minHeight: 'var(--btn-small-min-height)'
+          }}
+          disabled={isDisabled}
+          aria-label={`Use skill ${skillIndex} on Servant 3`}
+        >
+          S3
+        </Button>
+      </Tooltip>
+      <Tooltip 
         title="No Target"
-        style={{ border: '1px solid lightgray' }}
-        disabled={isDisabled}
+        enterDelay={300}
+        leaveDelay={200}
+        PopperProps={{ 
+          strategy: 'fixed',
+          modifiers: [{ name: 'preventOverflow', enabled: true }]
+        }}
       >
-        None
-      </Button>
+        <Button
+          className={`servant-${servantIndex + 1}`}
+          onClick={() => addCommand(generateSkillCommand(servantIndex, skillIndex))}
+          style={{ 
+            border: '1px solid lightgray',
+            minWidth: 'var(--btn-small-min-width)',
+            minHeight: 'var(--btn-small-min-height)'
+          }}
+          disabled={isDisabled}
+          aria-label={`Use skill ${skillIndex} with no target`}
+        >
+          None
+        </Button>
+      </Tooltip>
     </Grid>
   </Box>
 );
@@ -330,8 +387,6 @@ const renderButtonsForServant = (servantIndex, skillIndex, collectionNo, addComm
 };
 
 const CommandInputMenu = ({ activeServant, updateCommands, team }) => {
-  const [selectedServant, setSelectedServant] = useState(null);
-
   const addCommand = (command) => {
     updateCommands((prevCommands) => [...prevCommands, command]);
   };
@@ -357,44 +412,104 @@ const CommandInputMenu = ({ activeServant, updateCommands, team }) => {
         <Typography variant="h6">General Commands</Typography>
         <Grid container spacing={2} justifyContent="center">
           <Grid item>
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={() => addCommand('#')}
-              disabled={isDisabled}
+            <Tooltip 
+              title="End Turn - Token: #"
+              enterDelay={300}
+              leaveDelay={200}
+              PopperProps={{ 
+                strategy: 'fixed',
+                modifiers: [{ name: 'preventOverflow', enabled: true }]
+              }}
             >
-              End Turn
-            </Button>
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={() => addCommand('#')}
+                disabled={isDisabled}
+                style={{
+                  minWidth: 'var(--btn-min-width)',
+                  minHeight: 'var(--btn-min-height)'
+                }}
+                aria-label="End turn command"
+              >
+                End Turn
+              </Button>
+            </Tooltip>
           </Grid>
           <Grid item>
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={() => addCommand('4')}
-              disabled={isDisabled}
+            <Tooltip 
+              title="Use NP (Servant 1) - Token: 4"
+              enterDelay={300}
+              leaveDelay={200}
+              PopperProps={{ 
+                strategy: 'fixed',
+                modifiers: [{ name: 'preventOverflow', enabled: true }]
+              }}
             >
-              Use NP (Servant 1)
-            </Button>
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={() => addCommand('4')}
+                disabled={isDisabled}
+                style={{
+                  minWidth: 'var(--btn-min-width)',
+                  minHeight: 'var(--btn-min-height)'
+                }}
+                aria-label="Use Noble Phantasm for Servant 1"
+              >
+                Use NP (Servant 1)
+              </Button>
+            </Tooltip>
           </Grid>
           <Grid item>
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={() => addCommand('5')}
-              disabled={isDisabled}
+            <Tooltip 
+              title="Use NP (Servant 2) - Token: 5"
+              enterDelay={300}
+              leaveDelay={200}
+              PopperProps={{ 
+                strategy: 'fixed',
+                modifiers: [{ name: 'preventOverflow', enabled: true }]
+              }}
             >
-              Use NP (Servant 2)
-            </Button>
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={() => addCommand('5')}
+                disabled={isDisabled}
+                style={{
+                  minWidth: 'var(--btn-min-width)',
+                  minHeight: 'var(--btn-min-height)'
+                }}
+                aria-label="Use Noble Phantasm for Servant 2"
+              >
+                Use NP (Servant 2)
+              </Button>
+            </Tooltip>
           </Grid>
           <Grid item>
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={() => addCommand('6')}
-              disabled={isDisabled}
+            <Tooltip 
+              title="Use NP (Servant 3) - Token: 6"
+              enterDelay={300}
+              leaveDelay={200}
+              PopperProps={{ 
+                strategy: 'fixed',
+                modifiers: [{ name: 'preventOverflow', enabled: true }]
+              }}
             >
-              Use NP (Servant 3)
-            </Button>
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={() => addCommand('6')}
+                disabled={isDisabled}
+                style={{
+                  minWidth: 'var(--btn-min-width)',
+                  minHeight: 'var(--btn-min-height)'
+                }}
+                aria-label="Use Noble Phantasm for Servant 3"
+              >
+                Use NP (Servant 3)
+              </Button>
+            </Tooltip>
           </Grid>
         </Grid>
       </Box>
