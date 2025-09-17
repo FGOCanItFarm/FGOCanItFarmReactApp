@@ -30,14 +30,61 @@
   justify-content: space-between;
 }
 
-.common-servants-grid {
-  min-width: 18rem;
-  flex: 1;
-  margin-right: 1rem;
+/* New vertical layout for common servants and servant selection */
+.servants-container {
+  flex: 3;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
 }
 
+.common-servants-wrapper {
+  /* Top section for common servants */
+}
+
+.servant-selection-wrapper {
+  /* Bottom section for servant selection */
+  flex: 1;
+}
+
+/* Horizontal layout for common servants */
+.common-servants-grid {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.common-servants-horizontal {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--servant-gap);
+  align-items: flex-start;
+}
+
+.common-servant-item {
+  flex: 0 0 var(--servant-slot-size);
+  cursor: pointer;
+}
+
+/* Horizontal layout for servant selection */
 .servant-selection {
-  flex: 3;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.servant-selection-horizontal {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--servant-gap);
+  align-items: flex-start;
+  max-height: 30rem;
+  overflow-y: auto;
+}
+
+.servant-selection-item {
+  flex: 0 0 var(--servant-slot-size);
+  cursor: pointer;
 }
 
 .team-section {

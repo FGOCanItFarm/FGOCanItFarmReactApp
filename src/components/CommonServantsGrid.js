@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { Grid, Typography } from '@mui/material';
+import { Typography } from '@mui/material';
 import ServantAvatar from './ServantAvatar';
 
 const supportsList = [316, 284, 314, 357, 215];
@@ -28,25 +28,23 @@ const CommonServantsGrid = ({ handleServantClick, team }) => {
   }, []);
 
   return (
-    <div style={{ maxWidth: '16rem', display: 'flex', flexDirection: 'column', alignItems: 'center', height: '100%', overflowY: 'auto' }}>
+    <div className="common-servants-grid">
       <Typography variant="h6" style={{ marginBottom: "1rem" }}>Common Servants</Typography>
-      <Grid container spacing={2} style={{ flexDirection: 'column' }}>
+      <div className="common-servants-horizontal">
         {servants.map((servant, index) => (
-          <Grid
-            item
+          <div
             key={index}
-            xs={12}
+            className="common-servant-item"
             onClick={() => handleServantClick(servant)}
-            style={{ cursor: 'pointer' }}
           >
             <ServantAvatar
               servantFace={servant.extraAssets?.faces?.ascension?.['4']}
               bgType={servant.noblePhantasms?.['0']?.card}
               tagType={servant.noblePhantasms?.['0']?.effectFlags?.['0']}
             />
-          </Grid>
+          </div>
         ))}
-      </Grid>
+      </div>
     </div>
   );
 };

@@ -91,16 +91,18 @@ const TeamSelectionPage = ({ team, setTeam, servants, filteredServants, setFilte
             attackTypeLabels={attackTypeLabels}
           />
         </div>
-        <div className="common-servants-grid">
-          <CommonServantsGrid
-            handleServantClick={handleServantClick}
-          />
-        </div>
-        <div className="servant-selection">
-          <ServantSelection
-            servants={filteredServants}
-            handleServantClick={handleServantClick}
-          />
+        <div className="servants-container">
+          <div className="common-servants-wrapper">
+            <CommonServantsGrid
+              handleServantClick={handleServantClick}
+            />
+          </div>
+          <div className="servant-selection-wrapper">
+            <ServantSelection
+              servants={filteredServants}
+              handleServantClick={handleServantClick}
+            />
+          </div>
         </div>
       </div>
       <Box mt={2}>

@@ -20,6 +20,10 @@
   --sticky-team-max-width: 480px;
   --servant-compact-size: 48px;
   
+  /* Servant avatar sizing for consistent layout */
+  --servant-slot-size: 88px;
+  --servant-gap: 8px;
+  
   /* Z-index layers */
   --z-sticky: 1000;
   --z-tooltip: 1100;
