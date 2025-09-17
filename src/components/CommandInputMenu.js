@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Box, Button, Typography, Grid, Tooltip } from '@mui/material';
 import '../CommandInputMenu.css';
 import '../ui-vars.css';
