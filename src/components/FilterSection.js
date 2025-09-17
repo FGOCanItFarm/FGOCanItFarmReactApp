@@ -1,5 +1,6 @@
 import React from 'react';
-import { Typography, TextField, Button, Box } from '@mui/material';
+import { Typography, TextField, Box } from '@mui/material';
+import './FilterSection.css';
 
 // Filter persistence configuration
 // Set to 'remember' to persist filters across page refreshes using localStorage
@@ -81,98 +82,108 @@ const FilterSection = ({ sortOrder, setSortOrder, searchQuery, setSearchQuery, s
       {/* Compact Class Filter */}
       <Box mb={2}>
         <Typography variant="subtitle2" gutterBottom>Class</Typography>
-        <div className="compact-filter-grid">
-          {classData.map(classItem => (
-            <button
-              key={classItem.key}
-              className={`filter-button ${selectedClass.includes(classItem.key.toLowerCase()) ? 'filter-button-active' : ''}`}
-              onClick={() => handleClassToggle(classItem.key.toLowerCase())}
-              data-filter="class"
-              data-val={classItem.key}
-              tabIndex={0}
-              role="button"
-              aria-pressed={selectedClass.includes(classItem.key.toLowerCase())}
-              title={`Toggle ${classItem.name} class filter`}
-            >
-              <img 
-                src={`${process.env.PUBLIC_URL}/class-icons/${classItem.key}.png`}
-                alt={classItem.name}
-                onError={(e) => {
-                  // Fallback to text if image doesn't exist
-                  e.target.style.display = 'none';
-                  e.target.parentElement.innerHTML = classItem.name.substring(0, 3);
-                }}
-                style={{ width: '32px', height: '32px' }}
-              />
-              <span className="filter-button-text">{classItem.name}</span>
-            </button>
-          ))}
+        <div className="filter-grid-wrapper">
+          <div className="filter-grid">
+            {classData.map(classItem => (
+              <button
+                key={classItem.key}
+                className={`filter-item ${selectedClass.includes(classItem.key.toLowerCase()) ? 'active' : ''}`}
+                onClick={() => handleClassToggle(classItem.key.toLowerCase())}
+                data-filter="class"
+                data-val={classItem.key}
+                tabIndex={0}
+                aria-pressed={selectedClass.includes(classItem.key.toLowerCase())}
+                title={`Toggle ${classItem.name} class filter`}
+              >
+                <img 
+                  src={`${process.env.PUBLIC_URL}/class-icons/${classItem.key}.png`}
+                  alt={classItem.name}
+                  onError={(e) => {
+                    // Fallback to text if image doesn't exist
+                    e.target.style.display = 'none';
+                    e.target.parentElement.innerHTML = classItem.name.substring(0, 3);
+                  }}
+                  style={{ width: '32px', height: '32px' }}
+                />
+                <span className="filter-item-text">{classItem.name}</span>
+              </button>
+            ))}
+          </div>
         </div>
       </Box>
 
       {/* Compact Rarity Filter */}
       <Box mb={2}>
         <Typography variant="subtitle2" gutterBottom>Rarity</Typography>
-        <div className="compact-filter-row">
-          {[5, 4, 3, 2, 1, 0].map(rarity => (
-            <button
-              key={rarity}
-              className={`filter-button filter-button-small ${selectedRarity.includes(rarity.toString()) ? 'filter-button-active' : ''}`}
-              onClick={() => handleRarityToggle(rarity)}
-              data-filter="rarity"
-              data-val={rarity}
-              tabIndex={0}
-              role="button"
-              aria-pressed={selectedRarity.includes(rarity.toString())}
-              title={`Toggle ${rarity} star rarity filter`}
-            >
-              {rarity}★
-            </button>
-          ))}
+        <div className="filter-grid-wrapper">
+          <div className="filter-grid">
+            {[5, 4, 3, 2, 1, 0].map(rarity => (
+              <button
+                key={rarity}
+                className={`filter-item ${selectedRarity.includes(rarity.toString()) ? 'active' : ''}`}
+                onClick={() => handleRarityToggle(rarity)}
+                data-filter="rarity"
+                data-val={rarity}
+                tabIndex={0}
+                aria-pressed={selectedRarity.includes(rarity.toString())}
+                title={`Toggle ${rarity} star rarity filter`}
+              >
+                {rarity}★
+              </button>
+            ))}
+            {/* Add placeholder to complete 7 columns */}
+            <div style={{ visibility: 'hidden' }}></div>
+          </div>
         </div>
       </Box>
 
       {/* Compact NP Type Filter */}
       <Box mb={2}>
         <Typography variant="subtitle2" gutterBottom>NP Type</Typography>
-        <div className="compact-filter-row">
-          {['buster', 'arts', 'quick'].map(npType => (
-            <button
-              key={npType}
-              className={`filter-button filter-button-np ${selectedNpType.includes(npType.toLowerCase()) ? 'filter-button-active' : ''}`}
-              onClick={() => handleNpToggle(npType.toLowerCase())}
-              data-filter="npType"
-              data-val={npType}
-              tabIndex={0}
-              role="button"
-              aria-pressed={selectedNpType.includes(npType.toLowerCase())}
-              title={`Toggle ${npType} NP type filter`}
-            >
-              {capitalize(npType)}
-            </button>
-          ))}
+        <div className="filter-grid-wrapper">
+          <div className="filter-grid">
+            {['buster', 'arts', 'quick'].map(npType => (
+              <button
+                key={npType}
+                className={`filter-item ${selectedNpType.includes(npType.toLowerCase()) ? 'active' : ''}`}
+                onClick={() => handleNpToggle(npType.toLowerCase())}
+                data-filter="npType"
+                data-val={npType}
+                tabIndex={0}
+                aria-pressed={selectedNpType.includes(npType.toLowerCase())}
+                title={`Toggle ${npType} NP type filter`}
+              >
+                {capitalize(npType)}
+              </button>
+            ))}
+            {/* Add placeholders to complete 7 columns */}
+            {[...Array(4)].map((_, i) => <div key={`np-placeholder-${i}`} style={{ visibility: 'hidden' }}></div>)}
+          </div>
         </div>
       </Box>
 
       {/* Compact Attack Type Filter */}
       <Box mb={2}>
         <Typography variant="subtitle2" gutterBottom>Attack Type</Typography>
-        <div className="compact-filter-row">
-          {['attackEnemyOne', 'attackEnemyAll', 'support'].map(attackType => (
-            <button
-              key={attackType}
-              className={`filter-button filter-button-attack ${selectedAttackType.includes(attackType) ? 'filter-button-active' : ''}`}
-              onClick={() => handleAttackToggle(attackType)}
-              data-filter="attackType"
-              data-val={attackType}
-              tabIndex={0}
-              role="button"
-              aria-pressed={selectedAttackType.includes(attackType)}
-              title={`Toggle ${attackTypeLabels[attackType]} attack type filter`}
-            >
-              {attackTypeLabels[attackType]}
-            </button>
-          ))}
+        <div className="filter-grid-wrapper">
+          <div className="filter-grid">
+            {['attackEnemyOne', 'attackEnemyAll', 'support'].map(attackType => (
+              <button
+                key={attackType}
+                className={`filter-item ${selectedAttackType.includes(attackType) ? 'active' : ''}`}
+                onClick={() => handleAttackToggle(attackType)}
+                data-filter="attackType"
+                data-val={attackType}
+                tabIndex={0}
+                aria-pressed={selectedAttackType.includes(attackType)}
+                title={`Toggle ${attackTypeLabels[attackType]} attack type filter`}
+              >
+                {attackTypeLabels[attackType]}
+              </button>
+            ))}
+            {/* Add placeholders to complete 7 columns */}
+            {[...Array(4)].map((_, i) => <div key={`attack-placeholder-${i}`} style={{ visibility: 'hidden' }}></div>)}
+          </div>
         </div>
       </Box>
     </div>

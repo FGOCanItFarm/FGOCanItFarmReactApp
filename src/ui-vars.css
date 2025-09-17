@@ -29,4 +29,10 @@
   --z-tooltip: 1100;
   --z-popover: 1200;
   --z-modal: 1300;
+  
+  /* Filter and servant grid sizing */
+  --filter-gap: 8px;
+  --servant-slot-size: 80px;
+  --servant-row-height: 90px;
+  --servant-gap: 8px;
 }

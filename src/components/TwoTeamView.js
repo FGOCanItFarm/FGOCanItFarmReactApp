@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Box, Button, Typography, Grid, Tooltip } from '@mui/material';
+import { Button, Typography, Tooltip } from '@mui/material';
 import ServantAvatar from './ServantAvatar';
 import '../ui-vars.css';
 
@@ -13,36 +13,37 @@ const generateSkillCommand = (servantIndex, skillIndex, targetIndex = null) => {
   return command || `Skill ${skillIndex}`;
 };
 
-const generateChoiceCommand = (servantIndex, skillIndex, choice, targetIndex = null) => {
-  const skillLabels = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i'];
-  let command = skillLabels[servantIndex * 3 + (skillIndex - 1)];
-  switch (choice) {
-    case 12: command += `[Ch2A]`; break;
-    case 22: command += `[Ch2B]`; break;
-    case 13: command += `[Ch3A]`; break;
-    case 23: command += `[Ch3B]`; break;
-    case 33: command += `[Ch3C]`; break;
-    default: break;
-  }
-  if (targetIndex !== null) {
-    command += `${targetIndex + 1}`;
-  }
-  return command || `Skill ${skillIndex} Choice ${choice}`;
-};
+// Preserved for API compatibility - may be used in future
+// const generateChoiceCommand = (servantIndex, skillIndex, choice, targetIndex = null) => {
+//   const skillLabels = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i'];
+//   let command = skillLabels[servantIndex * 3 + (skillIndex - 1)];
+//   switch (choice) {
+//     case 12: command += `[Ch2A]`; break;
+//     case 22: command += `[Ch2B]`; break;
+//     case 13: command += `[Ch3A]`; break;
+//     case 23: command += `[Ch3B]`; break;
+//     case 33: command += `[Ch3C]`; break;
+//     default: break;
+//   }
+//   if (targetIndex !== null) {
+//     command += `${targetIndex + 1}`;
+//   }
+//   return command || `Skill ${skillIndex} Choice ${choice}`;
+// };
 
-const generateChoiceTargetCommand = (servantIndex, skillIndex, choice, targetIndex) => {
-  const skillLabels = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i'];
-  let command = skillLabels[servantIndex * 3 + (skillIndex - 1)];
-  switch (choice) {
-    case 12: command += `([Ch2A]${targetIndex})`; break;
-    case 22: command += `([Ch2B]${targetIndex})`; break;
-    case 13: command += `([Ch3A]${targetIndex})`; break;
-    case 23: command += `([Ch3B]${targetIndex})`; break;
-    case 33: command += `([Ch3C]${targetIndex})`; break;
-    default: break;
-  }
-  return command;
-};
+// const generateChoiceTargetCommand = (servantIndex, skillIndex, choice, targetIndex) => {
+//   const skillLabels = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i'];
+//   let command = skillLabels[servantIndex * 3 + (skillIndex - 1)];
+//   switch (choice) {
+//     case 12: command += `([Ch2A]${targetIndex})`; break;
+//     case 22: command += `([Ch2B]${targetIndex})`; break;
+//     case 13: command += `([Ch3A]${targetIndex})`; break;
+//     case 23: command += `([Ch3B]${targetIndex})`; break;
+//     case 33: command += `([Ch3C]${targetIndex})`; break;
+//     default: break;
+//   }
+//   return command;
+// };
 
 const TwoTeamView = ({ team, servants, selectedMysticCode, addCommand }) => {
   const [selectedSource, setSelectedSource] = useState(null);
