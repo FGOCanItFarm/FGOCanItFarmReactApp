@@ -17,7 +17,7 @@
   --sticky-team-height: 80px;
   --sticky-team-expanded-height: 120px;
   --sticky-team-width: 100%;
-  --sticky-team-max-width: 480px;
+  --sticky-team-max-width: 648px; /* Increased by 35% from 480px */
   --servant-compact-size: 48px;
   
   /* Servant avatar sizing for consistent layout */

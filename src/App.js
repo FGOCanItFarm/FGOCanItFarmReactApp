@@ -54,8 +54,8 @@ const App = () => {
     const savedServantEffects = loadFromLocalStorage('servantEffects');
     setServantEffects(savedServantEffects);
 
-    // Filter persistence logic
-    const FILTER_PERSISTENCE = 'remember'; // 'remember' or 'reset'
+    // Filter persistence logic - forcing reset on refresh/navigation
+    const FILTER_PERSISTENCE = 'reset'; // 'remember' or 'reset'
     
     if (FILTER_PERSISTENCE === 'remember') {
       // Load filters from localStorage
@@ -113,7 +113,7 @@ const App = () => {
 
   // Save filters to localStorage whenever they change (if persistence is enabled)
   useEffect(() => {
-    const FILTER_PERSISTENCE = 'remember'; // 'remember' or 'reset'
+    const FILTER_PERSISTENCE = 'reset'; // 'remember' or 'reset'
     
     if (FILTER_PERSISTENCE === 'remember') {
       const filters = {

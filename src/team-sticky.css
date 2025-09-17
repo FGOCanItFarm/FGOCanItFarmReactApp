@@ -19,7 +19,7 @@
   bottom: calc(var(--spacing-lg) + var(--btn-min-height) + var(--spacing-sm)) !important;
   right: var(--spacing-lg) !important;
   z-index: var(--z-sticky) !important;
-  max-width: var(--sticky-team-max-width) !important;
+  max-width: min(var(--sticky-team-max-width), 95vw) !important;
   min-width: 320px !important;
   border-radius: 12px !important;
 }
