@@ -75,11 +75,35 @@
 
 .servant-selection-horizontal {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   gap: var(--servant-gap);
   align-items: flex-start;
   max-height: 30rem;
-  overflow-y: auto;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  /* Add a subtle scrollbar styling */
+  scrollbar-width: thin;
+  scrollbar-color: #ccc #f0f0f0;
+}
+
+/* WebKit scrollbar styling for servant selection */
+.servant-selection-horizontal::-webkit-scrollbar {
+  height: 8px;
+}
+
+.servant-selection-horizontal::-webkit-scrollbar-track {
+  background: #f0f0f0;
+  border-radius: 4px;
+}
+
+.servant-selection-horizontal::-webkit-scrollbar-thumb {
+  background: #ccc;
+  border-radius: 4px;
+}
+
+.servant-selection-horizontal::-webkit-scrollbar-thumb:hover {
+  background: #999;
 }
 
 .servant-selection-item {
@@ -95,4 +119,94 @@
 
 .mystic-code-selection {
   flex: 1;
+}
+
+/* Compact Filter UI Styles */
+.filter-container {
+  background: #f8f9fa;
+  border: 1px solid #e9ecef;
+  border-radius: 8px;
+  padding: var(--spacing-md);
+  max-width: 100%;
+}
+
+.compact-filter-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+  gap: var(--spacing-xs);
+  margin-bottom: var(--spacing-sm);
+}
+
+.compact-filter-row {
+  display: flex;
+  gap: var(--spacing-xs);
+  flex-wrap: wrap;
+  margin-bottom: var(--spacing-sm);
+}
+
+.filter-button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-xs);
+  border: 2px solid #dee2e6;
+  border-radius: 6px;
+  background: white;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-height: 60px;
+  position: relative;
+}
+
+.filter-button:hover {
+  border-color: #007bff;
+  background: #e7f3ff;
+}
+
+.filter-button:focus {
+  outline: 2px solid #007bff;
+  outline-offset: 2px;
+}
+
+.filter-button-active {
+  border-color: #007bff !important;
+  background: #007bff !important;
+  color: white !important;
+}
+
+.filter-button-text {
+  font-size: 10px;
+  text-align: center;
+  margin-top: 2px;
+  line-height: 1.1;
+}
+
+.filter-button-small {
+  min-height: 40px;
+  min-width: 50px;
+  font-weight: bold;
+}
+
+.filter-button-np,
+.filter-button-attack {
+  min-height: 40px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+/* Responsive adjustments for compact filters */
+@media (max-width: 768px) {
+  .compact-filter-grid {
+    grid-template-columns: repeat(auto-fit, minmax(60px, 1fr));
+  }
+  
+  .filter-button {
+    min-height: 50px;
+    padding: var(--spacing-xs) 2px;
+  }
+  
+  .filter-button-text {
+    font-size: 8px;
+  }
 }
