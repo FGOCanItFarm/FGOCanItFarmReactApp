@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { Button, Grid, Typography, Box, Container } from '@mui/material';
+import { Button, Typography, Box, Container, Tooltip } from '@mui/material';
 import FilterSection from './FilterSection';
 import ServantSelection from './ServantSelection';
 import TeamSection from './TeamSection';
@@ -7,6 +7,7 @@ import CommonServantsGrid from './CommonServantsGrid';
 import SimpleMysticCodeSelection from './SimpleMysticCodeSelection';
 import { useNavigate } from 'react-router-dom';
 import '../TeamSelectionPage.css';
+import '../ui-vars.css';
 
 const TeamSelectionPage = ({ team, setTeam, servants, filteredServants, setFilteredServants, handleServantClick, handleTeamServantClick, updateServantEffects, clearTeam, sortOrder, setSortOrder, searchQuery, setSearchQuery, selectedRarity, setSelectedRarity, selectedClass, setSelectedClass, selectedNpType, setSelectedNpType, selectedAttackType, setSelectedAttackType, capitalize, handleCheckboxChange, attackTypeLabels, selectedMysticCode, setSelectedMysticCode}) => {
   const navigate = useNavigate();
@@ -103,9 +104,28 @@ const TeamSelectionPage = ({ team, setTeam, servants, filteredServants, setFilte
         </div>
       </div>
       <Box mt={2}>
-        <Button variant="contained" color="secondary" onClick={clearTeam}>
-          Clear Team
-        </Button>
+        <Tooltip 
+          title="Clear all servants from the team"
+          enterDelay={300}
+          leaveDelay={200}
+          PopperProps={{ 
+            strategy: 'fixed',
+            modifiers: [{ name: 'preventOverflow', enabled: true }]
+          }}
+        >
+          <Button 
+            variant="contained" 
+            color="secondary" 
+            onClick={clearTeam}
+            style={{
+              minWidth: 'var(--btn-min-width)',
+              minHeight: 'var(--btn-min-height)'
+            }}
+            aria-label="Clear all servants from team"
+          >
+            Clear Team
+          </Button>
+        </Tooltip>
       </Box>
       <div className="team-mystic-code">
         <div className="team-section">
@@ -126,12 +146,50 @@ const TeamSelectionPage = ({ team, setTeam, servants, filteredServants, setFilte
         </div>
       </div>
       <div className="team-selection-buttons">
-        <Button variant="contained" color="primary" onClick={handleGotoQuest}>
-          GOTO Quests
-        </Button>
-        <Button variant="contained" color="primary" onClick={handleGotoSearch}>
-          GOTO Search
-        </Button>
+        <Tooltip 
+          title="Navigate to quest selection page"
+          enterDelay={300}
+          leaveDelay={200}
+          PopperProps={{ 
+            strategy: 'fixed',
+            modifiers: [{ name: 'preventOverflow', enabled: true }]
+          }}
+        >
+          <Button 
+            variant="contained" 
+            color="primary" 
+            onClick={handleGotoQuest}
+            style={{
+              minWidth: 'var(--btn-min-width)',
+              minHeight: 'var(--btn-min-height)'
+            }}
+            aria-label="Go to quest selection page"
+          >
+            GOTO Quests
+          </Button>
+        </Tooltip>
+        <Tooltip 
+          title="Navigate to search page"
+          enterDelay={300}
+          leaveDelay={200}
+          PopperProps={{ 
+            strategy: 'fixed',
+            modifiers: [{ name: 'preventOverflow', enabled: true }]
+          }}
+        >
+          <Button 
+            variant="contained" 
+            color="primary" 
+            onClick={handleGotoSearch}
+            style={{
+              minWidth: 'var(--btn-min-width)',
+              minHeight: 'var(--btn-min-height)'
+            }}
+            aria-label="Go to search page"
+          >
+            GOTO Search
+          </Button>
+        </Tooltip>
       </div>
     </Container>
   );

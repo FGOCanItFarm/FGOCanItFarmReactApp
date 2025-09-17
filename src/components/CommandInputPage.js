@@ -1,15 +1,12 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Button, Grid, Typography, Box, Container, Modal } from '@mui/material';
 import CommandInputMenu from './CommandInputMenu';
 import TeamSection from './TeamSection';
 import MysticCodeCommand from './MysticCodeCommand';
 import SelectedServantDetails from './SelectedServantDetails';
-import { useNavigate } from 'react-router-dom';
 import '../CommandInputPage.css';
 
 const CommandInputPage = ({ team, servants, setTeam, activeServant, setActiveServant, commands, setCommands, selectedQuest, selectedMysticCode, setSelectedMysticCode, handleSubmit, openModal, handleOpenModal, handleCloseModal, updateServantEffects }) => {
-  const navigate = useNavigate();
-
   const handleTeamServantClick = (index) => {
     setActiveServant(index);
   };
