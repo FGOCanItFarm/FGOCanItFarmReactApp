@@ -53,6 +53,37 @@ const App = () => {
     setSelectedMysticCode(savedMysticCode);
     const savedServantEffects = loadFromLocalStorage('servantEffects');
     setServantEffects(savedServantEffects);
+
+    // Filter persistence logic
+    const FILTER_PERSISTENCE = 'remember'; // 'remember' or 'reset'
+    
+    if (FILTER_PERSISTENCE === 'remember') {
+      // Load filters from localStorage
+      const savedFilters = localStorage.getItem('fgocif.filters.v1');
+      if (savedFilters) {
+        try {
+          const filters = JSON.parse(savedFilters);
+          setSearchQuery(filters.searchQuery || '');
+          setSelectedRarity(filters.selectedRarity || []);
+          setSelectedClass(filters.selectedClass || []);
+          setSelectedNpType(filters.selectedNpType || []);
+          setSelectedAttackType(filters.selectedAttackType || []);
+          setSortOrder(filters.sortOrder || '');
+        } catch (error) {
+          console.error('Error loading filters from localStorage:', error);
+        }
+      }
+    } else {
+      // Reset filters to defaults
+      setSearchQuery('');
+      setSelectedRarity([]);
+      setSelectedClass([]);
+      setSelectedNpType([]);
+      setSelectedAttackType([]);
+      setSortOrder('');
+      // Clear localStorage filters
+      localStorage.removeItem('fgocif.filters.v1');
+    }
   }, []);
 
   // Save team data to local storage whenever it changes
@@ -79,6 +110,23 @@ const App = () => {
   useEffect(() => {
     saveToLocalStorage('servantEffects', servantEffects);
   }, [servantEffects]);
+
+  // Save filters to localStorage whenever they change (if persistence is enabled)
+  useEffect(() => {
+    const FILTER_PERSISTENCE = 'remember'; // 'remember' or 'reset'
+    
+    if (FILTER_PERSISTENCE === 'remember') {
+      const filters = {
+        searchQuery,
+        selectedRarity,
+        selectedClass,
+        selectedNpType,
+        selectedAttackType,
+        sortOrder
+      };
+      localStorage.setItem('fgocif.filters.v1', JSON.stringify(filters));
+    }
+  }, [searchQuery, selectedRarity, selectedClass, selectedNpType, selectedAttackType, sortOrder]);
 
   const fetchServants = useCallback(async () => {
     try {

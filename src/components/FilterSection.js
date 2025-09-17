@@ -1,6 +1,12 @@
 import React from 'react';
 import { Grid, Typography, TextField, Checkbox, FormControlLabel } from '@mui/material';
 
+// Filter persistence configuration
+// Set to 'remember' to persist filters across page refreshes using localStorage
+// Set to 'reset' to always reset filters to defaults on page load
+// Note: This constant is used in App.js for implementation
+// const FILTER_PERSISTENCE = 'remember';
+
 const FilterSection = ({ sortOrder, setSortOrder, searchQuery, setSearchQuery, selectedRarity, setSelectedRarity, selectedClass, setSelectedClass, selectedNpType, setSelectedNpType, selectedAttackType, setSelectedAttackType, capitalize, handleCheckboxChange, attackTypeLabels }) => {
   return (
     <Grid container spacing={2} style={{ marginBottom: '1rem', maxWidth: '32rem' }}>

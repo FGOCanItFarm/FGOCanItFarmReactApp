@@ -1,34 +1,26 @@
 import React from 'react';
-import { Grid, Typography } from '@mui/material';
+import { Typography } from '@mui/material';
 import ServantAvatar from './ServantAvatar';
 
 const ServantSelection = ({ servants, handleServantClick }) => {
   return (
-    <div>
+    <div className="servant-selection">
       <Typography variant="h6" style={{ marginBottom: "1rem" }}>Servant Selection</Typography>
-      <Grid container spacing={2} style={{ width: '35rem', height: '35rem', overflowY: 'auto', display: 'flex', flexWrap: 'wrap' }}>
+      <div className="servant-selection-horizontal">
         {servants.map((servant, index) => (
-          <Grid
-            item
-            xs={4}
+          <div
             key={index}
+            className="servant-selection-item"
             onClick={() => handleServantClick(servant)}
-            sx={{
-              width: '128px',
-              height: '128px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center'
-            }}
           >
             <ServantAvatar
               servantFace={servant.extraAssets?.faces?.ascension?.['4']}
               bgType={servant.noblePhantasms?.['0']?.card}
               tagType={servant.noblePhantasms?.['0']?.effectFlags?.['0']}
             />
-          </Grid>
+          </div>
         ))}
-      </Grid>
+      </div>
     </div>
   );
 };
