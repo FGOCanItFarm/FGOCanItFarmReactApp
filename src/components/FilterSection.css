@@ -1,0 +1,89 @@
+/* FilterSection.css - Fixed 7-column filter layout */
+
+.filter-grid-wrapper {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  /* Ensure scrollbar visibility for horizontal scroll */
+  scrollbar-width: thin;
+  scrollbar-color: #ccc #f0f0f0;
+}
+
+.filter-grid-wrapper::-webkit-scrollbar {
+  height: 8px;
+}
+
+.filter-grid-wrapper::-webkit-scrollbar-track {
+  background: #f0f0f0;
+  border-radius: 4px;
+}
+
+.filter-grid-wrapper::-webkit-scrollbar-thumb {
+  background: #ccc;
+  border-radius: 4px;
+}
+
+.filter-grid-wrapper::-webkit-scrollbar-thumb:hover {
+  background: #999;
+}
+
+.filter-grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(32px, 1fr));
+  gap: var(--filter-gap, 8px);
+  min-width: fit-content;
+}
+
+/* Ensure filter items maintain consistent sizing */
+.filter-grid .filter-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-xs, 4px);
+  border: 2px solid #dee2e6;
+  border-radius: 6px;
+  background: white;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-height: 60px;
+  position: relative;
+}
+
+.filter-grid .filter-item:hover {
+  border-color: #007bff;
+  background: #e7f3ff;
+}
+
+.filter-grid .filter-item:focus {
+  outline: 2px solid #007bff;
+  outline-offset: 2px;
+}
+
+.filter-grid .filter-item.active {
+  border-color: #007bff !important;
+  background: #007bff !important;
+  color: white !important;
+}
+
+.filter-item-text {
+  font-size: 10px;
+  text-align: center;
+  margin-top: 2px;
+  line-height: 1.1;
+}
+
+/* Narrow screen adjustments */
+@media (max-width: 420px) {
+  .filter-grid {
+    grid-template-columns: repeat(7, minmax(30px, 1fr));
+  }
+  
+  .filter-grid .filter-item {
+    min-height: 50px;
+    padding: 2px;
+  }
+  
+  .filter-item-text {
+    font-size: 8px;
+  }
+}

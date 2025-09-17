@@ -4,7 +4,7 @@ import FilterSection from './FilterSection';
 import ServantSelection from './ServantSelection';
 import TeamSection from './TeamSection';
 import CommonServantsGrid from './CommonServantsGrid';
-import SimpleMysticCodeSelection from './SimpleMysticCodeSelection';
+import MysticCodeCommand from './MysticCodeCommand';
 import TwoTeamView from './TwoTeamView';
 import { useNavigate } from 'react-router-dom';
 import '../TeamSelectionPage.css';
@@ -14,6 +14,14 @@ const TeamSelectionPage = ({ team, setTeam, servants, filteredServants, setFilte
   const navigate = useNavigate();
   const [showTwoTeamView, setShowTwoTeamView] = useState(false);
   const [commands, setCommands] = useState([]);
+
+  const updateCommands = (newCommands) => {
+    if (typeof newCommands === 'function') {
+      setCommands(newCommands);
+    } else {
+      setCommands(newCommands);
+    }
+  };
 
   const handleGotoQuest = () => {
     navigate('/quest-selection');
@@ -161,7 +169,10 @@ const TeamSelectionPage = ({ team, setTeam, servants, filteredServants, setFilte
               />
             </div>
             <div className="mystic-code-selection">
-              <SimpleMysticCodeSelection
+              <MysticCodeCommand
+                team={team}
+                setTeam={setTeam}
+                updateCommands={updateCommands}
                 selectedMysticCode={selectedMysticCode}
                 setSelectedMysticCode={setSelectedMysticCode}
               />
