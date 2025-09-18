@@ -1,0 +1,119 @@
+/* ServantSelection.css - Fixed 7×3 viewport with horizontal scroll */
+
+.servant-selection-viewport {
+  width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  /* Ensure scrollbar visibility for horizontal scroll */
+  scrollbar-width: thin;
+  scrollbar-color: #ccc #f0f0f0;
+  /* Add gradient overlays to indicate scrollable content */
+  position: relative;
+}
+
+.servant-selection-viewport::-webkit-scrollbar {
+  height: 8px;
+}
+
+.servant-selection-viewport::-webkit-scrollbar-track {
+  background: #f0f0f0;
+  border-radius: 4px;
+}
+
+.servant-selection-viewport::-webkit-scrollbar-thumb {
+  background: #ccc;
+  border-radius: 4px;
+}
+
+.servant-selection-viewport::-webkit-scrollbar-thumb:hover {
+  background: #999;
+}
+
+.servant-grid {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-rows: var(--servant-row-height);
+  grid-template-rows: repeat(3, var(--servant-row-height));
+  grid-auto-columns: var(--servant-slot-size);
+  gap: var(--servant-gap);
+  padding: var(--spacing-sm, 8px);
+  min-width: fit-content;
+}
+
+.servant-grid-item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  border: 2px solid transparent;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+  background: white;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  overflow: hidden;
+}
+
+.servant-grid-item:hover {
+  border-color: #007bff;
+  transform: scale(1.05);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+
+.servant-grid-item:focus {
+  outline: 2px solid #007bff;
+  outline-offset: 2px;
+}
+
+/* Ensure ServantAvatar fills the slot properly */
+.servant-grid-item .servant-avatar {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+/* Gradient overlays for scroll indication */
+.servant-selection-viewport::before,
+.servant-selection-viewport::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 20px;
+  pointer-events: none;
+  z-index: 10;
+  transition: opacity 0.3s ease;
+}
+
+.servant-selection-viewport::before {
+  left: 0;
+  background: linear-gradient(to right, rgba(255,255,255,0.8), transparent);
+}
+
+.servant-selection-viewport::after {
+  right: 0;
+  background: linear-gradient(to left, rgba(255,255,255,0.8), transparent);
+}
+
+/* Hide gradients when not needed */
+.servant-selection-viewport:not(.has-scroll)::before,
+.servant-selection-viewport:not(.has-scroll)::after {
+  opacity: 0;
+}
+
+/* Mobile responsive adjustments */
+@media (max-width: 768px) {
+  .servant-grid {
+    grid-auto-columns: calc(var(--servant-slot-size) * 0.8);
+    grid-auto-rows: calc(var(--servant-row-height) * 0.8);
+    grid-template-rows: repeat(3, calc(var(--servant-row-height) * 0.8));
+  }
+}
+
+@media (max-width: 480px) {
+  .servant-grid {
+    grid-auto-columns: calc(var(--servant-slot-size) * 0.7);
+    grid-auto-rows: calc(var(--servant-row-height) * 0.7);
+    grid-template-rows: repeat(3, calc(var(--servant-row-height) * 0.7));
+  }
+}

@@ -17,12 +17,23 @@
   --sticky-team-height: 80px;
   --sticky-team-expanded-height: 120px;
   --sticky-team-width: 100%;
-  --sticky-team-max-width: 480px;
+  --sticky-team-max-width: 648px; /* Increased by 35% from 480px */
   --servant-compact-size: 48px;
+  
+  /* Servant avatar sizing for consistent layout */
+  --servant-slot-size: 88px;
+  --servant-row-height: var(--servant-slot-size);
+  --servant-gap: 8px;
   
   /* Z-index layers */
   --z-sticky: 1000;
   --z-tooltip: 1100;
   --z-popover: 1200;
   --z-modal: 1300;
+  
+  /* Filter and servant grid sizing */
+  --filter-gap: 8px;
+  --servant-slot-size: 80px;
+  --servant-row-height: 90px;
+  --servant-gap: 8px;
 }
