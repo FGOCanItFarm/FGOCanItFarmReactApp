@@ -4,7 +4,7 @@ account_id = "01b39c9f6c4f09bb5aaf25bc5bb89890"
 
 [site]
 bucket = "./build"
-entry-point = "workers-site"
+main = "workers-site/index.js""
 
 # If you prefer to deploy a Worker script instead of a site:
 # main = "src/worker/index.js"
