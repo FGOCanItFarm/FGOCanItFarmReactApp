@@ -1,0 +1,10 @@
+name = "fgocif-webpage"
+compatibility_date = "2025-09-18"
+account_id = "01b39c9f6c4f09bb5aaf25bc5bb89890"
+
+[site]
+bucket = "./build"
+entry-point = "workers-site"
+
+# If you prefer to deploy a Worker script instead of a site:
+# main = "src/worker/index.js"
