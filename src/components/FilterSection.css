@@ -30,7 +30,8 @@
   display: grid;
   grid-template-columns: repeat(7, minmax(32px, 1fr));
   gap: var(--filter-gap, 8px);
-  min-width: fit-content;
+  width: max-content; /* allow horizontal scrolling when container is narrower */
+  box-sizing: border-box;
 }
 
 /* Ensure filter items maintain consistent sizing */

@@ -20,8 +20,10 @@
 }
 
 .filter-section {
-  flex: 3;
+  /* Fixed-width filter column so it cannot be squashed by the servant grid */
+  flex: 0 0 320px; /* fixed basis */
   margin-right: 1rem;
+  min-width: 280px;
 }
 
 .team-selection-buttons {
@@ -32,19 +34,20 @@
 
 /* New vertical layout for common servants and servant selection */
 .servants-container {
-  flex: 3;
+  /* Flexible area for servant lists; allow children to overflow horizontally */
+  flex: 1 1 auto;
   display: flex;
   flex-direction: column;
   gap: var(--spacing-lg);
+  min-width: 0; /* allow overflow children to trigger scroll instead of growing layout */
 }
 
-.common-servants-wrapper {
-  /* Top section for common servants */
-}
+/* common-servants-wrapper intentionally left unstyled; parent rules handle layout */
 
 .servant-selection-wrapper {
   /* Bottom section for servant selection */
-  flex: 1;
+  flex: 1 1 auto;
+  min-width: 0; /* important so child viewport can overflow */
 }
 
 /* Horizontal layout for common servants */

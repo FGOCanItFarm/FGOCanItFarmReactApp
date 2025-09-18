@@ -22,6 +22,7 @@
   
   /* Servant avatar sizing for consistent layout */
   --servant-slot-size: 88px;
+  --servant-row-height: var(--servant-slot-size);
   --servant-gap: 8px;
   
   /* Z-index layers */
