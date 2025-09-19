@@ -130,6 +130,7 @@
   border: 1px solid #e9ecef;
   border-radius: 8px;
   padding: var(--spacing-md);
+  min-width: 400px;
   max-width: 100%;
 }
 
