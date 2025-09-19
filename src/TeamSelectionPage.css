@@ -28,8 +28,11 @@
 
 /* Keep filter visually on top when adjacent content overflows */
 .filter-section {
-  position: relative;
-  z-index: 2;
+  /* Align the flex-basis with the inner container's min-width to avoid overflow
+     (filter-container has min-width: 400px). Removing the z-index prevents the
+     filter background from sitting above the servant area. */
+  flex: 0 0 400px; /* fixed basis matching .filter-container */
+  min-width: 400px;
   box-sizing: border-box;
 }
 
