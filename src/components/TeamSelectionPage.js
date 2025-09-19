@@ -1,27 +1,16 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { Button, Typography, Box, Container, Tooltip } from '@mui/material';
 import FilterSection from './FilterSection';
 import ServantSelection from './ServantSelection';
 import TeamSection from './TeamSection';
 import CommonServantsGrid from './CommonServantsGrid';
 import MysticCodeCommand from './MysticCodeCommand';
-import TwoTeamView from './TwoTeamView';
 import { useNavigate } from 'react-router-dom';
 import '../TeamSelectionPage.css';
 import '../ui-vars.css';
 
 const TeamSelectionPage = ({ team, setTeam, servants, filteredServants, setFilteredServants, handleServantClick, handleTeamServantClick, updateServantEffects, clearTeam, sortOrder, setSortOrder, searchQuery, setSearchQuery, selectedRarity, setSelectedRarity, selectedClass, setSelectedClass, selectedNpType, setSelectedNpType, selectedAttackType, setSelectedAttackType, capitalize, handleCheckboxChange, attackTypeLabels, selectedMysticCode, setSelectedMysticCode}) => {
   const navigate = useNavigate();
-  const [showTwoTeamView, setShowTwoTeamView] = useState(false);
-  const [commands, setCommands] = useState([]);
-
-  const updateCommands = (newCommands) => {
-    if (typeof newCommands === 'function') {
-      setCommands(newCommands);
-    } else {
-      setCommands(newCommands);
-    }
-  };
 
   const handleGotoQuest = () => {
     navigate('/quest-selection');
@@ -31,13 +20,7 @@ const TeamSelectionPage = ({ team, setTeam, servants, filteredServants, setFilte
     navigate('/search');
   };
 
-  const addCommand = (command) => {
-    setCommands(prev => [...prev, command]);
-  };
-
-  const toggleTwoTeamView = () => {
-    setShowTwoTeamView(!showTwoTeamView);
-  };
+  
 
   useEffect(() => {
     const filterServants = () => {
@@ -91,38 +74,8 @@ const TeamSelectionPage = ({ team, setTeam, servants, filteredServants, setFilte
     <Container>
       <Typography variant="h4">Select Your Team</Typography>
       
-      {/* Toggle between views */}
-      <Box mt={2} mb={2}>
-        <Tooltip 
-          title={showTwoTeamView ? "Switch to normal team selection view" : "Switch to two-team command view"}
-          enterDelay={300}
-          leaveDelay={200}
-        >
-          <Button 
-            variant="outlined" 
-            onClick={toggleTwoTeamView}
-            style={{
-              minWidth: 'var(--btn-min-width)',
-              minHeight: 'var(--btn-min-height)'
-            }}
-            aria-label={showTwoTeamView ? "Switch to normal view" : "Switch to two-team view"}
-          >
-            {showTwoTeamView ? 'Normal View' : 'Two-Team View'}
-          </Button>
-        </Tooltip>
-      </Box>
-
-      {showTwoTeamView ? (
-        /* Two-Team View */
-        <TwoTeamView
-          team={team}
-          servants={servants}
-          selectedMysticCode={selectedMysticCode}
-          addCommand={addCommand}
-        />
-      ) : (
-        /* Normal View */
-        <>
+      {/* Normal View */}
+      <>
           <div className="filter-common-servants">
             <div className="filter-section">
               <FilterSection
@@ -172,14 +125,12 @@ const TeamSelectionPage = ({ team, setTeam, servants, filteredServants, setFilte
               <MysticCodeCommand
                 team={team}
                 setTeam={setTeam}
-                updateCommands={updateCommands}
                 selectedMysticCode={selectedMysticCode}
                 setSelectedMysticCode={setSelectedMysticCode}
               />
             </div>
           </div>
         </>
-      )}
 
       {/* Common buttons section */}
       <Box mt={2}>
@@ -255,30 +206,7 @@ const TeamSelectionPage = ({ team, setTeam, servants, filteredServants, setFilte
         </Tooltip>
       </div>
 
-      {/* Commands display (if any) */}
-      {commands.length > 0 && (
-        <Box mt={2}>
-          <Typography variant="h6">Generated Commands:</Typography>
-          <Box sx={{ 
-            p: 2, 
-            bgcolor: '#f5f5f5', 
-            borderRadius: 1, 
-            fontFamily: 'monospace',
-            fontSize: '0.875rem',
-            wordBreak: 'break-all'
-          }}>
-            {commands.join(', ')}
-          </Box>
-          <Button 
-            variant="outlined" 
-            size="small" 
-            onClick={() => setCommands([])}
-            style={{ marginTop: 'var(--spacing-sm)' }}
-          >
-            Clear Commands
-          </Button>
-        </Box>
-      )}
+      {/* Commands display removed from this page; CommandInputPage owns command list */}
     </Container>
   );
 };

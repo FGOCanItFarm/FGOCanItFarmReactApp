@@ -117,17 +117,19 @@ const TwoTeamView = ({ team, servants, selectedMysticCode, addCommand }) => {
                     }
                   }}
                 >
-                  {servant ? (
-                    <ServantAvatar
-                      servantFace={servant.extraAssets?.faces?.ascension?.['4']}
-                      bgType={servant.noblePhantasms?.[0]?.card}
-                      tagType={servant.noblePhantasms?.[0]?.effectFlags?.[0]}
-                    />
-                  ) : (
-                    <div className="empty-slot">
-                      <Typography variant="caption">{index + 1}</Typography>
-                    </div>
-                  )}
+                        {servant ? (
+                          <ServantAvatar
+                            servantFace={servant.extraAssets?.faces?.ascension?.['4'] || '/temp_servant_img.jpg'}
+                            bgType={servant.noblePhantasms?.[0]?.card}
+                            tagType={servant.noblePhantasms?.[0]?.effectFlags?.[0]}
+                          />
+                        ) : (
+                          <ServantAvatar
+                            servantFace={'/temp_servant_img.jpg'}
+                            bgType={null}
+                            tagType={null}
+                          />
+                        )}
                 </div>
               );
             })}

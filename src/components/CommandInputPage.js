@@ -5,6 +5,8 @@ import TeamSection from './TeamSection';
 import MysticCodeCommand from './MysticCodeCommand';
 import SelectedServantDetails from './SelectedServantDetails';
 import '../CommandInputPage.css';
+import TwoTeamView from './TwoTeamView';
+import { Tooltip } from '@mui/material';
 
 const CommandInputPage = ({ team, servants, setTeam, activeServant, setActiveServant, commands, setCommands, selectedQuest, selectedMysticCode, setSelectedMysticCode, handleSubmit, openModal, handleOpenModal, handleCloseModal, updateServantEffects }) => {
   const handleTeamServantClick = (index) => {
@@ -21,52 +23,79 @@ const CommandInputPage = ({ team, servants, setTeam, activeServant, setActiveSer
     setTeam(updatedTeam);
   };
 
+  // Two-Team view toggle and adapter to append commands into the shared `commands` state
+  const [showTwoTeamView, setShowTwoTeamView] = React.useState(false);
+  const addCommand = (command) => {
+    setCommands(prev => [...prev, command]);
+  };
+
   return (
     <Container className="command-input-container">
       <Typography variant="h4">Team</Typography>
-      <Box className="command-input-grid">
-        <Box className="team-section">
-          <TeamSection
-            team={team}
-            servants={servants}
-            activeServant={activeServant}
-            handleTeamServantClick={handleTeamServantClick}
-            updateServantEffects={updateServantEffects}
-            pageType="command-input-page"
-          />
-        </Box>
-        <Box className="mystic-code-section">
-          <MysticCodeCommand
-            team={team}
-            setTeam={setTeam}
-            updateCommands={setCommands}
-            selectedMysticCode={selectedMysticCode}
-            setSelectedMysticCode={setSelectedMysticCode}
-          />
-        </Box>
+
+      <Box mt={2} mb={2}>
+        <Tooltip title={showTwoTeamView ? "Switch to normal command input" : "Switch to two-team view"} enterDelay={300}>
+          <Button
+            variant="outlined"
+            onClick={() => setShowTwoTeamView(v => !v)}
+            aria-label={showTwoTeamView ? "Switch to normal command input" : "Switch to two-team view"}
+            style={{ minWidth: 'var(--btn-min-width)', minHeight: 'var(--btn-min-height)' }}
+          >
+            {showTwoTeamView ? 'Normal View' : 'Two-Team View'}
+          </Button>
+        </Tooltip>
       </Box>
-      <Box className="command-input-menu">
-        <Grid container spacing={2}>
-          <Grid item xs={6}>
-            <CommandInputMenu updateCommands={setCommands} team={team} activeServant={activeServant} />
-          </Grid>
-          <Grid item xs={6}>
-            <SelectedServantDetails servant={team[activeServant]} handleEffectChange={handleEffectChange} />
-          </Grid>
-        </Grid>
-      </Box>
-      <Box mt={4}>
-        <Typography variant="h6">Commands</Typography>
-        <Box component="pre" p={2} border="1px solid black" bgcolor="#f5f5f5" style={{ whiteSpace: 'nowrap' }}>
-          {commands.join(' ')}
-        </Box>
-      </Box>
-      <Button variant="contained" color="secondary" onClick={() => setCommands([])} style={{ marginTop: '20px' }}>
-        Clear Commands
-      </Button>
-      <Button variant="contained" color="primary" onClick={handleOpenModal} style={{ marginTop: '20px' }}>
-        Submit Team
-      </Button>
+
+      {showTwoTeamView ? (
+        <TwoTeamView team={team} servants={servants} selectedMysticCode={selectedMysticCode} addCommand={addCommand} />
+      ) : (
+        <>
+          <Box className="command-input-grid">
+            <Box className="team-section">
+              <TeamSection
+                team={team}
+                servants={servants}
+                activeServant={activeServant}
+                handleTeamServantClick={handleTeamServantClick}
+                updateServantEffects={updateServantEffects}
+                pageType="command-input-page"
+              />
+            </Box>
+            <Box className="mystic-code-section">
+              <MysticCodeCommand
+                team={team}
+                setTeam={setTeam}
+                updateCommands={setCommands}
+                selectedMysticCode={selectedMysticCode}
+                setSelectedMysticCode={setSelectedMysticCode}
+              />
+            </Box>
+          </Box>
+          <Box className="command-input-menu">
+            <Grid container spacing={2}>
+              <Grid item xs={6}>
+                <CommandInputMenu updateCommands={setCommands} team={team} activeServant={activeServant} />
+              </Grid>
+              <Grid item xs={6}>
+                <SelectedServantDetails servant={team[activeServant]} handleEffectChange={handleEffectChange} />
+              </Grid>
+            </Grid>
+          </Box>
+          <Box mt={4}>
+            <Typography variant="h6">Commands</Typography>
+            <Box component="pre" p={2} border="1px solid black" bgcolor="#f5f5f5" style={{ whiteSpace: 'nowrap' }}>
+              {commands.join(' ')}
+            </Box>
+          </Box>
+          <Button variant="contained" color="secondary" onClick={() => setCommands([])} style={{ marginTop: '20px' }}>
+            Clear Commands
+          </Button>
+          <Button variant="contained" color="primary" onClick={handleOpenModal} style={{ marginTop: '20px' }}>
+            Submit Team
+          </Button>
+        </>
+      )}
+
       <Modal open={openModal} onClose={handleCloseModal}>
         <Box p={4} bgcolor="white" borderRadius="8px" boxShadow={3} style={{ margin: 'auto', marginTop: '10%', width: '50%' }}>
           <Typography variant="h6">Confirm Submission</Typography>
