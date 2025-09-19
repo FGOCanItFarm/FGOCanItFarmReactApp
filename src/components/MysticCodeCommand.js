@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Grid, Typography, Box, Button, Select, MenuItem } from '@mui/material';
+import { Box, Button, Select, MenuItem, Typography } from '@mui/material';
 
 const mysticCodes = [
   { id: 410, name: 'Winter Casual' },
@@ -9,7 +9,7 @@ const mysticCodes = [
   { id: 20, name: 'Chaldea Combat Uniform' },
 ];
 
-const MysticCodeCommand = ({ team, setTeam, updateCommands, selectedMysticCode, setSelectedMysticCode }) => {
+const MysticCodeCommand = ({ team = [], setTeam = () => {}, updateCommands = () => {}, selectedMysticCode, setSelectedMysticCode, onSwap = () => {} }) => {
   const [selectedTop, setSelectedTop] = useState(null);
   const [selectedBottom, setSelectedBottom] = useState(null);
 
@@ -17,139 +17,82 @@ const MysticCodeCommand = ({ team, setTeam, updateCommands, selectedMysticCode, 
     const newTeam = [...team];
     [newTeam[index1], newTeam[index2]] = [newTeam[index2], newTeam[index1]];
     setTeam(newTeam);
+    // Notify parent that a swap occurred so it can update selections or other UI
+    try { onSwap(index1, index2); } catch (e) { /* noop */ }
   };
 
-  const handleSwap = () => {
-    if (selectedTop !== null && selectedBottom !== null) {
-      swapServants(selectedTop, selectedBottom);
-      setSelectedTop(null);
-      setSelectedBottom(null);
-    }
-  };
+  const addCommand = (cmd) => updateCommands((prev) => [...prev, cmd]);
 
-  const addCommand = (command) => {
-    updateCommands((prevCommands) => [...prevCommands, command]);
-  };
-
-  const renderButtons = (mysticCodeId) => {
-    const isSwapMC = mysticCodeId === 20 || mysticCodeId === 210;
-    switch (isSwapMC) {
-      case true: // Chaldea Combat Uniform
-        return (
-          <div>
-            <Box>
-              <Typography variant="h6">Skill 1</Typography>
-              <Grid>
-                <Button size="small" style={{ border: '1px solid lightgray' }} onClick={() => addCommand(`j1`)} title={`Use Skill 1 on Servant 1: ${team[0]?.name}`}>1</Button>
-                <Button size="small" style={{ border: '1px solid lightgray' }} onClick={() => addCommand(`j2`)} title={`Use Skill 1 on Servant 2: ${team[1]?.name}`}>2</Button>
-                <Button size="small" style={{ border: '1px solid lightgray' }} onClick={() => addCommand(`j3`)} title={`Use Skill 1 on Servant 3: ${team[2]?.name}`}>3</Button>
-              </Grid>
-              <Button size="small" style={{ border: '1px solid lightgray' }} onClick={() => addCommand(`j`)} title={`Use Skill on Self/Team`}>None</Button>
-            </Box>
-            <Box>
-              <Typography variant="h6">Skill 2</Typography>
-              <Grid>
-                <Button size="small" style={{ border: '1px solid lightgray' }} onClick={() => addCommand(`k1`)} title={`Use Skill 2 on Servant 1 ${team[0]?.name}`}>1</Button>
-                <Button size="small" style={{ border: '1px solid lightgray' }} onClick={() => addCommand(`k2`)} title={`Use Skill 2 on Servant 2 ${team[1]?.name}`}>2</Button>
-                <Button size="small" style={{ border: '1px solid lightgray' }} onClick={() => addCommand(`k3`)} title={`Use Skill 2 on Servant 3 ${team[2]?.name}`}>3</Button>
-              </Grid>
-              <Button size="small" style={{ border: '1px solid lightgray' }} onClick={() => addCommand(`k`)} title={`Use Skill 2 on Self/Team`}>None</Button>
-            </Box>
-            <Select
-              value={selectedTop}
-              onChange={(e) => setSelectedTop(e.target.value)}
-              displayEmpty
-              fullWidth
-              style={{ marginBottom: '20px', minWidth: '200px' }}
-            >
-              <MenuItem value="">Select Top Servant</MenuItem>
-              {team.slice(0, 3).map((servant, index) => (
-                <MenuItem key={index} value={index}>
-                  {servant.collectionNo}
-                </MenuItem>
-              ))}
-            </Select>
-            <Select
-              value={selectedBottom}
-              onChange={(e) => setSelectedBottom(e.target.value)}
-              displayEmpty
-              fullWidth
-              style={{ marginBottom: '20px', minWidth: '200px' }}
-            >
-              <MenuItem value="">Select Bottom Servant</MenuItem>
-              {team.slice(3, 6).filter(servant => servant.collectionNo !== "").map((servant, index) => (
-                <MenuItem key={index} value={index + 3}>
-                  {servant.collectionNo}
-                </MenuItem>
-              ))}
-            </Select>
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={() => { handleSwap(); addCommand(`x${selectedTop + 1}${selectedBottom + 1 - 3}`); }}
-              disabled={selectedTop === null || selectedBottom === null || !team[selectedTop] || !team[selectedBottom]}
-            >
-              Swap
-            </Button>
-          </div>
-        );
-      default:
-        return (
-          <Box>
-            <Box>
-              <Typography variant="h6">Skill 1</Typography>
-              <Grid>
-                <Button size="small" style={{ border: '1px solid lightgray' }} onClick={() => addCommand(`j1`)} title={`Use Skill 1 on Servant 1: ${team[0]?.name}`}>1</Button>
-                <Button size="small" style={{ border: '1px solid lightgray' }} onClick={() => addCommand(`j2`)} title={`Use Skill 1 on Servant 2: ${team[1]?.name}`}>2</Button>
-                <Button size="small" style={{ border: '1px solid lightgray' }} onClick={() => addCommand(`j3`)} title={`Use Skill 1 on Servant 3: ${team[2]?.name}`}>3</Button>
-              </Grid>
-              <Button size="small" style={{ border: '1px solid lightgray' }} onClick={() => addCommand(`j`)} title={`Use Skill on Self/Team`}>None</Button>
-            </Box>
-            <Box>
-              <Typography variant="h6">Skill 2</Typography>
-              <Grid>
-                <Button size="small" style={{ border: '1px solid lightgray' }} onClick={() => addCommand(`k1`)} title={`Use Skill 2 on Servant 1 ${team[0]?.name}`}>1</Button>
-                <Button size="small" style={{ border: '1px solid lightgray' }} onClick={() => addCommand(`k2`)} title={`Use Skill 2 on Servant 2 ${team[1]?.name}`}>2</Button>
-                <Button size="small" style={{ border: '1px solid lightgray' }} onClick={() => addCommand(`k3`)} title={`Use Skill 2 on Servant 3 ${team[2]?.name}`}>3</Button>
-              </Grid>
-              <Button size="small" style={{ border: '1px solid lightgray' }} onClick={() => addCommand(`k`)} title={`Use Skill 2 on Self/Team`}>None</Button>
-            </Box>
-            <Box>
-              <Typography variant="h6">Skill 3</Typography>
-              <Grid>
-                <Button size="small" style={{ border: '1px solid lightgray' }} onClick={() => addCommand(`l1`)} title={`Use Skill 3 on Servant 1 ${team[0]?.name}`}>1</Button>
-                <Button size="small" style={{ border: '1px solid lightgray' }} onClick={() => addCommand(`l2`)} title={`Use Skill 3 on Servant 2 ${team[1]?.name}`}>2</Button>
-                <Button size="small" style={{ border: '1px solid lightgray' }} onClick={() => addCommand(`l3`)} title={`Use Skill 3 on Servant 3 ${team[2]?.name}`}>3</Button>
-              </Grid>
-              <Button size="small" style={{ border: '1px solid lightgray' }} onClick={() => addCommand(`l`)} title={`Use Skill 3 on Self/Team`}>None</Button>
-            </Box>
-          </Box>
-        );
-    }
-  };
-
-  const handleMysticCodeChange = (event) => {
-    setSelectedMysticCode(event.target.value);
-  };
+  const isSwapMC = selectedMysticCode === 20 || selectedMysticCode === 210;
 
   return (
-    <div style={{ backgroundColor: '#e0f7fa', padding: '20px', borderRadius: '8px', width: '30rem' }}>
+    <div style={{ backgroundColor: '#e0f7fa', padding: 8, width: '30rem' }}>
       <Typography variant="h6">Mystic Codes</Typography>
+
       <Select
-        value={selectedMysticCode}
-        onChange={handleMysticCodeChange}
+        value={selectedMysticCode ?? ''}
+        onChange={(e) => setSelectedMysticCode(e.target.value)}
         displayEmpty
         fullWidth
-        style={{ marginBottom: '20px', minWidth: '200px' }}
+        style={{ marginBottom: 12 }}
       >
         <MenuItem value="" disabled>Select Mystic Code</MenuItem>
-        {mysticCodes.map((mysticCode) => (
-          <MenuItem key={mysticCode.id} value={mysticCode.id} style={{ whiteSpace: 'normal' }}>
-            {mysticCode.name}
-          </MenuItem>
+        {mysticCodes.map((mc) => (
+          <MenuItem key={mc.id} value={mc.id}>{mc.name}</MenuItem>
         ))}
       </Select>
-      {selectedMysticCode && renderButtons(selectedMysticCode)}
+
+      <Box display="flex" gap={8} mb={1}>
+        <Button variant="outlined" onClick={() => addCommand('j')}>Skill 1</Button>
+        <Button variant="outlined" onClick={() => addCommand('k')}>Skill 2</Button>
+        {!isSwapMC && <Button variant="outlined" onClick={() => addCommand('l')}>Skill 3</Button>}
+      </Box>
+
+      {isSwapMC && (
+        <Box display="flex" gap={8} alignItems="center">
+          <Select
+            value={selectedTop ?? ''}
+            onChange={(e) => setSelectedTop(e.target.value === '' ? null : Number(e.target.value))}
+            displayEmpty
+            style={{ minWidth: 140 }}
+          >
+            <MenuItem value="">Top 1-3</MenuItem>
+            {team.slice(0, 3).map((s, i) => (
+              <MenuItem key={i} value={i} disabled={!s || !s.collectionNo}>{s && s.collectionNo ? `${s.collectionNo}` : `Empty ${i + 1}`}</MenuItem>
+            ))}
+          </Select>
+
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={() => {
+              if (selectedTop !== null && selectedBottom !== null) {
+                swapServants(selectedTop, selectedBottom);
+                // emit a compact swap token: x<topIndex+1><bottomIndex+1>
+                const cmd = `x${selectedTop + 1}${selectedBottom + 1}`;
+                addCommand(cmd);
+                setSelectedTop(null);
+                setSelectedBottom(null);
+              }
+            }}
+            disabled={selectedTop === null || selectedBottom === null || !team[selectedTop] || !team[selectedBottom]}
+          >
+            Swap
+          </Button>
+
+          <Select
+            value={selectedBottom ?? ''}
+            onChange={(e) => setSelectedBottom(e.target.value === '' ? null : Number(e.target.value))}
+            displayEmpty
+            style={{ minWidth: 140 }}
+          >
+            <MenuItem value="">Bottom 4-6</MenuItem>
+            {team.slice(3, 6).map((s, i) => (
+              <MenuItem key={i} value={i + 3} disabled={!s || !s.collectionNo}>{s && s.collectionNo ? `${s.collectionNo}` : `Empty ${i + 4}`}</MenuItem>
+            ))}
+          </Select>
+        </Box>
+      )}
     </div>
   );
 };

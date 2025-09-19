@@ -8,7 +8,7 @@ import './FilterSection.css';
 // Note: This constant is used in App.js for implementation
 // const FILTER_PERSISTENCE = 'remember';
 
-const FilterSection = ({ sortOrder, setSortOrder, searchQuery, setSearchQuery, selectedRarity, setSelectedRarity, selectedClass, setSelectedClass, selectedNpType, setSelectedNpType, selectedAttackType, setSelectedAttackType, capitalize, handleCheckboxChange, attackTypeLabels }) => {
+const FilterSection = ({ sortOrder, setSortOrder, searchQuery, setSearchQuery, selectedRarity, setSelectedRarity, selectedClass, setSelectedClass, selectedNpType, setSelectedNpType, selectedAttackType, setSelectedAttackType, capitalize, handleCheckboxChange, attackTypeLabels, includeEnemyOnly = false, setIncludeEnemyOnly = () => {} }) => {
   
   // Class data with English names for compact UI
   const classData = [
@@ -82,6 +82,12 @@ const FilterSection = ({ sortOrder, setSortOrder, searchQuery, setSearchQuery, s
       {/* Compact Class Filter */}
       <Box mb={2}>
         <Typography variant="subtitle2" gutterBottom>Class</Typography>
+        <div style={{ marginBottom: '0.5rem' }}>
+          <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            <input type="checkbox" checked={includeEnemyOnly} onChange={(e) => setIncludeEnemyOnly(e.target.checked)} />
+            <Typography variant="caption">Include enemy-only servants</Typography>
+          </label>
+        </div>
         <div className="filter-grid-wrapper">
           <div className="filter-grid">
             {classData.map(classItem => (
@@ -95,13 +101,19 @@ const FilterSection = ({ sortOrder, setSortOrder, searchQuery, setSearchQuery, s
                 aria-pressed={selectedClass.includes(classItem.key.toLowerCase())}
                 title={`Toggle ${classItem.name} class filter`}
               >
-                <img 
+                <img
                   src={`${process.env.PUBLIC_URL}/class-icons/${classItem.key}.png`}
                   alt={classItem.name}
                   onError={(e) => {
-                    // Fallback to text if image doesn't exist
-                    e.target.style.display = 'none';
-                    e.target.parentElement.innerHTML = classItem.name.substring(0, 3);
+                    // Fallback: hide the broken image and show full text label in the existing span
+                    try {
+                      e.target.style.display = 'none';
+                      const textSpan = e.target.parentElement.querySelector('.filter-item-text');
+                      if (textSpan) textSpan.textContent = classItem.name;
+                    } catch (err) {
+                      // Last resort: replace innerHTML with the full name
+                      e.target.parentElement.innerHTML = classItem.name;
+                    }
                   }}
                   style={{ width: '32px', height: '32px' }}
                 />

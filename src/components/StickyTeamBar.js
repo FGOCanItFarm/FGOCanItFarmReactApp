@@ -1,13 +1,16 @@
 import React, { useState } from 'react';
-import { Box, Button, Paper, Typography, Popover, Portal } from '@mui/material';
+import { Box, Button, Paper, Typography, Popover, Portal, Modal } from '@mui/material';
 import ServantAvatar from './ServantAvatar';
 import '../ui-vars.css';
 import '../team-sticky.css';
 
-const StickyTeamBar = ({ team, servants, selectedMysticCode, selectedQuest }) => {
-  const [expanded, setExpanded] = useState(false);
+const StickyTeamBar = ({ team, servants, selectedMysticCode, selectedQuest, servantEffects = [], updateServantEffects = () => {} }) => {
+  // Start the sticky team bar popped out by default
+  const [expanded, setExpanded] = useState(true);
   const [anchorEl, setAnchorEl] = useState(null);
   const [hoveredServant, setHoveredServant] = useState(null);
+  const [editIndex, setEditIndex] = useState(null);
+  const [editState, setEditState] = useState({ append2: false, append5: false, extraJson: '' });
 
   const handleToggle = () => {
     setExpanded(!expanded);
@@ -32,6 +35,37 @@ const StickyTeamBar = ({ team, servants, selectedMysticCode, selectedQuest }) =>
     if (event.key === 'Escape') {
       setExpanded(false);
     }
+  };
+
+  const openEditForIndex = (index) => {
+    const effects = servantEffects[index] || {};
+    setEditState({
+      append2: !!effects.append2,
+      append5: !!effects.append5,
+      extraJson: effects.extraJson ? JSON.stringify(effects.extraJson, null, 2) : ''
+    });
+    setEditIndex(index);
+  };
+
+  const closeEdit = () => {
+    setEditIndex(null);
+    setEditState({ append2: false, append5: false, extraJson: '' });
+  };
+
+  const saveEdit = () => {
+    try {
+      let parsedExtra = {};
+      if (editState.extraJson && editState.extraJson.trim()) {
+        parsedExtra = JSON.parse(editState.extraJson);
+      }
+      updateServantEffects(editIndex, 'append2', editState.append2);
+      updateServantEffects(editIndex, 'append5', editState.append5);
+      updateServantEffects(editIndex, 'extraJson', parsedExtra);
+    } catch (err) {
+      // If JSON parse fails, still set as raw string under a different key to avoid losing data
+      updateServantEffects(editIndex, 'extraJsonRaw', editState.extraJson);
+    }
+    closeEdit();
   };
 
   const mysticCodeNames = {
@@ -73,7 +107,7 @@ const StickyTeamBar = ({ team, servants, selectedMysticCode, selectedQuest }) =>
                 {team.slice(0, 6).map((servantObj, index) => {
                   const servant = servants?.find(s => s.collectionNo === servantObj.collectionNo);
                   
-                  return (
+                    return (
                     <div 
                       key={index}
                       className="sticky-servant-slot"
@@ -82,7 +116,7 @@ const StickyTeamBar = ({ team, servants, selectedMysticCode, selectedQuest }) =>
                       aria-label={servant ? `${servant.name} in position ${index + 1}` : `Empty slot ${index + 1}`}
                     >
                       {servant ? (
-                        <div className="sticky-servant-avatar">
+                        <div className="sticky-servant-avatar" onClick={() => openEditForIndex(index)} role="button" tabIndex={0} aria-label={`Edit stats for slot ${index + 1}`}>
                           <ServantAvatar
                             servantFace={servant.extraAssets?.faces?.ascension?.['4']}
                             bgType={servant.noblePhantasms?.[0]?.card}
@@ -90,7 +124,7 @@ const StickyTeamBar = ({ team, servants, selectedMysticCode, selectedQuest }) =>
                           />
                         </div>
                       ) : (
-                        <div className="sticky-servant-empty">
+                        <div className="sticky-servant-empty" onClick={() => openEditForIndex(index)} role="button" tabIndex={0} aria-label={`Edit stats for empty slot ${index + 1}`}>
                           <Typography variant="caption">{index + 1}</Typography>
                         </div>
                       )}
@@ -157,6 +191,33 @@ const StickyTeamBar = ({ team, servants, selectedMysticCode, selectedQuest }) =>
           </Box>
         </Paper>
       </Popover>
+
+      {/* Edit modal for per-unit extra stats */}
+      <Modal open={editIndex !== null} onClose={closeEdit}>
+        <Paper sx={{ p: 2, width: 420, margin: 'auto', marginTop: '10%' }}>
+          <Typography variant="h6">Edit Unit Extras {editIndex !== null ? `- Slot ${editIndex + 1}` : ''}</Typography>
+          <Box mt={1}>
+            <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <input type="checkbox" checked={editState.append2} onChange={(e) => setEditState(s => ({ ...s, append2: e.target.checked }))} />
+              <Typography variant="body2">Append2</Typography>
+            </label>
+          </Box>
+          <Box mt={1}>
+            <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <input type="checkbox" checked={editState.append5} onChange={(e) => setEditState(s => ({ ...s, append5: e.target.checked }))} />
+              <Typography variant="body2">Append5</Typography>
+            </label>
+          </Box>
+          <Box mt={1}>
+            <Typography variant="caption">Extra JSON</Typography>
+            <textarea value={editState.extraJson} onChange={(e) => setEditState(s => ({ ...s, extraJson: e.target.value }))} style={{ width: '100%', minHeight: '8rem', fontFamily: 'monospace' }} />
+          </Box>
+          <Box mt={2} display="flex" gap={1} justifyContent="flex-end">
+            <Button variant="outlined" onClick={closeEdit}>Cancel</Button>
+            <Button variant="contained" onClick={saveEdit} color="primary">Save</Button>
+          </Box>
+        </Paper>
+      </Modal>
     </>
   );
 };
