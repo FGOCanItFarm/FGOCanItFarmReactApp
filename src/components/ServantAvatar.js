@@ -4,7 +4,7 @@ import { ReactComponent as AoESvg } from '../AoE.svg'; // Adjust the path as nec
 import { ReactComponent as SingleTargetSvg } from '../SingleTarget.svg'; // Adjust the path as necessary
 import { ReactComponent as SupportSvg } from '../Support.svg'; // Adjust the path as necessary
 
-const ServantAvatar = ({ bgType, servantFace = "https://static.atlasacademy.io/JP/Faces/f_28001003.png", tagType }) => {
+const ServantAvatar = ({ bgType, servantFace, tagType }) => {
 
   let TagImage;
   switch (tagType) {
@@ -18,7 +18,7 @@ const ServantAvatar = ({ bgType, servantFace = "https://static.atlasacademy.io/J
       TagImage = SupportSvg;
       break;
     default:
-      TagImage = SupportSvg;
+      TagImage = null; // don't show a tag for empty/unknown types
   }
 
   let bgImage;
@@ -33,7 +33,7 @@ const ServantAvatar = ({ bgType, servantFace = "https://static.atlasacademy.io/J
       bgImage = `${process.env.PUBLIC_URL}/quickbg.svg`;
       break;
     default:
-      bgImage = `${process.env.PUBLIC_URL}/artsbg.svg`;
+      bgImage = null;
   }
 
   return (
@@ -50,14 +50,18 @@ const ServantAvatar = ({ bgType, servantFace = "https://static.atlasacademy.io/J
         >
           <div className="box">
             <div className="imgBox">
-              <img
-                src={servantFace}
-                className="custom-avatar"
-                alt="servant icon"
-              />
+              {servantFace ? (
+                <img
+                  src={servantFace}
+                  className="custom-avatar"
+                  alt="servant icon"
+                />
+              ) : (
+                <div className="empty-avatar" aria-hidden="true" />
+              )}
             </div>
             <div className="tag">
-              <TagImage className={"TagImage"} />
+              {TagImage ? <TagImage className={"TagImage"} /> : null}
             </div>
           </div>
         </div>

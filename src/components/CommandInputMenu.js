@@ -386,6 +386,13 @@ const renderButtonsForServant = (servantIndex, skillIndex, collectionNo, addComm
   return buttons;
 };
 
+// Exported helper component so other UIs (like TwoTeamView) can reuse the
+// same choice rendering and command generation logic.
+export const ChoiceSelector = ({ servantIndex, skillIndex, addCommand, team, isDisabled }) => {
+  const collectionNo = team?.[servantIndex]?.collectionNo;
+  return renderButtonsForServant(servantIndex, skillIndex, collectionNo, addCommand, team, isDisabled);
+};
+
 const CommandInputMenu = ({ activeServant, updateCommands, team }) => {
   const addCommand = (command) => {
     updateCommands((prevCommands) => [...prevCommands, command]);

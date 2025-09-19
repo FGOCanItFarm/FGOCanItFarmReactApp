@@ -28,7 +28,8 @@
 
 .filter-grid {
   display: grid;
-  grid-template-columns: repeat(5, minmax(32px, 1fr));
+  /* Allow more room for text labels by using 5 flexible columns that can grow */
+  grid-template-columns: repeat(5, minmax(48px, 1fr));
   gap: var(--filter-gap, 1rem);
   box-sizing: border-box;
 }
@@ -67,10 +68,12 @@
 }
 
 .filter-item-text {
-  font-size: 10px;
+  font-size: 12px;
   text-align: center;
-  margin-top: 2px;
+  margin-top: 4px;
   line-height: 1.1;
+  white-space: normal;
+  word-break: break-word;
 }
 
 /* Narrow screen adjustments */

@@ -2,14 +2,12 @@ import React, { useEffect } from 'react';
 import { Button, Typography, Box, Container, Tooltip } from '@mui/material';
 import FilterSection from './FilterSection';
 import ServantSelection from './ServantSelection';
-import TeamSection from './TeamSection';
 import CommonServantsGrid from './CommonServantsGrid';
-import MysticCodeCommand from './MysticCodeCommand';
 import { useNavigate } from 'react-router-dom';
 import '../TeamSelectionPage.css';
 import '../ui-vars.css';
 
-const TeamSelectionPage = ({ team, setTeam, servants, filteredServants, setFilteredServants, handleServantClick, handleTeamServantClick, updateServantEffects, clearTeam, sortOrder, setSortOrder, searchQuery, setSearchQuery, selectedRarity, setSelectedRarity, selectedClass, setSelectedClass, selectedNpType, setSelectedNpType, selectedAttackType, setSelectedAttackType, capitalize, handleCheckboxChange, attackTypeLabels, selectedMysticCode, setSelectedMysticCode}) => {
+const TeamSelectionPage = ({ team, setTeam, servants, filteredServants, setFilteredServants, handleServantClick, handleTeamServantClick, updateServantEffects, clearTeam, sortOrder, setSortOrder, searchQuery, setSearchQuery, selectedRarity, setSelectedRarity, selectedClass, setSelectedClass, selectedNpType, setSelectedNpType, selectedAttackType, setSelectedAttackType, capitalize, handleCheckboxChange, attackTypeLabels, selectedMysticCode, setSelectedMysticCode, includeEnemyOnly = false, setIncludeEnemyOnly = () => {}, enemyOnlyBlacklist = new Set() }) => {
   const navigate = useNavigate();
 
   const handleGotoQuest = () => {
@@ -30,7 +28,11 @@ const TeamSelectionPage = ({ team, setTeam, servants, filteredServants, setFilte
         filtered = filtered.filter(servant => selectedRarity.includes(servant.rarity.toString()));
       }
       if (selectedClass.length > 0) {
-        filtered = filtered.filter(servant => selectedClass.includes(servant.className.toLowerCase()));
+        filtered = filtered.filter(servant => {
+          const cls = (servant.className || '').toLowerCase();
+          // Allow matches where the servant class contains or startsWith the selected class
+          return selectedClass.some(sel => cls === sel || cls.startsWith(sel) || cls.includes(sel));
+        });
       }
       if (selectedNpType.length > 0) {
         filtered = filtered.filter(servant =>
@@ -52,6 +54,11 @@ const TeamSelectionPage = ({ team, setTeam, servants, filteredServants, setFilte
       }
       if (sortOrder) {
         filtered = filtered.sort((a, b) => a[sortOrder].localeCompare(b[sortOrder]));
+      }
+
+      // Exclude known enemy-only servants unless the user explicitly includes them
+      if (!includeEnemyOnly && enemyOnlyBlacklist && enemyOnlyBlacklist.size > 0) {
+        filtered = filtered.filter(servant => !enemyOnlyBlacklist.has(String(servant.collectionNo)));
       }
 
       // By default do NOT force-include team members into the filtered list.
@@ -94,6 +101,8 @@ const TeamSelectionPage = ({ team, setTeam, servants, filteredServants, setFilte
                 capitalize={capitalize}
                 handleCheckboxChange={handleCheckboxChange}
                 attackTypeLabels={attackTypeLabels}
+                includeEnemyOnly={includeEnemyOnly}
+                setIncludeEnemyOnly={setIncludeEnemyOnly}
               />
             </div>
             <div className="servants-container">
@@ -110,26 +119,7 @@ const TeamSelectionPage = ({ team, setTeam, servants, filteredServants, setFilte
               </div>
             </div>
           </div>
-          <div className="team-mystic-code">
-            <div className="team-section">
-              <TeamSection
-                team={team}
-                servants={servants}
-                activeServant={null}
-                handleTeamServantClick={handleTeamServantClick}
-                updateServantEffects={updateServantEffects}
-                pageType="team-selection-page"
-              />
-            </div>
-            <div className="mystic-code-selection">
-              <MysticCodeCommand
-                team={team}
-                setTeam={setTeam}
-                selectedMysticCode={selectedMysticCode}
-                setSelectedMysticCode={setSelectedMysticCode}
-              />
-            </div>
-          </div>
+          {/* Team and Mystic Code moved to Command Input page. This area now focuses on filters and servant listing. */}
         </>
 
       {/* Common buttons section */}

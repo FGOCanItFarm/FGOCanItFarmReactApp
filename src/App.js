@@ -12,7 +12,7 @@ import axios from 'axios';
 import './ui-vars.css';
 
 const App = () => {
-  const [team, setTeam] = useState(Array(6).fill({ collectionNo: '' }));
+  const [team, setTeam] = useState(Array.from({ length: 6 }, () => ({ collectionNo: '' })));
   const [servants, setServants] = useState([]);
   const [filteredServants, setFilteredServants] = useState([]);
   const [sortOrder, setSortOrder] = useState('');
@@ -27,6 +27,14 @@ const App = () => {
   const [openModal, setOpenModal] = useState(false);
   const [servantEffects, setServantEffects] = useState(Array(6).fill({}));
   const [activeServant, setActiveServant] = useState(null);
+  // Control whether enemy-only NPCs are included in filtered lists (default: false)
+  const [includeEnemyOnly, setIncludeEnemyOnly] = useState(false);
+
+  // Small hard-coded blacklist of known enemy-only / NPC collectionNos to hide by default.
+  // Add collectionNos here as strings (e.g., '123', '456').
+  const ENEMY_ONLY_BLACKLIST = new Set([
+    '240', '436', '83', '411', '149', '443', '333'
+  ]);
 
   axios.defaults.baseURL = process.env.REACT_APP_API_URL;
 
@@ -44,15 +52,28 @@ const App = () => {
   // Load team, commands, quest, and mystic code data from local storage when the component mounts
   useEffect(() => {
     const savedTeam = loadFromLocalStorage('team');
-    setTeam(savedTeam);
+    // Normalize saved team: must be array of length 6 with objects containing collectionNo.
+    const BLACKLISTED_COLLECTIONNOS = new Set(['316']);
+    const normalizeTeam = (raw) => {
+      if (!Array.isArray(raw) || raw.length !== 6) return Array.from({ length: 6 }, () => ({ collectionNo: '' }));
+      // Ensure each slot is an object with a valid collectionNo string; if invalid, replace with empty slot
+      return raw.map(slot => {
+        if (!slot || typeof slot !== 'object') return { collectionNo: '' };
+        if (!slot.collectionNo || typeof slot.collectionNo !== 'string' || slot.collectionNo.trim() === '' || BLACKLISTED_COLLECTIONNOS.has(String(slot.collectionNo))) return { collectionNo: '' };
+        // If collectionNo was a numeric id that we removed from supports, it's still valid as a string here; keep it
+        return { collectionNo: slot.collectionNo };
+      });
+    };
+
+    setTeam(normalizeTeam(savedTeam));
     const savedCommands = loadFromLocalStorage('commands');
     setCommands(savedCommands);
     const savedQuest = loadFromLocalStorage('selectedQuest');
     setSelectedQuest(savedQuest);
     const savedMysticCode = loadFromLocalStorage('selectedMysticCode');
     setSelectedMysticCode(savedMysticCode);
-    const savedServantEffects = loadFromLocalStorage('servantEffects');
-    setServantEffects(savedServantEffects);
+  const savedServantEffects = loadFromLocalStorage('servantEffects');
+  setServantEffects(Array.isArray(savedServantEffects) && savedServantEffects.length === 6 ? savedServantEffects : Array(6).fill({}));
 
     // Filter persistence logic - forcing reset on refresh/navigation
     const FILTER_PERSISTENCE = 'reset'; // 'remember' or 'reset'
@@ -163,7 +184,8 @@ const App = () => {
   };
 
   const clearTeam = () => {
-    setTeam(Array(6).fill({ collectionNo: '' }));
+    // create unique empty objects for each slot to avoid shared references
+    setTeam(Array.from({ length: 6 }, () => ({ collectionNo: '' })));
   };
 
   const handleCheckboxChange = (event, setState, state) => {
@@ -265,6 +287,9 @@ const App = () => {
               attackTypeLabels={attackTypeLabels}
               selectedMysticCode={selectedMysticCode}
               setSelectedMysticCode={setSelectedMysticCode}
+              includeEnemyOnly={includeEnemyOnly}
+              setIncludeEnemyOnly={setIncludeEnemyOnly}
+              enemyOnlyBlacklist={ENEMY_ONLY_BLACKLIST}
             />
           } />
           <Route path="/quest-selection" element={
@@ -309,6 +334,8 @@ const App = () => {
         servants={servants}
         selectedMysticCode={selectedMysticCode}
         selectedQuest={selectedQuest}
+        servantEffects={servantEffects}
+        updateServantEffects={updateServantEffects}
       />
     </Router>
   );

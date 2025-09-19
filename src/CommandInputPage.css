@@ -12,6 +12,25 @@
   margin-bottom: 20px;
 }
 
+.command-input-popup.team-section {
+  width: 100%;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 12px;
+  border: 1px solid rgba(0,0,0,0.12);
+  background: #fafafa;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+}
+
+/* Center bottom team popout removed — sticky bottom-right popout is used instead */
+.team-popout-slot {
+  width: calc(var(--servant-compact-size) + 2rem);
+  height: calc(var(--servant-compact-size) + 2rem);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 .team-section, .mystic-code-section {
   flex: 1;
   margin: 0 10px;

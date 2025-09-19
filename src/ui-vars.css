@@ -1,8 +1,8 @@
 /* UI Variables for consistent spacing and sizing */
 :root {
   /* Button sizing */
-  --btn-min-width: 80px;
-  --btn-min-height: 36px;
+  --btn-min-width: 100px;
+  --btn-min-height: 44px;
   --btn-small-min-width: 60px;
   --btn-small-min-height: 32px;
   
@@ -14,14 +14,14 @@
   --spacing-xl: 32px;
   
   /* Sticky team bar */
-  --sticky-team-height: 80px;
-  --sticky-team-expanded-height: 120px;
+  --sticky-team-height: 96px;
+  --sticky-team-expanded-height: 144px;
   --sticky-team-width: 100%;
-  --sticky-team-max-width: 648px; /* Increased by 35% from 480px */
-  --servant-compact-size: 48px;
+  --sticky-team-max-width: 760px; /* increased for larger panel */
+  --servant-compact-size: 64px;
   
   /* Servant avatar sizing for consistent layout */
-  --servant-slot-size: 88px;
+  --servant-slot-size: 96px;
   --servant-row-height: var(--servant-slot-size);
   --servant-gap: 8px;
   

@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
-import { Button, Typography, Tooltip } from '@mui/material';
+import { Button, Typography, Tooltip, Modal, Box } from '@mui/material';
 import ServantAvatar from './ServantAvatar';
+import MysticCodeCommand from './MysticCodeCommand';
 import '../ui-vars.css';
+import { ChoiceSelector } from './CommandInputMenu';
 
 // Import command generation functions to preserve existing APIs
 const generateSkillCommand = (servantIndex, skillIndex, targetIndex = null) => {
@@ -45,12 +47,20 @@ const generateSkillCommand = (servantIndex, skillIndex, targetIndex = null) => {
 //   return command;
 // };
 
-const TwoTeamView = ({ team, servants, selectedMysticCode, addCommand }) => {
+const TwoTeamView = ({ team, servants, setTeam = () => {}, selectedMysticCode, setSelectedMysticCode, addCommand, updateCommands }) => {
   const [selectedSource, setSelectedSource] = useState(null);
   const [selectedTarget, setSelectedTarget] = useState(null);
+  const [choiceModal, setChoiceModal] = useState({ open: false, servantIndex: null, skillIndex: null, targetIndex: null });
 
   const handleSourceClick = (index) => {
-    setSelectedSource(index);
+    // Only allow selecting a source if that slot has a servant assigned.
+    const hasCollection = Boolean(team[index]?.collectionNo);
+    if (hasCollection) {
+      setSelectedSource(index);
+    } else {
+      // If user clicked an empty slot, clear any existing selection instead of selecting it.
+      setSelectedSource(null);
+    }
   };
 
   const handleTargetClick = (index) => {
@@ -59,11 +69,49 @@ const TwoTeamView = ({ team, servants, selectedMysticCode, addCommand }) => {
 
   const handleSkillClick = (skillIndex) => {
     if (selectedSource !== null) {
-      const command = generateSkillCommand(selectedSource, skillIndex, selectedTarget);
-      addCommand(command);
-      // Reset selection after using skill
-      setSelectedSource(null);
-      setSelectedTarget(null);
+      // Guard: ensure the selected source slot actually has a servant with a collectionNo
+      const sourceServant = team[selectedSource] && team[selectedSource].collectionNo ? servants.find(s => s.collectionNo === team[selectedSource].collectionNo) : null;
+      if (!sourceServant) {
+        // No servant in the selected source slot — ignore the skill click to avoid generating commands for empty slots.
+        return;
+      }
+
+      // Some servants/skills are choice-based. We'll detect that by checking
+      // the collectionNo and skillIndex against known choice mappings. If it
+      // looks like a choice skill, open a modal with options via ChoiceSelector.
+      const collectionNo = sourceServant.collectionNo;
+      const isChoice = (() => {
+        // Mirror the mapping in CommandInputMenu.renderButtonsForServant
+        switch (collectionNo) {
+          case 373:
+            // 373: skill 1 and 3 are choice-style; skill 2 uses 2-choice-with-target layout
+            return (skillIndex === 1 || skillIndex === 3);
+          case 428:
+            return skillIndex === 1;
+          case 268:
+            return skillIndex === 2;
+          case 421:
+          case 11:
+          case 391:
+          case 424:
+          case 425:
+          case 414:
+          case 259:
+            return skillIndex === 3;
+          default:
+            return false;
+        }
+      })();
+
+      if (isChoice) {
+        setChoiceModal({ open: true, servantIndex: selectedSource, skillIndex, targetIndex: selectedTarget });
+      } else {
+        const command = generateSkillCommand(selectedSource, skillIndex, selectedTarget);
+        addCommand(command);
+        // Reset selection after using skill
+        setSelectedSource(null);
+        setSelectedTarget(null);
+      }
     }
   };
 
@@ -72,7 +120,9 @@ const TwoTeamView = ({ team, servants, selectedMysticCode, addCommand }) => {
   };
 
   const handleNP = (npIndex) => {
-    addCommand(`n${npIndex}`);
+    // NP buttons should emit tokens 4,5,6 (one-based) rather than 'n1','n2','n3'
+    const token = String(3 + Number(npIndex)); // 1->4, 2->5, 3->6
+    addCommand(token);
   };
 
   const mysticCodeNames = {
@@ -85,13 +135,6 @@ const TwoTeamView = ({ team, servants, selectedMysticCode, addCommand }) => {
 
   return (
     <div className="two-team-view">
-      {/* Mystic Code Section (above, centered) */}
-      <div className="mystic-code-center">
-        <Typography variant="h6" align="center" gutterBottom>
-          Mystic Code: {selectedMysticCode ? mysticCodeNames[selectedMysticCode] || `ID: ${selectedMysticCode}` : 'None'}
-        </Typography>
-      </div>
-
       {/* Three-column layout */}
       <div className="three-column-layout">
         {/* Left: Full 6-unit team */}
@@ -119,13 +162,12 @@ const TwoTeamView = ({ team, servants, selectedMysticCode, addCommand }) => {
                 >
                         {servant ? (
                           <ServantAvatar
-                            servantFace={servant.extraAssets?.faces?.ascension?.['4'] || '/temp_servant_img.jpg'}
+                            servantFace={servant.extraAssets?.faces?.ascension?.['4']}
                             bgType={servant.noblePhantasms?.[0]?.card}
                             tagType={servant.noblePhantasms?.[0]?.effectFlags?.[0]}
                           />
                         ) : (
                           <ServantAvatar
-                            servantFace={'/temp_servant_img.jpg'}
                             bgType={null}
                             tagType={null}
                           />
@@ -149,7 +191,10 @@ const TwoTeamView = ({ team, servants, selectedMysticCode, addCommand }) => {
                 <Button
                   variant="outlined"
                   onClick={() => handleSkillClick(skillIndex)}
-                  disabled={selectedSource === null}
+                  disabled={
+                    // disabled if no source selected or the selected slot lacks a servant
+                    selectedSource === null || !(team[selectedSource] && team[selectedSource].collectionNo)
+                  }
                   className="skill-button"
                   aria-label={`Skill ${skillIndex}`}
                 >
@@ -205,6 +250,26 @@ const TwoTeamView = ({ team, servants, selectedMysticCode, addCommand }) => {
               );
             })}
           </div>
+          {/* Mystic Code selector now shown under Targets */}
+          <div style={{ marginTop: '1rem' }}>
+              <MysticCodeCommand
+                team={team}
+                setTeam={setTeam}
+                updateCommands={updateCommands}
+                selectedMysticCode={selectedMysticCode}
+                setSelectedMysticCode={setSelectedMysticCode}
+                onSwap={(topIndex, bottomIndex) => {
+                  // If the swap brings a servant into the front 3 (indices 0-2), select it as source
+                  // For example swapping bottomIndex -> topIndex where bottomIndex < 3 means a unit entered the field
+                  // We will prefer selecting the index that now contains the previously-bottom servant if it's in 0-2
+                  if (bottomIndex >= 0 && bottomIndex < 3) {
+                    setSelectedSource(bottomIndex);
+                  } else if (topIndex >= 0 && topIndex < 3) {
+                    setSelectedSource(topIndex);
+                  }
+                }}
+              />
+          </div>
         </div>
       </div>
 
@@ -236,6 +301,29 @@ const TwoTeamView = ({ team, servants, selectedMysticCode, addCommand }) => {
           ))}
         </div>
       </div>
+      {/* Choice modal for skills that require selecting one of multiple options */}
+      <Modal open={choiceModal.open} onClose={() => setChoiceModal({ open: false })}>
+        <Box p={2} bgcolor="white" style={{ margin: 'auto', marginTop: '10%', width: '80%', maxWidth: '600px' }}>
+          <Typography variant="h6">Choose Skill Option</Typography>
+          {choiceModal.open && (
+            <ChoiceSelector
+              servantIndex={choiceModal.servantIndex}
+              skillIndex={choiceModal.skillIndex}
+              addCommand={(cmd) => {
+                addCommand(cmd);
+                setChoiceModal({ open: false });
+                setSelectedSource(null);
+                setSelectedTarget(null);
+              }}
+              team={team}
+              isDisabled={false}
+            />
+          )}
+          <Box mt={2}>
+            <Button variant="outlined" onClick={() => setChoiceModal({ open: false })}>Cancel</Button>
+          </Box>
+        </Box>
+      </Modal>
     </div>
   );
 };
