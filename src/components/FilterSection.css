@@ -30,7 +30,6 @@
   display: grid;
   grid-template-columns: repeat(5, minmax(32px, 1fr));
   gap: var(--filter-gap, 1rem);
-  width: max-content; /* allow horizontal scrolling when container is narrower */
   box-sizing: border-box;
 }
 
@@ -47,6 +46,7 @@
   cursor: pointer;
   transition: all 0.2s ease;
   min-height: 60px;
+  min-width: 50px;
   position: relative;
 }
 

@@ -156,8 +156,6 @@ const FilterSection = ({ sortOrder, setSortOrder, searchQuery, setSearchQuery, s
                 {capitalize(npType)}
               </button>
             ))}
-            {/* Add placeholders to complete 7 columns */}
-            {[...Array(4)].map((_, i) => <div key={`np-placeholder-${i}`} style={{ visibility: 'hidden' }}></div>)}
           </div>
         </div>
       </Box>
@@ -181,8 +179,6 @@ const FilterSection = ({ sortOrder, setSortOrder, searchQuery, setSearchQuery, s
                 {attackTypeLabels[attackType]}
               </button>
             ))}
-            {/* Add placeholders to complete 7 columns */}
-            {[...Array(4)].map((_, i) => <div key={`attack-placeholder-${i}`} style={{ visibility: 'hidden' }}></div>)}
           </div>
         </div>
       </Box>
