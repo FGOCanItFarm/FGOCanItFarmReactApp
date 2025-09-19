@@ -20,12 +20,6 @@
   padding: 0.5rem;
 }
 
-.filter-section {
-  /* Fixed-width filter column so it cannot be squashed by the servant grid */
-  flex: 0 0 320px; /* fixed basis */
-  min-width: 280px;
-}
-
 /* Keep filter visually on top when adjacent content overflows */
 .filter-section {
   /* Align the flex-basis with the inner container's min-width to avoid overflow

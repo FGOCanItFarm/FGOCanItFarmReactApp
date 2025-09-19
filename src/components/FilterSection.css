@@ -28,9 +28,8 @@
 
 .filter-grid {
   display: grid;
-  grid-template-columns: repeat(7, minmax(32px, 1fr));
-  gap: var(--filter-gap, 8px);
-  width: max-content; /* allow horizontal scrolling when container is narrower */
+  grid-template-columns: repeat(5, minmax(32px, 1fr));
+  gap: var(--filter-gap, 1rem);
   box-sizing: border-box;
 }
 
@@ -47,6 +46,7 @@
   cursor: pointer;
   transition: all 0.2s ease;
   min-height: 60px;
+  min-width: 50px;
   position: relative;
 }
 
