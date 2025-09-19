@@ -7,8 +7,9 @@
 
 .filter-common-servants {
   display: flex;
-  justify-content: space-between;
   align-items: flex-start;
+  /* explicit gap between filter column and servants area */
+  gap: 1rem;
   height: 44rem;
 }
 
@@ -22,8 +23,14 @@
 .filter-section {
   /* Fixed-width filter column so it cannot be squashed by the servant grid */
   flex: 0 0 320px; /* fixed basis */
-  margin-right: 1rem;
   min-width: 280px;
+}
+
+/* Keep filter visually on top when adjacent content overflows */
+.filter-section {
+  position: relative;
+  z-index: 2;
+  box-sizing: border-box;
 }
 
 .team-selection-buttons {
@@ -40,6 +47,28 @@
   flex-direction: column;
   gap: var(--spacing-lg);
   min-width: 0; /* allow overflow children to trigger scroll instead of growing layout */
+}
+
+/* Ensure the servant area doesn't render on top of the filter column
+   — wide grids should scroll inside this container instead of overflowing */
+.servants-container {
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+/* Constrain wrappers so their internal scrolling is contained */
+.common-servants-wrapper,
+.servant-selection-wrapper {
+  overflow: hidden;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+/* Make horizontal servant lists respect their parent's width and scroll internally */
+.common-servants-horizontal,
+.servant-selection-horizontal {
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 /* common-servants-wrapper intentionally left unstyled; parent rules handle layout */
