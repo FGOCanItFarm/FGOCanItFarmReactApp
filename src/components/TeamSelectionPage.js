@@ -75,7 +75,7 @@ const TeamSelectionPage = ({ team, setTeam, servants, filteredServants, setFilte
     };
 
     filterServants();
-  }, [selectedRarity, selectedClass, selectedNpType, selectedAttackType, searchQuery, sortOrder, servants, team, setFilteredServants]);
+  }, [selectedRarity, selectedClass, selectedNpType, selectedAttackType, searchQuery, sortOrder, servants, team, setFilteredServants, includeEnemyOnly, enemyOnlyBlacklist]);
 
   return (
     <Container>

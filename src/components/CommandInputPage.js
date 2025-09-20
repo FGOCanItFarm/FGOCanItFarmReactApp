@@ -3,22 +3,9 @@ import { Button, Typography, Box, Container, Modal } from '@mui/material';
 // MysticCodeCommand moved into TwoTeamView
 import '../CommandInputPage.css';
 import TwoTeamView from './TwoTeamView';
-import ServantAvatar from './ServantAvatar';
 
 const CommandInputPage = ({ team, servants, setTeam, activeServant, setActiveServant, commands, setCommands, selectedQuest, selectedMysticCode, setSelectedMysticCode, handleSubmit, openModal, handleOpenModal, handleCloseModal, updateServantEffects }) => {
-  const handleTeamServantClick = (index) => {
-    setActiveServant(index);
-  };
-
-  const handleEffectChange = (field, value) => {
-    const updatedTeam = team.map((servant, index) => {
-      if (index === activeServant) {
-        return { ...servant, [field]: value };
-      }
-      return servant;
-    });
-    setTeam(updatedTeam);
-  };
+  // (handleTeamServantClick and handleEffectChange were removed because they were unused in this component)
 
   // Two-Team view toggle and adapter to append commands into the shared `commands` state
   // History stack to support undo for commands editor

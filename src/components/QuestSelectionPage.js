@@ -11,12 +11,12 @@ const QuestSelectionPage = ({ selectedQuest, setSelectedQuest }) => {
   };
 
   return (
-    <Container>
-      <Typography variant="h4">Select Farming Node</Typography>
-      <Grid container spacing={2} direction="row">
-        <QuestSelection setSelectedQuest={setSelectedQuest} />
-      </Grid>
-      <Button variant="contained" color="primary" onClick={handleNext} style={{ marginTop: '20px' }}>
+    <Container sx={{ py: 3 }}>
+      <Typography variant="h4" sx={{ mb: 2 }}>
+        Select Farming Node
+      </Typography>
+      <QuestSelection setSelectedQuest={setSelectedQuest} />
+      <Button variant="contained" color="primary" onClick={handleNext} sx={{ mt: 3 }}>
         Next
       </Button>
     </Container>

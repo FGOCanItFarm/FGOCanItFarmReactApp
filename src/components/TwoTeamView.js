@@ -125,13 +125,7 @@ const TwoTeamView = ({ team, servants, setTeam = () => {}, selectedMysticCode, s
     addCommand(token);
   };
 
-  const mysticCodeNames = {
-    410: 'Winter Casual',
-    210: 'Chaldea Uniform - Decisive Battle',
-    100: 'A Fragment of 2004',
-    40: 'Atlas Institute Uniform',
-    20: 'Chaldea Combat Uniform'
-  };
+  // mysticCodeNames moved to MysticCodeCommand; remove unused local variable
 
   return (
     <div className="two-team-view">
