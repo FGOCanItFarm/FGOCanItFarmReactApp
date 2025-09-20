@@ -1,10 +1,7 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import axios from 'axios';
 import {
-  FormControlLabel,
-  Checkbox,
   Typography,
-  TextField,
   Button,
   Grid,
   Card,
@@ -24,7 +21,7 @@ import '../questSelection.css';
 
 // (removed recommend-level normalization to avoid ambiguous client-side mapping)
 
-const QuestSelection = ({ setSelectedQuest }) => {
+const QuestSelection = ({ setSelectedQuest, selectedQuest }) => {
   const [warLongNames, setWarLongNames] = useState([]);
   const [quests, setQuests] = useState([]);
   const [selectedEvent, setSelectedEvent] = useState(null);
@@ -42,21 +39,7 @@ const QuestSelection = ({ setSelectedQuest }) => {
     return Array.from(map.values());
   }, [quests]);
 
-  // Sort deduped quests by openedAt descending (most recently opened at top)
-  const sortedQuests = useMemo(() => {
-    const arr = Array.isArray(dedupedQuests) ? dedupedQuests.slice() : [];
-    arr.sort((a, b) => {
-      const parseTime = (v) => {
-        if (!v) return 0;
-        // If numeric (timestamp), use it; otherwise try Date.parse
-        if (typeof v === 'number') return v;
-        const t = Date.parse(v);
-        return Number.isNaN(t) ? 0 : t;
-      };
-      return parseTime(b.openedAt) - parseTime(a.openedAt);
-    });
-    return arr;
-  }, [dedupedQuests]);
+  // (removed an earlier sortedQuests memo as it's unused; we compute event-level ordering below)
 
   // Group deduped quests by event (warLongName) and compute latest openedAt per event
   const sortedEvents = useMemo(() => {
@@ -98,11 +81,19 @@ const QuestSelection = ({ setSelectedQuest }) => {
   // Auto-select newest event when events list updates
   useEffect(() => {
     if (!selectedEvent && Array.isArray(sortedEvents) && sortedEvents.length > 0) {
-      // Render newest-first by reversing the sortedEvents when displaying. Ensure auto-select matches that view.
+      // If parent provided a selectedQuest, try to set the selectedEvent to the event containing it
+      if (selectedQuest && selectedQuest.warLongName) {
+        const exists = sortedEvents.some(g => g.warLongName === selectedQuest.warLongName);
+        if (exists) {
+          setSelectedEvent(selectedQuest.warLongName);
+          return;
+        }
+      }
+      // Otherwise default to newest event (rendered newest-first by reversing sortedEvents)
       const visible = [...sortedEvents].reverse();
       setSelectedEvent(visible[0].warLongName);
     }
-  }, [sortedEvents, selectedEvent]);
+  }, [sortedEvents, selectedEvent, selectedQuest]);
 
   const visibleEvents = useMemo(() => {
     return Array.isArray(sortedEvents) ? [...sortedEvents].reverse() : [];

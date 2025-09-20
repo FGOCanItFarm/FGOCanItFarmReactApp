@@ -69,7 +69,12 @@ const App = () => {
     const savedCommands = loadFromLocalStorage('commands');
     setCommands(savedCommands);
     const savedQuest = loadFromLocalStorage('selectedQuest');
-    setSelectedQuest(savedQuest);
+    // Normalize savedQuest: only accept objects with an id (otherwise treat as no selection)
+    if (savedQuest && typeof savedQuest === 'object' && ('id' in savedQuest || 'name' in savedQuest)) {
+      setSelectedQuest(savedQuest);
+    } else {
+      setSelectedQuest(null);
+    }
     const savedMysticCode = loadFromLocalStorage('selectedMysticCode');
     setSelectedMysticCode(savedMysticCode);
   const savedServantEffects = loadFromLocalStorage('servantEffects');
@@ -163,6 +168,29 @@ const App = () => {
     fetchServants();
   }, [fetchServants]);
 
+  // Warm up backend connections (preconnect to DB) on initial app load so team data
+  // is available quickly when the user first navigates to Team Selection.
+  useEffect(() => {
+    const warmup = async () => {
+      try {
+        // Fire-and-forget warmup request; backend can use this to initialize DB pools.
+        // Use a query param to indicate this is a warmup if backend wants to treat it specially.
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 3000);
+        await axios.get('/api/servants?warm=true', { signal: controller.signal });
+        clearTimeout(timeout);
+      } catch (err) {
+        // Ignore warmup errors — they are non-fatal and should not surface to users.
+        if (err.name !== 'CanceledError' && err.name !== 'AbortError') {
+          // Could log to analytics here if desired
+          // console.debug('Warmup request failed', err);
+        }
+      }
+    };
+    warmup();
+    return () => {};
+  }, []);
+
   const handleServantClick = (servant) => {
     const newTeam = [...team];
     const count = newTeam.filter(s => s.collectionNo === servant.collectionNo).length;
@@ -182,6 +210,11 @@ const App = () => {
   const handleTeamServantClick = (index) => {
     setActiveServant(index);
   };
+
+  // Stable callback to clear active servant selection so child effects can safely depend on it
+  const clearActiveServant = useCallback(() => {
+    setActiveServant(null);
+  }, [setActiveServant]);
 
   const clearTeam = () => {
     // create unique empty objects for each slot to avoid shared references
@@ -207,18 +240,25 @@ const App = () => {
     support: 'Support'
   };
 
-  const updateServantEffects = (index, field, value) => {
+  const updateServantEffects = (index, fieldOrObject, maybeValue) => {
+    // Support two call shapes:
+    // updateServantEffects(index, 'field', value)
+    // updateServantEffects(index, { key1: val1, key2: val2 })
+    const updateObj = (typeof fieldOrObject === 'object' && fieldOrObject !== null)
+      ? fieldOrObject
+      : { [fieldOrObject]: maybeValue };
+
     const newEffects = [...servantEffects];
     newEffects[index] = {
       ...newEffects[index],
-      [field]: value
+      ...updateObj
     };
     setServantEffects(newEffects);
 
     const newTeam = [...team];
     newTeam[index] = {
       ...newTeam[index],
-      [field]: value
+      ...updateObj
     };
     setTeam(newTeam);
   };
@@ -336,6 +376,9 @@ const App = () => {
         selectedQuest={selectedQuest}
         servantEffects={servantEffects}
         updateServantEffects={updateServantEffects}
+        activeServant={activeServant}
+        clearActiveServant={clearActiveServant}
+        setActiveServant={setActiveServant}
       />
     </Router>
   );

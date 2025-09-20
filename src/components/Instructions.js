@@ -1,72 +1,98 @@
 import React from 'react';
 
+import React from 'react';
+import { Box, Typography, List, ListItem, Divider } from '@mui/material';
+
 const Instructions = () => {
   return (
-    <div style={{ padding: '20px' }}>
-      <h1>Welcome to FGOCanItFarmReactApp</h1>
-      <h2>How to Use</h2>
-      <p>Welcome to the FGOCanItFarmReactApp! This application allows you to simulate team compositions and strategies for the game Fate/Grand Order. Below is a detailed guide on how to interact with the application.</p>
+    <Box sx={{ p: 3, maxWidth: 920, mx: 'auto' }}>
+      <Typography variant="h4" component="h1" gutterBottom>
+        FGOCanItFarm — Quick Instructions
+      </Typography>
 
-      <h3>Teams Page</h3>
-      <p>The Teams page is the main functional component of the application. Here, you can select and configure your team of servants, choose a Mystic Code, and set up commands for simulation.</p>
+      <Typography variant="subtitle1" gutterBottom>
+        A compact, up-to-date guide that highlights recent UI improvements and how to perform common workflows.
+      </Typography>
 
-      <h4>Selecting Your Team</h4>
-      <ol>
-        <li>Use the <strong>Filter Section</strong> to filter servants by rarity, class, NP type, and attack type. You can also search for specific servants using the search bar.</li>
-        <li>Click on a servant from the <strong>Servant Selection</strong> or <strong>Common Servants Grid</strong> to add them to your team. You can have up to 6 servants in your team.</li>
-        <li>To remove a servant from your team, click on the <strong>Clear Team</strong> button.</li>
-      </ol>
+      <Divider sx={{ my: 2 }} />
 
-      <h4>Configuring Servant Effects</h4>
-      <ol>
-        <li>Click on a servant in your team to open the configuration panel.</li>
-        <li>In the configuration panel, you can set various effects for the servant, such as:
-          <ul>
-            <li>Append 2</li>
-            <li>Append 5</li>
-            <li>Attack</li>
-            <li>Atk Up</li>
-            <li>Arts Up</li>
-            <li>Quick Up</li>
-            <li>Buster Up</li>
-            <li>NP Up</li>
-            <li>Initial Charge</li>
-          </ul>
-        </li>
-      </ol>
+      <Typography variant="h6">Team selection & quick tips</Typography>
+      <List dense>
+        <ListItem>
+          Use the left-side filters to find servants by name, class, NP type, rarity or tags.
+        </ListItem>
+        <ListItem>
+          Click a servant tile to add them to your active team (up to 6). Click a filled slot to open the per-unit editor.
+        </ListItem>
+        <ListItem>
+          To remove a servant, open the slot and use the Clear / Remove button in the editor.
+        </ListItem>
+      </List>
 
-      <h4>Selecting a Mystic Code</h4>
-      <ol>
-        <li>Scroll down to the <strong>Select Mystic Code</strong> section.</li>
-        <li>Choose a Mystic Code from the available options.</li>
-      </ol>
+      <Divider sx={{ my: 2 }} />
 
-      <h4>Selecting a Farming Node</h4>
-      <ol>
-        <li>Navigate to the <strong>Select Farming Node</strong> page.</li>
-        <li>Choose a quest from the available options.</li>
-      </ol>
+      <Typography variant="h6">Per-unit editor (non-modal, persistent)</Typography>
+      <Typography paragraph>
+        The editor opens in-place (non-modal) and will not change the page scroll. Values you set here are persisted per-unit so you can tweak NP gauge, initial charge, and form/mode without losing them.
+      </Typography>
+      <List dense>
+        <ListItem>
+          NP / Noble Phantasm: set the servant's NP type and level used for the simulation.
+        </ListItem>
+        <ListItem>
+          Initial Charge: enter starting NP gauge (e.g. 50 for 50%).
+        </ListItem>
+        <ListItem>
+          Mode/Form switches (if applicable): choose the servant's form or class mode; these settings persist per-slot.
+        </ListItem>
+      </List>
 
-      <h4>Setting Up Commands</h4>
-      <ol>
-        <li>Navigate to the <strong>Input Commands</strong> page.</li>
-        <li>Use the <strong>Command Input Menu</strong> to add commands for the simulation. You can add commands such as "End Turn" and "Use NP".</li>
-        <li>The commands will be displayed in the <strong>Commands</strong> section.</li>
-        <li>To clear all commands, click on the <strong>Clear Commands</strong> button.</li>
-      </ol>
+      <Divider sx={{ my: 2 }} />
 
-      <h4>Submitting Your Team</h4>
-      <ol>
-        <li>Once you have configured your team, selected a Mystic Code, and set up commands, click on the <strong>Submit Team</strong> button.</li>
-        <li>A confirmation modal will appear, displaying the final values that will be submitted.</li>
-        <li>Click on <strong>Confirm</strong> to submit your team or <strong>Cancel</strong> to make changes.</li>
-      </ol>
+      <Typography variant="h6">Commands & Skill choices</Typography>
+      <Typography paragraph>
+        Command input is handled by the canonical SourceTargetCommandInput component (previously exposed as TwoTeamView). Use the command panel to add skills, NPs, and other actions. Choice-type skills now use an inline selector instead of a modal.
+      </Typography>
+      <List dense>
+        <ListItem>
+          Choice skills: when you tap a choice-capable skill, an inline choice bar appears above the general commands. There are two groups: a 2-choice group and a 3-choice group. A vertical divider separates them for clarity.
+        </ListItem>
+        <ListItem>
+          If a servant's choice includes a targetable option, the choice will use the special target-aware command generator. The interface provides explicit buttons so you can manually select the correct option.
+        </ListItem>
+        <ListItem>
+          Command tokens generated by the UI are shown in the command list. You can reorder or remove commands before running a simulation.
+        </ListItem>
+      </List>
 
-      <h3>Future Features</h3>
-      <p>We are currently working on adding more features to the application, including data analysis and log analysis. Stay tuned for updates!</p>
+      <Divider sx={{ my: 2 }} />
 
-      <p>If you have any questions or feedback, please contact us at <a href="mailto:support@fgocanitfarm.com">support@fgocanitfarm.com</a>.</p>
-    </div>
+      <Typography variant="h6">Submit & simulate</Typography>
+      <Typography paragraph>
+        Once your team and commands are ready, submit the team to run the simulation. The submit flow provides a final confirmation and shows the commands that will execute.
+      </Typography>
+
+      <Divider sx={{ my: 2 }} />
+
+      <Typography variant="h6">Troubleshooting & tips</Typography>
+      <List dense>
+        <ListItem>
+          If choice controls don't appear, try selecting the skill again or check the console for debug logs (the app logs choice flow with tags like <code>[STCI]</code>).
+        </ListItem>
+        <ListItem>
+          Hover popovers have been removed — information and edit actions are exposed with persistent icon buttons so accidental hovers won't change the UI.
+        </ListItem>
+        <ListItem>
+          If you notice incorrect choice mapping for a specific servant/skill, report the servant collection and skill index so we can add a specific mapping rule.
+        </ListItem>
+      </List>
+
+      <Divider sx={{ my: 2 }} />
+
+      <Typography variant="body2" color="text.secondary">
+        Questions or feedback? Send an email to <a href="mailto:support@fgocanitfarm.com">support@fgocanitfarm.com</a>.
+      </Typography>
+    </Box>
   );
 };
 

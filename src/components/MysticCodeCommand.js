@@ -9,7 +9,7 @@ const mysticCodes = [
   { id: 20, name: 'Chaldea Combat Uniform' },
 ];
 
-const MysticCodeCommand = ({ team = [], setTeam = () => {}, updateCommands = () => {}, selectedMysticCode, setSelectedMysticCode, onSwap = () => {} }) => {
+const MysticCodeCommand = ({ team = [], servants = [], setTeam = () => {}, updateCommands = () => {}, selectedMysticCode, setSelectedMysticCode, onSwap = () => {} }) => {
   const [selectedTop, setSelectedTop] = useState(null);
   const [selectedBottom, setSelectedBottom] = useState(null);
 
@@ -57,9 +57,11 @@ const MysticCodeCommand = ({ team = [], setTeam = () => {}, updateCommands = () 
             style={{ minWidth: 140 }}
           >
             <MenuItem value="">Top 1-3</MenuItem>
-            {team.slice(0, 3).map((s, i) => (
-              <MenuItem key={i} value={i} disabled={!s || !s.collectionNo}>{s && s.collectionNo ? `${s.collectionNo}` : `Empty ${i + 1}`}</MenuItem>
-            ))}
+            {team.slice(0, 3).map((s, i) => {
+              const serv = s && s.collectionNo ? servants.find(x => String(x.collectionNo) === String(s.collectionNo)) : null;
+              const label = serv ? `${serv.name} (${serv.collectionNo})` : (s && s.collectionNo ? `${s.collectionNo}` : `Empty ${i + 1}`);
+              return <MenuItem key={i} value={i} disabled={!s || !s.collectionNo}>{label}</MenuItem>;
+            })}
           </Select>
 
           <Button
@@ -87,9 +89,11 @@ const MysticCodeCommand = ({ team = [], setTeam = () => {}, updateCommands = () 
             style={{ minWidth: 140 }}
           >
             <MenuItem value="">Bottom 4-6</MenuItem>
-            {team.slice(3, 6).map((s, i) => (
-              <MenuItem key={i} value={i + 3} disabled={!s || !s.collectionNo}>{s && s.collectionNo ? `${s.collectionNo}` : `Empty ${i + 4}`}</MenuItem>
-            ))}
+            {team.slice(3, 6).map((s, i) => {
+              const serv = s && s.collectionNo ? servants.find(x => String(x.collectionNo) === String(s.collectionNo)) : null;
+              const label = serv ? `${serv.name} (${serv.collectionNo})` : (s && s.collectionNo ? `${s.collectionNo}` : `Empty ${i + 4}`);
+              return <MenuItem key={i} value={i + 3} disabled={!s || !s.collectionNo}>{label}</MenuItem>;
+            })}
           </Select>
         </Box>
       )}

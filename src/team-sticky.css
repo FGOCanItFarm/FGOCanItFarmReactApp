@@ -14,6 +14,28 @@
   font-weight: 600 !important;
 }
 
+/* Pulsating reminder when the team panel is collapsed */
+@keyframes stickyPulse {
+  0% {
+    transform: scale(1);
+    box-shadow: 0 6px 14px rgba(33, 150, 243, 0.12);
+  }
+  50% {
+    transform: scale(1.04);
+    box-shadow: 0 10px 26px rgba(33, 150, 243, 0.18);
+  }
+  100% {
+    transform: scale(1);
+    box-shadow: 0 6px 14px rgba(33, 150, 243, 0.12);
+  }
+}
+
+.sticky-team-toggle.pulse {
+  animation: stickyPulse 1.8s ease-in-out infinite;
+  background-image: linear-gradient(90deg, #1976d2, #63a4ff);
+  color: #fff !important;
+}
+
 .sticky-team-panel {
   position: fixed !important;
   bottom: calc(var(--spacing-lg) + var(--btn-min-height) + var(--spacing-sm)) !important;
@@ -22,6 +44,8 @@
   max-width: min(var(--sticky-team-max-width), 95vw) !important;
   min-width: 420px !important;
   border-radius: 12px !important;
+  /* Reserve scrollbar gutter to avoid layout shifts when scrollbars appear/disappear */
+  scrollbar-gutter: stable;
 }
 
 .sticky-team-content {
@@ -39,29 +63,40 @@
 }
 
 .sticky-servant-slot {
-  width: calc(var(--servant-compact-size) + 2rem);
-  height: calc(var(--servant-compact-size) + 2rem);
+  width: 6.75rem;
+  height: 6.875rem;
   border: 1px solid #ddd;
   border-radius: var(--spacing-xs);
-  overflow: hidden;
+  /* Allow overlaying controls (edit icon) to be visible/clickable */
+  overflow: visible;
   position: relative;
+  z-index: 60;
   cursor: default;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .sticky-servant-slot:hover {
-  transform: translateY(-2px);
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
 .sticky-servant-avatar {
-  transform: scale(0.65);
+  transform: scale(1);
   transform-origin: center;
   position: absolute;
-  top: -18%;
-  left: -18%;
-  width: 136%;
-  height: 136%;
+  /* Prevent the avatar artwork from stealing pointer events so overlay controls remain clickable */
+  pointer-events: none;
+}
+
+/* Allow the inner image and tag to still accept pointer events if needed */
+.sticky-servant-avatar img,
+.sticky-servant-avatar .TagImage {
+  pointer-events: auto;
+}
+
+/* Ensure MUI IconButton inside avatar is interactive and visually on top */
+.sticky-servant-avatar .MuiIconButton-root {
+  pointer-events: auto;
+  z-index: 40;
 }
 
 .sticky-servant-empty {
