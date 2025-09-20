@@ -1,6 +1,4 @@
 import React from 'react';
-
-import React from 'react';
 import { Box, Typography, List, ListItem, Divider } from '@mui/material';
 
 const Instructions = () => {
