@@ -42,22 +42,26 @@
 }
 
 .servant-grid-item {
+  flex: 0 0 var(--servant-slot-size);
+  cursor: pointer;
+  width: var(--servant-slot-size);
+  height: var(--servant-row-height);
   display: flex;
   align-items: center;
   justify-content: center;
-  cursor: pointer;
+  box-sizing: border-box;
   border: 2px solid transparent;
   border-radius: 8px;
-  transition: all 0.2s ease;
+  transition: all 0.16s ease;
   background: white;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.06);
   overflow: hidden;
 }
 
 .servant-grid-item:hover {
-  border-color: #007bff;
-  transform: scale(1.05);
-  box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+  border-color: var(--primary, #007bff);
+  transform: translateY(-4px) scale(1.03);
+  box-shadow: 0 6px 12px rgba(0,0,0,0.12);
 }
 
 .servant-grid-item:focus {
@@ -67,9 +71,24 @@
 
 /* Ensure ServantAvatar fills the slot properly */
 .servant-grid-item .servant-avatar {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
+  width: var(--servant-slot-size);
+  height: var(--servant-row-height);
+  object-fit: cover;
+  display: block;
+}
+
+/* Reusable highlight class to apply to other servant lists */
+.servant-item-highlight {
+  border: 2px solid transparent;
+  border-radius: 8px;
+  transition: all 0.16s ease;
+  background: white;
+}
+
+.servant-item-highlight:hover {
+  border-color: var(--primary, #007bff);
+  transform: translateY(-4px) scale(1.03);
+  box-shadow: 0 6px 12px rgba(0,0,0,0.12);
 }
 
 /* Gradient overlays for scroll indication */

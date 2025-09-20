@@ -2,7 +2,7 @@ import React from 'react';
 import { Button, Typography, Box, Container, Modal } from '@mui/material';
 // MysticCodeCommand moved into TwoTeamView
 import '../CommandInputPage.css';
-import TwoTeamView from './TwoTeamView';
+import SourceTargetCommandInput from './SourceTargetCommandInput';
 
 const CommandInputPage = ({ team, servants, setTeam, activeServant, setActiveServant, commands, setCommands, selectedQuest, selectedMysticCode, setSelectedMysticCode, handleSubmit, openModal, handleOpenModal, handleCloseModal, updateServantEffects }) => {
   // (handleTeamServantClick and handleEffectChange were removed because they were unused in this component)
@@ -58,7 +58,7 @@ const CommandInputPage = ({ team, servants, setTeam, activeServant, setActiveSer
   return (
     <Container className="command-input-container">
       {/* Always show the Two-Team view here (no toggle). Mystic Code UI moved into TwoTeamView. */}
-  <TwoTeamView team={team} servants={servants} setTeam={setTeam} selectedMysticCode={selectedMysticCode} setSelectedMysticCode={setSelectedMysticCode} addCommand={addCommand} updateCommands={setCommands} />
+  <SourceTargetCommandInput team={team} servants={servants} setTeam={setTeam} selectedMysticCode={selectedMysticCode} setSelectedMysticCode={setSelectedMysticCode} addCommand={addCommand} updateCommands={setCommands} setActiveServant={setActiveServant} />
 
       {/* Center bottom team popout removed — using the sticky bottom-right team popout instead */}
 

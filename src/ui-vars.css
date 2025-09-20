@@ -14,16 +14,17 @@
   --spacing-xl: 32px;
   
   /* Sticky team bar */
-  --sticky-team-height: 96px;
-  --sticky-team-expanded-height: 144px;
+  --sticky-team-height: 8rem;
+  --sticky-team-expanded-height: 9rem;
   --sticky-team-width: 100%;
   --sticky-team-max-width: 760px; /* increased for larger panel */
   --servant-compact-size: 64px;
   
   /* Servant avatar sizing for consistent layout */
-  --servant-slot-size: 96px;
+  --servant-slot-size: 7rem;
   --servant-row-height: var(--servant-slot-size);
-  --servant-gap: 8px;
+  /* Gap between servant items (used by grids/lists) */
+  --servant-gap: 1rem;
   
   /* Z-index layers */
   --z-sticky: 1000;
@@ -33,7 +34,5 @@
   
   /* Filter and servant grid sizing */
   --filter-gap: 8px;
-  --servant-slot-size: 80px;
-  --servant-row-height: 90px;
-  --servant-gap: 8px;
+  /* Ensure the final values used across the app match the intended slot size */
 }

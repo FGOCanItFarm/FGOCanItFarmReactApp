@@ -3,7 +3,7 @@ import { Box, Button, Typography, Grid, Tooltip } from '@mui/material';
 import '../CommandInputMenu.css';
 import '../ui-vars.css';
 
-const generateSkillCommand = (servantIndex, skillIndex, targetIndex = null) => {
+export const generateSkillCommand = (servantIndex, skillIndex, targetIndex = null) => {
   const skillLabels = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i'];
   let command = skillLabels[servantIndex * 3 + (skillIndex - 1)];
   if (targetIndex !== null) {
@@ -12,7 +12,7 @@ const generateSkillCommand = (servantIndex, skillIndex, targetIndex = null) => {
   return command || `Skill ${skillIndex}`;
 };
 
-const generateChoiceCommand = (servantIndex, skillIndex, choice, targetIndex = null) => {
+export const generateChoiceCommand = (servantIndex, skillIndex, choice, targetIndex = null) => {
   const skillLabels = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i'];
   let command = skillLabels[servantIndex * 3 + (skillIndex - 1)];
   switch (choice) {
@@ -29,7 +29,7 @@ const generateChoiceCommand = (servantIndex, skillIndex, choice, targetIndex = n
   return command || `Skill ${skillIndex} Choice ${choice}`;
 };
 
-const generateChoiceTargetCommand = (servantIndex, skillIndex, choice, targetIndex) => {
+export const generateChoiceTargetCommand = (servantIndex, skillIndex, choice, targetIndex) => {
   const skillLabels = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i'];
   let command = skillLabels[servantIndex * 3 + (skillIndex - 1)];
   switch (choice) {

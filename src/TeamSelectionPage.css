@@ -81,6 +81,7 @@
   display: flex;
   flex-direction: column;
   align-items: flex-start;
+  padding-left: 0.25rem;
 }
 
 .common-servants-horizontal {
@@ -88,11 +89,30 @@
   flex-wrap: wrap;
   gap: var(--servant-gap);
   align-items: flex-start;
+  padding-left: 0.25rem;
 }
 
 .common-servant-item {
   flex: 0 0 var(--servant-slot-size);
   cursor: pointer;
+  width: var(--servant-slot-size);
+  height: var(--servant-row-height);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  border: 2px solid transparent;
+  border-radius: 8px;
+  transition: all 0.16s ease;
+  background: white;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.06);
+  overflow: hidden;
+}
+
+.common-servant-item:hover {
+  border-color: var(--primary, #007bff);
+  transform: translateY(-4px) scale(1.03);
+  box-shadow: 0 6px 12px rgba(0,0,0,0.12);
 }
 
 /* Horizontal layout for servant selection */
@@ -308,10 +328,8 @@
 
 .team-servant-slot {
   aspect-ratio: 1;
-  border: 2px solid #dee2e6;
   border-radius: 8px;
   cursor: pointer;
-  transition: all 0.2s ease;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -329,17 +347,44 @@
   outline-offset: 2px;
 }
 
+.selected-source, .selected-target {
+  background: transparent !important;
+  position: relative;
+  outline: none;
+}
+
+/* Left stripe to indicate selection without covering the edit control */
 .selected-source {
-  border-color: #28a745 !important;
-  background: #d4edda !important;
-  box-shadow: 0 0 0 3px rgba(40, 167, 69, 0.25);
+  border-left: 6px solid rgba(40,167,69,0.95);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.06);
 }
 
 .selected-target {
-  border-color: #dc3545 !important;
-  background: #f8d7da !important;
-  box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.25);
+  border-left: 6px solid rgba(220,53,69,0.95);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.06);
 }
+
+/* Top-left badge (S or T) placed away from edit icon */
+.selected-source::before,
+.selected-target::before {
+  content: '';
+  position: absolute;
+  top: 6px;
+  left: 6px;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 4px;
+  border-radius: 10px;
+  color: #fff;
+  font-size: 11px;
+  line-height: 16px;
+  text-align: center;
+  display: inline-block;
+  box-shadow: 0 1px 0 rgba(0,0,0,0.12);
+}
+
+.selected-source::before { content: 'S'; background: rgba(40,167,69,0.95); }
+.selected-target::before { content: 'T'; background: rgba(220,53,69,0.95); }
 
 .empty-slot {
   width: 100%;
