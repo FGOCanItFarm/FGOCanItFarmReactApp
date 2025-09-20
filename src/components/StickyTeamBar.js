@@ -184,7 +184,7 @@ const StickyTeamBar = ({ team, servants, selectedMysticCode, selectedQuest, serv
           color="primary"
           onClick={handleToggle}
           onKeyDown={handleKeyDown}
-          className={`sticky-team-toggle ${!expanded ? 'pulse' : ''}`}
+          className={`sticky-team-toggle lava ${!expanded ? 'pulse' : ''}`}
           aria-label={expanded ? "Minimize team view" : "Expand team view"}
           aria-expanded={expanded}
         >
