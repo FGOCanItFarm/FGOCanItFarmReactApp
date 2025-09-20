@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Button, Typography, Tooltip, IconButton, Box } from '@mui/material';
+import { Button, Typography, Tooltip, IconButton, Box, Divider } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import ServantAvatar from './ServantAvatar';
 import MysticCodeCommand from './MysticCodeCommand';
@@ -23,6 +23,7 @@ const SourceTargetCommandInput = ({
 
   const handleSourceClick = (index) => {
     const hasCollection = Boolean(team[index]?.collectionNo);
+    console.debug('[STCI] handleSourceClick', { index, hasCollection, slot: team[index] });
     if (hasCollection) setSelectedSource(prev => (prev === index ? null : index));
     else setSelectedSource(null);
   };
@@ -39,7 +40,8 @@ const SourceTargetCommandInput = ({
     if (!servantCollectionNo) return false;
     const num = Number(servantCollectionNo);
     switch (num) {
-      case 373: return (skillIndex === 1 || skillIndex === 3);
+      // 373 has choice behavior on skills 1 and 3 (3-way) and skill 2 is a 2-choice-with-target
+      case 373: return true;
       case 428: return skillIndex === 1;
       case 268: return skillIndex === 2;
       case 421:
@@ -55,12 +57,16 @@ const SourceTargetCommandInput = ({
   };
 
   const handleSkillClick = (skillIndex) => {
+    console.debug('[STCI] handleSkillClick', { skillIndex, selectedSource, selectedTarget });
     if (selectedSource === null) return;
     const src = team[selectedSource];
     const sourceServant = src && src.collectionNo ? servants.find(s => String(s.collectionNo) === String(src.collectionNo)) : null;
     if (!sourceServant) return;
 
-    if (isChoiceSkill(sourceServant.collectionNo, skillIndex)) {
+    const choiceCheck = isChoiceSkill(sourceServant.collectionNo, skillIndex);
+    console.debug('[STCI] sourceServant', { collectionNo: sourceServant.collectionNo, choiceCheck });
+    if (choiceCheck) {
+      console.debug('[STCI] opening choiceState', { servantIndex: selectedSource, skillIndex, targetIndex: selectedTarget });
       setChoiceState({ open: true, servantIndex: selectedSource, skillIndex, targetIndex: selectedTarget });
       return;
     }
@@ -74,26 +80,28 @@ const SourceTargetCommandInput = ({
   const handleEndTurn = () => addCommand('z');
   const handleNP = (npIndex) => addCommand(String(3 + Number(npIndex)));
 
-  const performChoice = (choice) => {
+  // performChoice now accepts the chosen option (1-based) and the optionsCount (2 or 3)
+  const performChoice = (choice, optionsCount = 3) => {
     const { servantIndex, skillIndex, targetIndex } = choiceState;
+    if (servantIndex === null || skillIndex === null) return;
     const collectionNo = team?.[servantIndex]?.collectionNo ? Number(team[servantIndex].collectionNo) : null;
 
-    // Determine if this skill uses the special 2-choice-with-target format (e.g. collection 373, skill 2)
-    const isTwoChoiceWithTarget = (collectionNo === 373 && skillIndex === 2);
-
-    // Map user's choice (1/2/3) into the internal code expected by generateChoiceCommand
-    // Code format: <choice><optionsCount> — e.g. 22 means choice 2 of 2, 33 means choice 3 of 3
-    const optionsCount = isTwoChoiceWithTarget ? 2 : 3;
+    // Map user's choice into the internal code expected by generators (e.g., 12, 22, 13, 23, 33)
     const choiceCode = Number(`${choice}${optionsCount}`);
 
+    const isTwoChoiceWithTarget = (collectionNo === 373 && skillIndex === 2);
+
     let cmd;
-    if (isTwoChoiceWithTarget && targetIndex !== null) {
-      // generateChoiceTargetCommand expects a 1-based target index and outputs the parenthesized form
+    if (isTwoChoiceWithTarget && optionsCount === 2 && targetIndex !== null) {
+      // For the special two-choice-with-target case, use the target-specific generator
+      // generateChoiceTargetCommand expects a 1-based target index
       cmd = generateChoiceTargetCommand(servantIndex, skillIndex, choiceCode, targetIndex + 1);
     } else {
-      // For the general case use generateChoiceCommand; it will append a target if provided
+      // General case: generateChoiceCommand will append targetIndex (0-based) if provided
       cmd = generateChoiceCommand(servantIndex, skillIndex, choiceCode, targetIndex);
     }
+
+    console.debug('[STCI] performChoice ->', { servantIndex, skillIndex, targetIndex, choice, optionsCount, choiceCode, cmd });
 
     addCommand(cmd);
     setChoiceState({ open: false, servantIndex: null, skillIndex: null, targetIndex: null });
@@ -169,13 +177,23 @@ const SourceTargetCommandInput = ({
 
       {/* Inline Choice bar (renders only when a choice skill was triggered) */}
       {choiceState.open && (
-        <Box sx={{ mt: 2, p: 1, display: 'flex', gap: 1, alignItems: 'center', justifyContent: 'center' }}>
-          <Typography>Choose option:</Typography>
-          <Button variant="outlined" onClick={() => performChoice(1)}>Choice 1</Button>
-          <Button variant="outlined" onClick={() => performChoice(2)}>Choice 2</Button>
-          <Button variant="outlined" onClick={() => performChoice(3)}>Choice 3</Button>
-          <Button onClick={() => setChoiceState({ open: false, servantIndex: null, skillIndex: null, targetIndex: null })}>Cancel</Button>
-        </Box>
+          <Box sx={{ mt: 2, p: 1, display: 'flex', gap: 1, alignItems: 'center', justifyContent: 'center' }}>
+            <Typography>Choose option:</Typography>
+            {/* 2-choice group */}
+            <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
+              <Button variant="outlined" onClick={() => performChoice(1, 2)}>Choice 1</Button>
+              <Button variant="outlined" onClick={() => performChoice(2, 2)}>Choice 2</Button>
+            </Box>
+            {/* vertical divider between groups */}
+            <Divider orientation="vertical" flexItem sx={{ mx: 1 }} />
+            {/* 3-choice group */}
+            <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
+              <Button variant="outlined" onClick={() => performChoice(1, 3)}>Choice 1</Button>
+              <Button variant="outlined" onClick={() => performChoice(2, 3)}>Choice 2</Button>
+              <Button variant="outlined" onClick={() => performChoice(3, 3)}>Choice 3</Button>
+            </Box>
+            <Button onClick={() => setChoiceState({ open: false, servantIndex: null, skillIndex: null, targetIndex: null })}>Cancel</Button>
+          </Box>
       )}
 
       <div className="general-commands">
