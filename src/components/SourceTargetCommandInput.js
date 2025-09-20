@@ -77,7 +77,7 @@ const SourceTargetCommandInput = ({
     setSelectedTarget(null);
   };
 
-  const handleEndTurn = () => addCommand('z');
+  const handleEndTurn = () => addCommand('#');
   const handleNP = (npIndex) => addCommand(String(3 + Number(npIndex)));
 
   // performChoice now accepts the chosen option (1-based) and the optionsCount (2 or 3)
