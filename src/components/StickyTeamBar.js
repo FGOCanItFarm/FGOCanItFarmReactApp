@@ -16,6 +16,7 @@ const StickyTeamBar = ({ team, servants, selectedMysticCode, selectedQuest, serv
   const [editState, setEditState] = useState({
     np: 1,
     initialCharge: 0,
+    level: 90,
     attack: 0,
     atkUp: 0,
     artsUp: 0,
@@ -49,6 +50,7 @@ const StickyTeamBar = ({ team, servants, selectedMysticCode, selectedQuest, serv
     setEditState({
       np: effects.np || 1,
       initialCharge: effects.initialCharge || 0,
+      level: effects.level || 90,
       attack: effects.attack || 0,
       atkUp: effects.atkUp || 0,
       artsUp: effects.artsUp || 0,
@@ -129,6 +131,7 @@ const StickyTeamBar = ({ team, servants, selectedMysticCode, selectedQuest, serv
       const np = Math.round(clamp(editState.np, 1, 5));
       const initialCharge = clamp(editState.initialCharge, 0, 10000);
       const attack = clamp(editState.attack, 0, 10000);
+  const level = clamp(editState.level, 1, 120);
       const atkUp = clamp(editState.atkUp, 0, 100);
       const artsUp = clamp(editState.artsUp, 0, 100);
       const quickUp = clamp(editState.quickUp, 0, 100);
@@ -144,6 +147,7 @@ const StickyTeamBar = ({ team, servants, selectedMysticCode, selectedQuest, serv
       const payload = {
         np,
         initialCharge,
+        level,
         attack,
         atkUp,
         artsUp,
@@ -354,6 +358,15 @@ const StickyTeamBar = ({ team, servants, selectedMysticCode, selectedQuest, serv
                 onChange={(e) => setEditState(s => ({ ...s, attack: e.target.value }))}
                 size="small"
                 sx={{ width: 160 }}
+              />
+              <TextField
+                label="Level"
+                type="number"
+                inputProps={{ min: 1, max: 120 }}
+                value={editState.level}
+                onChange={(e) => setEditState(s => ({ ...s, level: e.target.value }))}
+                size="small"
+                sx={{ width: 120 }}
               />
             </Box>
 

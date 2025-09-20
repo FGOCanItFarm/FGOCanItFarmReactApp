@@ -68,12 +68,13 @@ const CommandInputPage = ({ team, servants, setTeam, activeServant, setActiveSer
         <textarea
           aria-label="Commands editor"
           value={commands.join(' ')}
+          rows={2}
           onChange={(e) => {
             const val = e.target.value.trim();
             const parsed = val.length ? val.split(/\s+/) : [];
             setCommandsWithHistory(parsed);
           }}
-          style={{ width: '100%', minHeight: '6rem', fontFamily: 'monospace', padding: '8px', boxSizing: 'border-box' }}
+          style={{ width: '100%', maxHeight: '4.5rem', overflowY: 'auto', fontFamily: 'monospace', padding: '8px', boxSizing: 'border-box', resize: 'vertical' }}
         />
         <Box mt={2} display="flex" gap="0.5rem" flexWrap="wrap">
           <Button variant="outlined" onClick={copyCommands}>Copy</Button>
