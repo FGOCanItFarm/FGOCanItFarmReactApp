@@ -276,10 +276,20 @@ const App = () => {
       commands
     };
     try {
+      // Debug: log payload (trim large fields if necessary)
+      console.debug('Submitting team payload:', teamData);
       await axios.post('/api/submit-team', teamData); // Adjust endpoint if needed
       console.log('Team submitted successfully');
     } catch (error) {
+      // Provide detailed info for easier debugging (server may return useful body)
+      const status = error?.response?.status;
+      const respData = error?.response?.data;
       console.error('Error submitting team:', error);
+      console.error('Server response status:', status);
+      console.error('Server response data:', respData);
+      const message = respData && typeof respData === 'string' ? respData : (respData && respData.message) ? respData.message : error.message;
+      // Surface a user-friendly message
+      alert(`Error submitting team: ${status || ''} ${message || 'See console for details'}`);
     }
     setOpenModal(false);
   };

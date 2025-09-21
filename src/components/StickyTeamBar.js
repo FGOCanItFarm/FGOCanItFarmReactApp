@@ -27,7 +27,7 @@ const StickyTeamBar = ({ team, servants, selectedMysticCode, selectedQuest, serv
     quickDamageUp: 0,
     artsDamageUp: 0,
     append_5: false,
-    mode: 1
+    ascension: 1
   });
   const isSmall = useMediaQuery('(max-width:600px)');
 
@@ -61,7 +61,7 @@ const StickyTeamBar = ({ team, servants, selectedMysticCode, selectedQuest, serv
       quickDamageUp: effects.quickDamageUp || 0,
       artsDamageUp: effects.artsDamageUp || 0,
       append_5: (effects.append_5 !== undefined) ? !!effects.append_5 : (!!effects.append5 || false),
-      mode: effects.mode || effects.formMode || 1
+      ascension: effects.ascension || 1
     });
     setEditIndex(index);
   }, [servantEffects]);
@@ -112,7 +112,7 @@ const StickyTeamBar = ({ team, servants, selectedMysticCode, selectedQuest, serv
       quickDamageUp: 0,
       artsDamageUp: 0,
       append_5: false,
-      mode: 1
+      ascension: 1
     });
   };
 
@@ -141,7 +141,7 @@ const StickyTeamBar = ({ team, servants, selectedMysticCode, selectedQuest, serv
       const quickDamageUp = clamp(editState.quickDamageUp, 0, 100);
       const artsDamageUp = clamp(editState.artsDamageUp, 0, 100);
       const append5bool = !!editState.append_5;
-  const mode = Math.max(1, Math.min(3, Math.round(Number(editState.mode) || 1)));
+      const ascension = Math.max(1, Math.min(3, Math.round(Number(editState.ascension) || 1)));
 
       // Persist all fields in a single merged payload to avoid sequential update race conditions
       const payload = {
@@ -159,7 +159,7 @@ const StickyTeamBar = ({ team, servants, selectedMysticCode, selectedQuest, serv
         artsDamageUp,
         append_5: append5bool,
         append5: append5bool,
-        mode
+        ascension
       };
       // Debug: log values we're about to persist
       // eslint-disable-next-line no-console
@@ -443,10 +443,10 @@ const StickyTeamBar = ({ team, servants, selectedMysticCode, selectedQuest, serv
             </Box>
 
             <Box mt={1} display="flex" alignItems="center" gap={1}>
-              <Typography variant="body2">Form Mode</Typography>
+              <Typography variant="body2">ascension Mode</Typography>
               <Box>
                 {[1,2,3].map(m => (
-                  <Button key={m} size="small" variant={editState.mode === m ? 'contained' : 'outlined'} onClick={() => setEditState(s => ({ ...s, mode: m }))} sx={{ ml: 0.5 }}>
+                  <Button key={m} size="small" variant={editState.ascension === m ? 'contained' : 'outlined'} onClick={() => setEditState(s => ({ ...s, ascension: m }))} sx={{ ml: 0.5 }}>
                     {m}
                   </Button>
                 ))}

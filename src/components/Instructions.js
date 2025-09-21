@@ -41,7 +41,7 @@ const Instructions = () => {
           Initial Charge: enter starting NP gauge (e.g. 50 for 50%).
         </ListItem>
         <ListItem>
-          Mode/Form switches (if applicable): choose the servant's form or class mode; these settings persist per-slot.
+          ascension/Form switches (if applicable): choose the servant's form or ascension; these settings persist per-slot.
         </ListItem>
       </List>
 
