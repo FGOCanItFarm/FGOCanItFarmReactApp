@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Box, Button, Paper, Typography, Portal, TextField, Checkbox, InputAdornment, useMediaQuery, Drawer, IconButton } from '@mui/material';
+import { Box, Button, Paper, Typography, Portal, TextField, Checkbox, InputAdornment, useMediaQuery, Drawer, IconButton, MenuItem } from '@mui/material';
 import InfoIcon from '@mui/icons-material/Info';
 import EditIcon from '@mui/icons-material/Edit';
 import ServantAvatar from './ServantAvatar';
@@ -16,6 +16,7 @@ const StickyTeamBar = ({ team, servants, selectedMysticCode, selectedQuest, serv
   const [editState, setEditState] = useState({
     np: 1,
     initialCharge: 0,
+    variant: '',
     level: 90,
     attack: 0,
     atkUp: 0,
@@ -29,6 +30,8 @@ const StickyTeamBar = ({ team, servants, selectedMysticCode, selectedQuest, serv
     append_5: false,
     ascension: 1
   });
+  // probed variant options (ascensions and costumes) for the current servant in the editor
+  const [variantOptions, setVariantOptions] = useState([]);
   const isSmall = useMediaQuery('(max-width:600px)');
 
   const handleToggle = () => {
@@ -47,9 +50,32 @@ const StickyTeamBar = ({ team, servants, selectedMysticCode, selectedQuest, serv
 
   const openEditForIndex = useCallback((index) => {
     const effects = servantEffects[index] || {};
+
+    // Probe the servant JSON for ascensionAdd -> individuality to surface possible variants (ascension keys and costumes)
+    const slot = team && team[index] ? team[index] : null;
+    const serv = slot && slot.collectionNo ? servants.find(s => String(s.collectionNo) === String(slot.collectionNo)) : null;
+    const options = [];
+    try {
+      const individuality = serv?.ascensionAdd?.individuality || {};
+      const asc = individuality.ascension || {};
+      Object.keys(asc).forEach(key => {
+        const traits = Array.isArray(asc[key]) ? asc[key].map(t => t.name || t) : [];
+        options.push({ id: `asc:${key}`, label: `Ascension ${key}`, traits });
+      });
+      const cost = individuality.costume || {};
+      Object.keys(cost).forEach(key => {
+        const traits = Array.isArray(cost[key]) ? cost[key].map(t => t.name || t) : [];
+        options.push({ id: `costume:${key}`, label: `Costume ${key}`, traits });
+      });
+    } catch (err) {
+      // ignore probing errors
+    }
+    setVariantOptions(options);
+
     setEditState({
       np: effects.np || 1,
       initialCharge: effects.initialCharge || 0,
+      variant: effects.variant || (options.length ? options[0].id : ''),
       level: effects.level || 90,
       attack: effects.attack || 0,
       atkUp: effects.atkUp || 0,
@@ -64,7 +90,7 @@ const StickyTeamBar = ({ team, servants, selectedMysticCode, selectedQuest, serv
       ascension: effects.ascension || 1
     });
     setEditIndex(index);
-  }, [servantEffects]);
+  }, [servantEffects, servants, team]);
 
   // If an activeServant index is provided (selected elsewhere), open the editor for that slot
   useEffect(() => {
@@ -140,8 +166,9 @@ const StickyTeamBar = ({ team, servants, selectedMysticCode, selectedQuest, serv
       const busterDamageUp = clamp(editState.busterDamageUp, 0, 100);
       const quickDamageUp = clamp(editState.quickDamageUp, 0, 100);
       const artsDamageUp = clamp(editState.artsDamageUp, 0, 100);
-      const append5bool = !!editState.append_5;
-      const ascension = Math.max(1, Math.min(3, Math.round(Number(editState.ascension) || 1)));
+  const append5bool = !!editState.append_5;
+  const ascension = Math.max(1, Math.min(3, Math.round(Number(editState.ascension) || 1)));
+  const variant = typeof editState.variant === 'string' ? editState.variant : '';
 
       // Persist all fields in a single merged payload to avoid sequential update race conditions
       const payload = {
@@ -159,7 +186,8 @@ const StickyTeamBar = ({ team, servants, selectedMysticCode, selectedQuest, serv
         artsDamageUp,
         append_5: append5bool,
         append5: append5bool,
-        ascension
+        ascension,
+        variant
       };
       // Debug: log values we're about to persist
       // eslint-disable-next-line no-console
@@ -443,13 +471,31 @@ const StickyTeamBar = ({ team, servants, selectedMysticCode, selectedQuest, serv
             </Box>
 
             <Box mt={1} display="flex" alignItems="center" gap={1}>
-              <Typography variant="body2">ascension Mode</Typography>
-              <Box>
-                {[1,2,3].map(m => (
-                  <Button key={m} size="small" variant={editState.ascension === m ? 'contained' : 'outlined'} onClick={() => setEditState(s => ({ ...s, ascension: m }))} sx={{ ml: 0.5 }}>
-                    {m}
-                  </Button>
-                ))}
+              <Typography variant="body2">Variant</Typography>
+              <TextField
+                select
+                size="small"
+                value={editState.variant}
+                onChange={(e) => setEditState(s => ({ ...s, variant: e.target.value }))}
+                sx={{ minWidth: 180 }}
+              >
+                {variantOptions.length === 0 ? (
+                  <MenuItem value="">Default</MenuItem>
+                ) : (
+                  variantOptions.map(opt => (
+                    <MenuItem key={opt.id} value={opt.id}>{opt.label}</MenuItem>
+                  ))
+                )}
+              </TextField>
+              {/* compact trait preview for current variant */}
+              <Box sx={{ ml: 1, display: 'flex', gap: 0.5, alignItems: 'center', flexWrap: 'wrap' }}>
+                {(() => {
+                  const cur = variantOptions.find(v => v.id === editState.variant) || null;
+                  if (!cur || !cur.traits || cur.traits.length === 0) return <Typography variant="caption" sx={{ opacity: 0.7 }}>no extra traits</Typography>;
+                  return cur.traits.slice(0, 6).map((t, i) => (
+                    <Typography key={i} variant="caption" sx={{ background: 'rgba(0,0,0,0.08)', px: 0.5, py: 0.25, borderRadius: 1 }}>{t}</Typography>
+                  ));
+                })()}
               </Box>
             </Box>
 
