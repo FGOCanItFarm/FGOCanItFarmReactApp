@@ -72,10 +72,22 @@ const StickyTeamBar = ({ team, servants, selectedMysticCode, selectedQuest, serv
     }
     setVariantOptions(options);
 
+    // If backend stored only variantId (e.g. "800190"), map it to the option id if possible
+    let initialVariant = '';
+    if (effects.variant) initialVariant = effects.variant;
+    else if (effects.variantId) {
+      // try to find matching option id prefix (costume or asc)
+      const vid = String(effects.variantId);
+      const found = options.find(o => o.id.endsWith(`:${vid}`));
+      initialVariant = found ? found.id : vid; // fallback to raw id
+    } else {
+      initialVariant = options.length ? options[0].id : '';
+    }
+
     setEditState({
       np: effects.np || 1,
       initialCharge: effects.initialCharge || 0,
-      variant: effects.variant || (options.length ? options[0].id : ''),
+      variant: initialVariant,
       level: effects.level || 90,
       attack: effects.attack || 0,
       atkUp: effects.atkUp || 0,
@@ -169,6 +181,8 @@ const StickyTeamBar = ({ team, servants, selectedMysticCode, selectedQuest, serv
   const append5bool = !!editState.append_5;
   const ascension = Math.max(1, Math.min(3, Math.round(Number(editState.ascension) || 1)));
   const variant = typeof editState.variant === 'string' ? editState.variant : '';
+  // only send the variantId portion (after the colon) to the API/backend
+  const variantId = variant && variant.indexOf(':') !== -1 ? variant.split(':', 2)[1] : variant || '';
 
       // Persist all fields in a single merged payload to avoid sequential update race conditions
       const payload = {
@@ -187,7 +201,7 @@ const StickyTeamBar = ({ team, servants, selectedMysticCode, selectedQuest, serv
         append_5: append5bool,
         append5: append5bool,
         ascension,
-        variant
+        variantId
       };
       // Debug: log values we're about to persist
       // eslint-disable-next-line no-console
