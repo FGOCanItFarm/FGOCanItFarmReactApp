@@ -56,19 +56,29 @@ const StickyTeamBar = ({ team, servants, selectedMysticCode, selectedQuest, serv
     const serv = slot && slot.collectionNo ? servants.find(s => String(s.collectionNo) === String(slot.collectionNo)) : null;
     const options = [];
     try {
-      const individuality = serv?.ascensionAdd?.individuality || {};
-      const asc = individuality.ascension || {};
-      Object.keys(asc).forEach(key => {
-        const traits = Array.isArray(asc[key]) ? asc[key].map(t => t.name || t) : [];
-        options.push({ id: `asc:${key}`, label: `Ascension ${key}`, traits });
-      });
-      const cost = individuality.costume || {};
-      Object.keys(cost).forEach(key => {
-        const traits = Array.isArray(cost[key]) ? cost[key].map(t => t.name || t) : [];
+      if (!serv) {
+        // eslint-disable-next-line no-console
+        console.debug('openEditForIndex: no servant found for slot', slot);
+      }
+
+      const add = serv?.ascensionAdd || {};
+      // We only probe ascensionAdd -> individuality -> costume per request
+      const indiv = add.individuality || {};
+      const costume = indiv.costume || {};
+
+      // For each costume key, collect traits (may be [] or array of trait objects)
+      Object.keys(costume).forEach(key => {
+        const data = costume[key];
+        const traits = Array.isArray(data) ? data.map(t => t.name || t) : [];
         options.push({ id: `costume:${key}`, label: `Costume ${key}`, traits });
       });
+
+      // Debug: show what variant options we discovered for this servant
+      // eslint-disable-next-line no-console
+      console.debug('variant probe (individuality.costume) for', serv?.name || serv?.collectionNo, Object.keys(costume), options);
     } catch (err) {
-      // ignore probing errors
+      // eslint-disable-next-line no-console
+      console.error('variant probe failed', err);
     }
     setVariantOptions(options);
 
