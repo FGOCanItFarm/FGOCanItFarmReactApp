@@ -27,40 +27,32 @@ const App = () => {
   const [openModal, setOpenModal] = useState(false);
   const [servantEffects, setServantEffects] = useState(Array(6).fill({}));
   const [activeServant, setActiveServant] = useState(null);
-  // Control whether enemy-only NPCs are included in filtered lists (default: false)
+  const [simulationResult, setSimulationResult] = useState(null);
   const [includeEnemyOnly, setIncludeEnemyOnly] = useState(false);
 
-  // Small hard-coded blacklist of known enemy-only / NPC collectionNos to hide by default.
-  // Add collectionNos here as strings (e.g., '123', '456').
   const ENEMY_ONLY_BLACKLIST = new Set([
     '240', '436', '83', '411', '149', '443', '333'
   ]);
 
   axios.defaults.baseURL = process.env.REACT_APP_API_URL;
 
-  // Function to save data to local storage
   const saveToLocalStorage = (key, value) => {
     localStorage.setItem(key, JSON.stringify(value));
   };
 
-  // Function to load data from local storage
   const loadFromLocalStorage = (key) => {
     const savedData = localStorage.getItem(key);
     return savedData ? JSON.parse(savedData) : [];
   };
 
-  // Load team, commands, quest, and mystic code data from local storage when the component mounts
   useEffect(() => {
     const savedTeam = loadFromLocalStorage('team');
-    // Normalize saved team: must be array of length 6 with objects containing collectionNo.
     const BLACKLISTED_COLLECTIONNOS = new Set(['316']);
     const normalizeTeam = (raw) => {
       if (!Array.isArray(raw) || raw.length !== 6) return Array.from({ length: 6 }, () => ({ collectionNo: '' }));
-      // Ensure each slot is an object with a valid collectionNo string; if invalid, replace with empty slot
       return raw.map(slot => {
         if (!slot || typeof slot !== 'object') return { collectionNo: '' };
         if (!slot.collectionNo || typeof slot.collectionNo !== 'string' || slot.collectionNo.trim() === '' || BLACKLISTED_COLLECTIONNOS.has(String(slot.collectionNo))) return { collectionNo: '' };
-        // If collectionNo was a numeric id that we removed from supports, it's still valid as a string here; keep it
         return { collectionNo: slot.collectionNo };
       });
     };
@@ -69,7 +61,6 @@ const App = () => {
     const savedCommands = loadFromLocalStorage('commands');
     setCommands(savedCommands);
     const savedQuest = loadFromLocalStorage('selectedQuest');
-    // Normalize savedQuest: only accept objects with an id (otherwise treat as no selection)
     if (savedQuest && typeof savedQuest === 'object' && ('id' in savedQuest || 'name' in savedQuest)) {
       setSelectedQuest(savedQuest);
     } else {
@@ -77,14 +68,11 @@ const App = () => {
     }
     const savedMysticCode = loadFromLocalStorage('selectedMysticCode');
     setSelectedMysticCode(savedMysticCode);
-  const savedServantEffects = loadFromLocalStorage('servantEffects');
-  setServantEffects(Array.isArray(savedServantEffects) && savedServantEffects.length === 6 ? savedServantEffects : Array(6).fill({}));
+    const savedServantEffects = loadFromLocalStorage('servantEffects');
+    setServantEffects(Array.isArray(savedServantEffects) && savedServantEffects.length === 6 ? savedServantEffects : Array(6).fill({}));
 
-    // Filter persistence logic - forcing reset on refresh/navigation
-    const FILTER_PERSISTENCE = 'reset'; // 'remember' or 'reset'
-    
+    const FILTER_PERSISTENCE = 'reset';
     if (FILTER_PERSISTENCE === 'remember') {
-      // Load filters from localStorage
       const savedFilters = localStorage.getItem('fgocif.filters.v1');
       if (savedFilters) {
         try {
@@ -100,56 +88,26 @@ const App = () => {
         }
       }
     } else {
-      // Reset filters to defaults
       setSearchQuery('');
       setSelectedRarity([]);
       setSelectedClass([]);
       setSelectedNpType([]);
       setSelectedAttackType([]);
       setSortOrder('');
-      // Clear localStorage filters
       localStorage.removeItem('fgocif.filters.v1');
     }
   }, []);
 
-  // Save team data to local storage whenever it changes
-  useEffect(() => {
-    saveToLocalStorage('team', team);
-  }, [team]);
+  useEffect(() => { saveToLocalStorage('team', team); }, [team]);
+  useEffect(() => { saveToLocalStorage('commands', commands); }, [commands]);
+  useEffect(() => { saveToLocalStorage('selectedQuest', selectedQuest); }, [selectedQuest]);
+  useEffect(() => { saveToLocalStorage('selectedMysticCode', selectedMysticCode); }, [selectedMysticCode]);
+  useEffect(() => { saveToLocalStorage('servantEffects', servantEffects); }, [servantEffects]);
 
-  // Save commands data to local storage whenever it changes
   useEffect(() => {
-    saveToLocalStorage('commands', commands);
-  }, [commands]);
-
-  // Save selected quest data to local storage whenever it changes
-  useEffect(() => {
-    saveToLocalStorage('selectedQuest', selectedQuest);
-  }, [selectedQuest]);
-
-  // Save selected mystic code data to local storage whenever it changes
-  useEffect(() => {
-    saveToLocalStorage('selectedMysticCode', selectedMysticCode);
-  }, [selectedMysticCode]);
-
-  // Save servant effects data to local storage whenever it changes
-  useEffect(() => {
-    saveToLocalStorage('servantEffects', servantEffects);
-  }, [servantEffects]);
-
-  // Save filters to localStorage whenever they change (if persistence is enabled)
-  useEffect(() => {
-    const FILTER_PERSISTENCE = 'reset'; // 'remember' or 'reset'
-    
+    const FILTER_PERSISTENCE = 'reset';
     if (FILTER_PERSISTENCE === 'remember') {
-      const filters = {
-        searchQuery,
-        selectedRarity,
-        selectedClass,
-        selectedNpType,
-        selectedAttackType,
-        sortOrder
-      };
+      const filters = { searchQuery, selectedRarity, selectedClass, selectedNpType, selectedAttackType, sortOrder };
       localStorage.setItem('fgocif.filters.v1', JSON.stringify(filters));
     }
   }, [searchQuery, selectedRarity, selectedClass, selectedNpType, selectedAttackType, sortOrder]);
@@ -164,27 +122,17 @@ const App = () => {
     }
   }, []);
 
-  useEffect(() => {
-    fetchServants();
-  }, [fetchServants]);
+  useEffect(() => { fetchServants(); }, [fetchServants]);
 
-  // Warm up backend connections (preconnect to DB) on initial app load so team data
-  // is available quickly when the user first navigates to Team Selection.
   useEffect(() => {
     const warmup = async () => {
       try {
-        // Fire-and-forget warmup request; backend can use this to initialize DB pools.
-        // Use a query param to indicate this is a warmup if backend wants to treat it specially.
         const controller = new AbortController();
         const timeout = setTimeout(() => controller.abort(), 3000);
         await axios.get('/api/servants?warm=true', { signal: controller.signal });
         clearTimeout(timeout);
       } catch (err) {
-        // Ignore warmup errors — they are non-fatal and should not surface to users.
-        if (err.name !== 'CanceledError' && err.name !== 'AbortError') {
-          // Could log to analytics here if desired
-          // console.debug('Warmup request failed', err);
-        }
+        if (err.name !== 'CanceledError' && err.name !== 'AbortError') {}
       }
     };
     warmup();
@@ -211,13 +159,11 @@ const App = () => {
     setActiveServant(index);
   };
 
-  // Stable callback to clear active servant selection so child effects can safely depend on it
   const clearActiveServant = useCallback(() => {
     setActiveServant(null);
   }, [setActiveServant]);
 
   const clearTeam = () => {
-    // create unique empty objects for each slot to avoid shared references
     setTeam(Array.from({ length: 6 }, () => ({ collectionNo: '' })));
   };
 
@@ -230,9 +176,7 @@ const App = () => {
     }
   };
 
-  const capitalize = (str) => {
-    return str.charAt(0).toUpperCase() + str.slice(1);
-  };
+  const capitalize = (str) => str.charAt(0).toUpperCase() + str.slice(1);
 
   const attackTypeLabels = {
     attackEnemyOne: 'Single Target',
@@ -241,25 +185,16 @@ const App = () => {
   };
 
   const updateServantEffects = (index, fieldOrObject, maybeValue) => {
-    // Support two call shapes:
-    // updateServantEffects(index, 'field', value)
-    // updateServantEffects(index, { key1: val1, key2: val2 })
     const updateObj = (typeof fieldOrObject === 'object' && fieldOrObject !== null)
       ? fieldOrObject
       : { [fieldOrObject]: maybeValue };
 
     const newEffects = [...servantEffects];
-    newEffects[index] = {
-      ...newEffects[index],
-      ...updateObj
-    };
+    newEffects[index] = { ...newEffects[index], ...updateObj };
     setServantEffects(newEffects);
 
     const newTeam = [...team];
-    newTeam[index] = {
-      ...newTeam[index],
-      ...updateObj
-    };
+    newTeam[index] = { ...newTeam[index], ...updateObj };
     setTeam(newTeam);
   };
 
@@ -276,21 +211,22 @@ const App = () => {
       commands
     };
     try {
-      await axios.post('/api/submit-team', teamData); // Adjust endpoint if needed
-      console.log('Team submitted successfully');
+      const response = await axios.post('/api/submit-team', teamData);
+      const result = response.data?.result ?? response.data ?? null;
+      setSimulationResult(result);
+      console.log('Team submitted successfully', result);
     } catch (error) {
       console.error('Error submitting team:', error);
+      setSimulationResult({
+        success: false,
+        error: error.response?.data?.error || error.message || 'Request failed'
+      });
     }
     setOpenModal(false);
   };
 
-  const handleOpenModal = () => {
-    setOpenModal(true);
-  };
-
-  const handleCloseModal = () => {
-    setOpenModal(false);
-  };
+  const handleOpenModal = () => setOpenModal(true);
+  const handleCloseModal = () => setOpenModal(false);
 
   return (
     <Router>
@@ -356,6 +292,8 @@ const App = () => {
               handleCloseModal={handleCloseModal}
               updateServantEffects={updateServantEffects}
               handleTeamServantClick={handleTeamServantClick}
+              simulationResult={simulationResult}
+              setSimulationResult={setSimulationResult}
             />
           } />
           <Route path="/search" element={
@@ -367,9 +305,8 @@ const App = () => {
           <Route path="/" element={<Instructions />} />
         </Routes>
       </Container>
-      
-      {/* Sticky Team Bar - always visible */}
-      <StickyTeamBar 
+
+      <StickyTeamBar
         team={team}
         servants={servants}
         selectedMysticCode={selectedMysticCode}
