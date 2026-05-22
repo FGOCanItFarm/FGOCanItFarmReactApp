@@ -8,7 +8,7 @@ import CommandInputPage from './components/CommandInputPage';
 import Instructions from './components/Instructions';
 import SearchPage from './components/SearchPage';
 import StickyTeamBar from './components/StickyTeamBar';
-import axios from 'axios';
+import { supabase } from './supabaseClient';
 import './ui-vars.css';
 
 const App = () => {
@@ -34,8 +34,7 @@ const App = () => {
     '240', '436', '83', '411', '149', '443', '333'
   ]);
 
-  axios.defaults.baseURL = process.env.REACT_APP_API_URL;
-
+  // Function to save data to local storage
   const saveToLocalStorage = (key, value) => {
     localStorage.setItem(key, JSON.stringify(value));
   };
@@ -113,31 +112,42 @@ const App = () => {
   }, [searchQuery, selectedRarity, selectedClass, selectedNpType, selectedAttackType, sortOrder]);
 
   const fetchServants = useCallback(async () => {
-    try {
-      const response = await axios.get(`/api/servants`);
-      setServants(response.data);
-      setFilteredServants(response.data);
-    } catch (error) {
-      console.error('There was an error fetching the servant data!', error);
+    const { data, error } = await supabase
+      .from('servants')
+      .select('collection_no, name, class_name, rarity, np_card, np_card_variable, np_card_options, attack_type, is_enemy_only, face_url, parser_flags')
+      .order('collection_no');
+
+    if (error) {
+      console.error('Error fetching servants:', error);
+      return;
     }
+
+    const mapped = (data || []).map(s => ({
+      collectionNo: String(s.collection_no),
+      name:         s.name,
+      className:    s.class_name,
+      rarity:       s.rarity,
+      np_card:      s.np_card,
+      np_card_variable: s.np_card_variable,
+      np_card_options:  s.np_card_options,
+      attack_type:  s.attack_type,
+      is_enemy_only: s.is_enemy_only,
+      face_url:     s.face_url,
+      parser_flags: s.parser_flags,
+      // Backward-compat shape so existing filter logic (noblePhantasms) works unchanged.
+      // Variable-NP servants expose all possible cards so they match any card filter.
+      noblePhantasms: (s.np_card_variable && s.np_card_options)
+        ? s.np_card_options.map(card => ({ card, effectFlags: s.attack_type ? [s.attack_type] : [] }))
+        : s.np_card
+          ? [{ card: s.np_card, effectFlags: s.attack_type ? [s.attack_type] : [] }]
+          : [],
+    }));
+
+    setServants(mapped);
+    setFilteredServants(mapped);
   }, []);
 
   useEffect(() => { fetchServants(); }, [fetchServants]);
-
-  useEffect(() => {
-    const warmup = async () => {
-      try {
-        const controller = new AbortController();
-        const timeout = setTimeout(() => controller.abort(), 3000);
-        await axios.get('/api/servants?warm=true', { signal: controller.signal });
-        clearTimeout(timeout);
-      } catch (err) {
-        if (err.name !== 'CanceledError' && err.name !== 'AbortError') {}
-      }
-    };
-    warmup();
-    return () => {};
-  }, []);
 
   const handleServantClick = (servant) => {
     const newTeam = [...team];
@@ -199,33 +209,19 @@ const App = () => {
   };
 
   const handleSubmit = async () => {
-    const teamData = {
-      team: team.map((servant, index) => ({
-        servant_id: servant.collectionNo,
-        append2: servantEffects[index].append2 || false,
-        append5: servantEffects[index].append5 || false,
-        ...servantEffects[index]
-      })),
-      mc_id: selectedMysticCode,
-      quest_id: selectedQuest?.id,
-      commands
-    };
-    try {
-      const response = await axios.post('/api/submit-team', teamData);
-      const result = response.data?.result ?? response.data ?? null;
-      setSimulationResult(result);
-      console.log('Team submitted successfully', result);
-    } catch (error) {
-      console.error('Error submitting team:', error);
-      setSimulationResult({
-        success: false,
-        error: error.response?.data?.error || error.message || 'Request failed'
-      });
-    }
+    // TODO: Wire to client-side simulation engine.
+    // Flow:
+    //   1. Build token string from commands[]
+    //   2. Fetch full servant data from Supabase for each team slot
+    //   3. Fetch full quest data from Supabase for selectedQuest.id
+    //   4. Fetch mystic code data from Supabase for selectedMysticCode
+    //   5. Call Driver.run(tokenString, { servants, quest, mc })
+    //   6. Display results and offer submit_run() RPC
+    console.log('Simulation wiring pending — see TODO in handleSubmit');
     setOpenModal(false);
   };
 
-  const handleOpenModal = () => setOpenModal(true);
+  const handleOpenModal  = () => setOpenModal(true);
   const handleCloseModal = () => setOpenModal(false);
 
   return (

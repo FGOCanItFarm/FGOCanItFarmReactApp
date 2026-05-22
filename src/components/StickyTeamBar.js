@@ -217,7 +217,7 @@ const StickyTeamBar = ({ team, servants, selectedMysticCode, selectedQuest, serv
                       {servant ? (
                         <div className="sticky-servant-avatar" role="button" tabIndex={0} aria-label={`Edit stats for slot ${index + 1}`}>
                           <ServantAvatar
-                            servantFace={servant.extraAssets?.faces?.ascension?.['4']}
+                            servantFace={servant.face_url}
                             bgType={servant.noblePhantasms?.[0]?.card}
                             tagType={servant.noblePhantasms?.[0]?.effectFlags?.[0]}
                           />
