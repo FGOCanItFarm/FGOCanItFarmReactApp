@@ -1,15 +1,18 @@
 import React from 'react';
 import { Button, Typography, Box, Container, Modal } from '@mui/material';
-// MysticCodeCommand moved into TwoTeamView
 import '../CommandInputPage.css';
 import SourceTargetCommandInput from './SourceTargetCommandInput';
+import SimulationStats from './SimulationStats';
 
-const CommandInputPage = ({ team, servants, setTeam, activeServant, setActiveServant, commands, setCommands, selectedQuest, selectedMysticCode, setSelectedMysticCode, handleSubmit, openModal, handleOpenModal, handleCloseModal, updateServantEffects }) => {
-  // (handleTeamServantClick and handleEffectChange were removed because they were unused in this component)
-
-  // Two-Team view toggle and adapter to append commands into the shared `commands` state
-  // History stack to support undo for commands editor
+const CommandInputPage = ({
+  team, servants, setTeam, activeServant, setActiveServant,
+  commands, setCommands, selectedQuest, selectedMysticCode, setSelectedMysticCode,
+  handleSubmit, openModal, handleOpenModal, handleCloseModal,
+  updateServantEffects, handleTeamServantClick,
+  simulationResult, setSimulationResult
+}) => {
   const [commandsHistory, setCommandsHistory] = React.useState([]);
+
   const addCommand = (command) => {
     setCommands(prev => {
       setCommandsHistory(h => [...h, prev]);
@@ -57,12 +60,17 @@ const CommandInputPage = ({ team, servants, setTeam, activeServant, setActiveSer
 
   return (
     <Container className="command-input-container">
-      {/* Always show the Two-Team view here (no toggle). Mystic Code UI moved into TwoTeamView. */}
-  <SourceTargetCommandInput team={team} servants={servants} setTeam={setTeam} selectedMysticCode={selectedMysticCode} setSelectedMysticCode={setSelectedMysticCode} addCommand={addCommand} updateCommands={setCommands} setActiveServant={setActiveServant} />
+      <SourceTargetCommandInput
+        team={team}
+        servants={servants}
+        setTeam={setTeam}
+        selectedMysticCode={selectedMysticCode}
+        setSelectedMysticCode={setSelectedMysticCode}
+        addCommand={addCommand}
+        updateCommands={setCommands}
+        setActiveServant={setActiveServant}
+      />
 
-      {/* Center bottom team popout removed — using the sticky bottom-right team popout instead */}
-
-      {/* Commands editor: textarea for copy/paste/edit, plus copy/paste/undo/clear/submit buttons */}
       <Box mt={4}>
         <Typography variant="h6">Commands</Typography>
         <textarea
@@ -73,7 +81,10 @@ const CommandInputPage = ({ team, servants, setTeam, activeServant, setActiveSer
             const parsed = val.length ? val.split(/\s+/) : [];
             setCommandsWithHistory(parsed);
           }}
-          style={{ width: '100%', minHeight: '6rem', fontFamily: 'monospace', padding: '8px', boxSizing: 'border-box' }}
+          style={{
+            width: '100%', minHeight: '6rem', fontFamily: 'monospace',
+            padding: '8px', boxSizing: 'border-box'
+          }}
         />
         <Box mt={2} display="flex" gap="0.5rem" flexWrap="wrap">
           <Button variant="outlined" onClick={copyCommands}>Copy</Button>
@@ -81,12 +92,29 @@ const CommandInputPage = ({ team, servants, setTeam, activeServant, setActiveSer
           <Button variant="outlined" onClick={() => pasteCommands(true)}>Paste (append)</Button>
           <Button variant="outlined" onClick={undoCommands} disabled={commandsHistory.length === 0}>Undo</Button>
           <Button variant="outlined" color="secondary" onClick={() => setCommandsWithHistory([])}>Clear</Button>
-          <Button variant="contained" color="primary" onClick={handleOpenModal}>Submit Team</Button>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={() => {
+              if (setSimulationResult) setSimulationResult(null);
+              handleOpenModal();
+            }}
+          >
+            Submit Team
+          </Button>
         </Box>
       </Box>
 
+      <SimulationStats result={simulationResult} />
+
       <Modal open={openModal} onClose={handleCloseModal}>
-        <Box p={4} bgcolor="white" borderRadius="8px" boxShadow={3} style={{ margin: 'auto', marginTop: '10%', width: '50%' }}>
+        <Box
+          p={4}
+          bgcolor="white"
+          borderRadius="8px"
+          boxShadow={3}
+          style={{ margin: 'auto', marginTop: '10%', width: '50%' }}
+        >
           <Typography variant="h6">Confirm Submission</Typography>
           <Typography variant="body1"><strong>Team:</strong> {JSON.stringify(team, null, 2)}</Typography>
           <Typography variant="body1"><strong>Mystic Code ID:</strong> {selectedMysticCode}</Typography>
