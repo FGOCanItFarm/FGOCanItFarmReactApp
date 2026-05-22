@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Box, Button, Paper, Typography, Portal, TextField, Checkbox, InputAdornment, useMediaQuery, Drawer, IconButton, MenuItem } from '@mui/material';
+import { Box, Button, Paper, Typography, Portal, TextField, Checkbox, InputAdornment, useMediaQuery, Drawer, IconButton } from '@mui/material';
 import InfoIcon from '@mui/icons-material/Info';
 import EditIcon from '@mui/icons-material/Edit';
 import ServantAvatar from './ServantAvatar';
@@ -16,8 +16,6 @@ const StickyTeamBar = ({ team, servants, selectedMysticCode, selectedQuest, serv
   const [editState, setEditState] = useState({
     np: 1,
     initialCharge: 0,
-    variant: '',
-    level: 90,
     attack: 0,
     atkUp: 0,
     artsUp: 0,
@@ -28,10 +26,8 @@ const StickyTeamBar = ({ team, servants, selectedMysticCode, selectedQuest, serv
     quickDamageUp: 0,
     artsDamageUp: 0,
     append_5: false,
-    ascension: 1
+    mode: 1
   });
-  // probed variant options (ascensions and costumes) for the current servant in the editor
-  const [variantOptions, setVariantOptions] = useState([]);
   const isSmall = useMediaQuery('(max-width:600px)');
 
   const handleToggle = () => {
@@ -50,55 +46,9 @@ const StickyTeamBar = ({ team, servants, selectedMysticCode, selectedQuest, serv
 
   const openEditForIndex = useCallback((index) => {
     const effects = servantEffects[index] || {};
-
-    // Probe the servant JSON for ascensionAdd -> individuality to surface possible variants (ascension keys and costumes)
-    const slot = team && team[index] ? team[index] : null;
-    const serv = slot && slot.collectionNo ? servants.find(s => String(s.collectionNo) === String(slot.collectionNo)) : null;
-    const options = [];
-    try {
-      if (!serv) {
-        // eslint-disable-next-line no-console
-        console.debug('openEditForIndex: no servant found for slot', slot);
-      }
-
-      const add = serv?.ascensionAdd || {};
-      // We only probe ascensionAdd -> individuality -> costume per request
-      const indiv = add.individuality || {};
-      const costume = indiv.costume || {};
-
-      // For each costume key, collect traits (may be [] or array of trait objects)
-      Object.keys(costume).forEach(key => {
-        const data = costume[key];
-        const traits = Array.isArray(data) ? data.map(t => t.name || t) : [];
-        options.push({ id: `costume:${key}`, label: `Costume ${key}`, traits });
-      });
-
-      // Debug: show what variant options we discovered for this servant
-      // eslint-disable-next-line no-console
-      console.debug('variant probe (individuality.costume) for', serv?.name || serv?.collectionNo, Object.keys(costume), options);
-    } catch (err) {
-      // eslint-disable-next-line no-console
-      console.error('variant probe failed', err);
-    }
-    setVariantOptions(options);
-
-    // If backend stored only variantId (e.g. "800190"), map it to the option id if possible
-    let initialVariant = '';
-    if (effects.variant) initialVariant = effects.variant;
-    else if (effects.variantId) {
-      // try to find matching option id prefix (costume or asc)
-      const vid = String(effects.variantId);
-      const found = options.find(o => o.id.endsWith(`:${vid}`));
-      initialVariant = found ? found.id : vid; // fallback to raw id
-    } else {
-      initialVariant = options.length ? options[0].id : '';
-    }
-
     setEditState({
       np: effects.np || 1,
       initialCharge: effects.initialCharge || 0,
-      variant: initialVariant,
-      level: effects.level || 90,
       attack: effects.attack || 0,
       atkUp: effects.atkUp || 0,
       artsUp: effects.artsUp || 0,
@@ -109,10 +59,10 @@ const StickyTeamBar = ({ team, servants, selectedMysticCode, selectedQuest, serv
       quickDamageUp: effects.quickDamageUp || 0,
       artsDamageUp: effects.artsDamageUp || 0,
       append_5: (effects.append_5 !== undefined) ? !!effects.append_5 : (!!effects.append5 || false),
-      ascension: effects.ascension || 1
+      mode: effects.mode || effects.formMode || 1
     });
     setEditIndex(index);
-  }, [servantEffects, servants, team]);
+  }, [servantEffects]);
 
   // If an activeServant index is provided (selected elsewhere), open the editor for that slot
   useEffect(() => {
@@ -160,7 +110,7 @@ const StickyTeamBar = ({ team, servants, selectedMysticCode, selectedQuest, serv
       quickDamageUp: 0,
       artsDamageUp: 0,
       append_5: false,
-      ascension: 1
+      mode: 1
     });
   };
 
@@ -179,7 +129,6 @@ const StickyTeamBar = ({ team, servants, selectedMysticCode, selectedQuest, serv
       const np = Math.round(clamp(editState.np, 1, 5));
       const initialCharge = clamp(editState.initialCharge, 0, 10000);
       const attack = clamp(editState.attack, 0, 10000);
-  const level = clamp(editState.level, 1, 120);
       const atkUp = clamp(editState.atkUp, 0, 100);
       const artsUp = clamp(editState.artsUp, 0, 100);
       const quickUp = clamp(editState.quickUp, 0, 100);
@@ -188,17 +137,13 @@ const StickyTeamBar = ({ team, servants, selectedMysticCode, selectedQuest, serv
       const busterDamageUp = clamp(editState.busterDamageUp, 0, 100);
       const quickDamageUp = clamp(editState.quickDamageUp, 0, 100);
       const artsDamageUp = clamp(editState.artsDamageUp, 0, 100);
-  const append5bool = !!editState.append_5;
-  const ascension = Math.max(1, Math.min(3, Math.round(Number(editState.ascension) || 1)));
-  const variant = typeof editState.variant === 'string' ? editState.variant : '';
-  // only send the variantId portion (after the colon) to the API/backend
-  const variantId = variant && variant.indexOf(':') !== -1 ? variant.split(':', 2)[1] : variant || '';
+      const append5bool = !!editState.append_5;
+  const mode = Math.max(1, Math.min(3, Math.round(Number(editState.mode) || 1)));
 
       // Persist all fields in a single merged payload to avoid sequential update race conditions
       const payload = {
         np,
         initialCharge,
-        level,
         attack,
         atkUp,
         artsUp,
@@ -210,8 +155,7 @@ const StickyTeamBar = ({ team, servants, selectedMysticCode, selectedQuest, serv
         artsDamageUp,
         append_5: append5bool,
         append5: append5bool,
-        ascension,
-        variantId
+        mode
       };
       // Debug: log values we're about to persist
       // eslint-disable-next-line no-console
@@ -273,7 +217,7 @@ const StickyTeamBar = ({ team, servants, selectedMysticCode, selectedQuest, serv
                       {servant ? (
                         <div className="sticky-servant-avatar" role="button" tabIndex={0} aria-label={`Edit stats for slot ${index + 1}`}>
                           <ServantAvatar
-                            servantFace={servant.extraAssets?.faces?.ascension?.['4']}
+                            servantFace={servant.face_url}
                             bgType={servant.noblePhantasms?.[0]?.card}
                             tagType={servant.noblePhantasms?.[0]?.effectFlags?.[0]}
                           />
@@ -411,15 +355,6 @@ const StickyTeamBar = ({ team, servants, selectedMysticCode, selectedQuest, serv
                 size="small"
                 sx={{ width: 160 }}
               />
-              <TextField
-                label="Level"
-                type="number"
-                inputProps={{ min: 1, max: 120 }}
-                value={editState.level}
-                onChange={(e) => setEditState(s => ({ ...s, level: e.target.value }))}
-                size="small"
-                sx={{ width: 120 }}
-              />
             </Box>
 
             <Box mt={1} display="grid" gridTemplateColumns="repeat(2, 1fr)" gap={1}>
@@ -495,31 +430,13 @@ const StickyTeamBar = ({ team, servants, selectedMysticCode, selectedQuest, serv
             </Box>
 
             <Box mt={1} display="flex" alignItems="center" gap={1}>
-              <Typography variant="body2">Variant</Typography>
-              <TextField
-                select
-                size="small"
-                value={editState.variant}
-                onChange={(e) => setEditState(s => ({ ...s, variant: e.target.value }))}
-                sx={{ minWidth: 180 }}
-              >
-                {variantOptions.length === 0 ? (
-                  <MenuItem value="">Default</MenuItem>
-                ) : (
-                  variantOptions.map(opt => (
-                    <MenuItem key={opt.id} value={opt.id}>{opt.label}</MenuItem>
-                  ))
-                )}
-              </TextField>
-              {/* compact trait preview for current variant */}
-              <Box sx={{ ml: 1, display: 'flex', gap: 0.5, alignItems: 'center', flexWrap: 'wrap' }}>
-                {(() => {
-                  const cur = variantOptions.find(v => v.id === editState.variant) || null;
-                  if (!cur || !cur.traits || cur.traits.length === 0) return <Typography variant="caption" sx={{ opacity: 0.7 }}>no extra traits</Typography>;
-                  return cur.traits.slice(0, 6).map((t, i) => (
-                    <Typography key={i} variant="caption" sx={{ background: 'rgba(0,0,0,0.08)', px: 0.5, py: 0.25, borderRadius: 1 }}>{t}</Typography>
-                  ));
-                })()}
+              <Typography variant="body2">Form Mode</Typography>
+              <Box>
+                {[1,2,3].map(m => (
+                  <Button key={m} size="small" variant={editState.mode === m ? 'contained' : 'outlined'} onClick={() => setEditState(s => ({ ...s, mode: m }))} sx={{ ml: 0.5 }}>
+                    {m}
+                  </Button>
+                ))}
               </Box>
             </Box>
 

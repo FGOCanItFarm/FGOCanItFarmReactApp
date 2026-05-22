@@ -27,6 +27,7 @@ const App = () => {
   const [openModal, setOpenModal] = useState(false);
   const [servantEffects, setServantEffects] = useState(Array(6).fill({}));
   const [activeServant, setActiveServant] = useState(null);
+  const [simulationResult, setSimulationResult] = useState(null);
   const [includeEnemyOnly, setIncludeEnemyOnly] = useState(false);
 
   const ENEMY_ONLY_BLACKLIST = new Set([
@@ -290,6 +291,8 @@ const App = () => {
               handleCloseModal={handleCloseModal}
               updateServantEffects={updateServantEffects}
               handleTeamServantClick={handleTeamServantClick}
+              simulationResult={simulationResult}
+              setSimulationResult={setSimulationResult}
             />
           } />
           <Route path="/search" element={
