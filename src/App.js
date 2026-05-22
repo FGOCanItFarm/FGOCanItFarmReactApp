@@ -39,7 +39,6 @@ const App = () => {
     localStorage.setItem(key, JSON.stringify(value));
   };
 
-  // Function to load data from local storage
   const loadFromLocalStorage = (key) => {
     const savedData = localStorage.getItem(key);
     return savedData ? JSON.parse(savedData) : [];
@@ -148,9 +147,7 @@ const App = () => {
     setFilteredServants(mapped);
   }, []);
 
-  useEffect(() => {
-    fetchServants();
-  }, [fetchServants]);
+  useEffect(() => { fetchServants(); }, [fetchServants]);
 
   const handleServantClick = (servant) => {
     const newTeam = [...team];
