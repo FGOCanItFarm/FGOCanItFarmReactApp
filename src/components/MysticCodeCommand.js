@@ -26,8 +26,8 @@ const MysticCodeCommand = ({ team = [], servants = [], setTeam = () => {}, updat
   const isSwapMC = selectedMysticCode === 20 || selectedMysticCode === 210;
 
   return (
-    <div style={{ backgroundColor: '#e0f7fa', padding: 8, width: '30rem' }}>
-      <Typography variant="h6">Mystic Codes</Typography>
+    <div style={{ background: 'var(--color-surface-2)', border: '1px solid var(--color-border)', borderRadius: 8, padding: 12, width: '100%', boxSizing: 'border-box' }}>
+      <Typography variant="h6" gutterBottom>Mystic Codes</Typography>
 
       <Select
         value={selectedMysticCode ?? ''}

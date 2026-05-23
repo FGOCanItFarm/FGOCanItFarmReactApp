@@ -121,11 +121,7 @@ const SourceTargetCommandInput = ({
               return (
                 <div key={index} className={`team-servant-slot ${isSelected ? 'selected-source' : ''}`} onClick={() => handleSourceClick(index)} role="button" tabIndex={0}>
                   <div style={{ position: 'relative' }}>
-                    <ServantAvatar
-                      servantFace={servant?.extraAssets?.faces?.ascension?.['4']}
-                      bgType={servant?.noblePhantasms?.[0]?.card}
-                      tagType={servant?.noblePhantasms?.[0]?.effectFlags?.[0]}
-                    />
+                    <ServantAvatar servantFace={servant?.face_url} />
                     <IconButton size="small" aria-label={`Edit slot ${index + 1}`} sx={{ position: 'absolute', top: 6, right: 6 }} onClick={(e) => openEditorFor(index, e)}>
                       <EditIcon fontSize="small" />
                     </IconButton>
@@ -159,7 +155,7 @@ const SourceTargetCommandInput = ({
               return (
                 <div key={index} className={`team-servant-slot ${isSelected ? 'selected-target' : ''}`} onClick={() => handleTargetClick(index)} role="button" tabIndex={0}>
                   <div style={{ position: 'relative' }}>
-                    <ServantAvatar servantFace={servant?.extraAssets?.faces?.ascension?.['4']} bgType={servant?.noblePhantasms?.[0]?.card} tagType={servant?.noblePhantasms?.[0]?.effectFlags?.[0]} />
+                    <ServantAvatar servantFace={servant?.face_url} />
                     <IconButton size="small" aria-label={`Edit slot ${index + 1}`} sx={{ position: 'absolute', top: 6, right: 6 }} onClick={(e) => openEditorFor(index, e)}>
                       <EditIcon fontSize="small" />
                     </IconButton>
