@@ -5,7 +5,10 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import WarningIcon from '@mui/icons-material/Warning';
 import { supabase } from '../supabaseClient';
 
-const WORKER_URL = process.env.REACT_APP_WORKER_URL;
+// When deployed as a single Cloudflare Worker, REACT_APP_WORKER_URL is not
+// needed — /health and /run are served by the same origin.  Set it only for
+// local development to point at `wrangler dev` (e.g. http://localhost:8787).
+const WORKER_URL = process.env.REACT_APP_WORKER_URL || '';
 
 function fmtAge(iso) {
   if (!iso) return null;
@@ -39,14 +42,12 @@ export default function DataUpdateButton() {
   useEffect(() => { fetchLastUpdated(); }, [fetchLastUpdated]);
 
   useEffect(() => {
-    if (!WORKER_URL) return;
     fetch(`${WORKER_URL}/health`)
       .then(r => setWorkerOk(r.ok))
       .catch(() => setWorkerOk(false));
   }, []);
 
   const handleSync = async () => {
-    if (!WORKER_URL) return;
     setRunning(true);
     setError(null);
     try {
@@ -64,32 +65,6 @@ export default function DataUpdateButton() {
   const ageText = lastUpdated === undefined ? null
     : lastUpdated ? `Updated ${fmtAge(lastUpdated)}`
     : 'Never synced';
-
-  if (!WORKER_URL) {
-    return (
-      <Box>
-        <Typography sx={{ fontSize: '0.7rem', color: 'var(--color-text-dim)', mb: 0.5, lineHeight: 1.4 }}>
-          Data sync not configured. Add to .env.local:
-        </Typography>
-        <Box
-          component="code"
-          sx={{
-            display: 'block',
-            backgroundColor: 'var(--color-surface-2)',
-            color: 'var(--color-gold)',
-            p: 0.75,
-            borderRadius: 0.5,
-            fontSize: '0.65rem',
-            fontFamily: 'monospace',
-            userSelect: 'all',
-            wordBreak: 'break-all',
-          }}
-        >
-          REACT_APP_WORKER_URL=https://…
-        </Box>
-      </Box>
-    );
-  }
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.6 }}>

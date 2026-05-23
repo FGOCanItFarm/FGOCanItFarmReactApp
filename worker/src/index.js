@@ -340,7 +340,9 @@ export default {
       return Response.json({ status: 'started' }, { headers: { 'Access-Control-Allow-Origin': '*' } });
     }
 
-    return new Response('Not found', { status: 404 });
+    // All other requests — serve the React app static assets.
+    // The ASSETS binding handles SPA fallback (index.html for unknown paths).
+    return env.ASSETS.fetch(request);
   },
 
   async scheduled(event, env, ctx) {
