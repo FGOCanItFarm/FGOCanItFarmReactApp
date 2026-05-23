@@ -24,11 +24,7 @@ const NP_DAMAGE_FUNC_TYPES = new Set([
   'damageNpIndividualSum',
 ]);
 
-// AA nice API uses 'event' for time-limited wars and 'permanent' for always-open
-// ones. 'eventQuest' was the old incorrect assumption; both are kept in case AA
-// ever changes the naming. 'free' covers some permanent farming war categories.
-const KEEP_WAR_TYPES = new Set(['event', 'eventQuest', 'permanent', 'free']);
-const RECOMMEND_LVS  = new Set(['90', '90+', '90++', '90+++', '90★', '90★★', '90★★★']);
+const RECOMMEND_LVS = new Set(['90', '90+', '90++', '90+++', '90★', '90★★', '90★★★']);
 
 // Minimum gap between user-triggered syncs. The trigger endpoint is open (no
 // token) so anyone can press "Sync Game Data", but it no-ops if a sync ran
@@ -242,21 +238,13 @@ async function retrieveQuests(supabase) {
   const basicWars = await fetchWithBackoff(`${AA_BASE}/export/JP/basic_war.json`);
   if (!basicWars) { console.error('Failed to fetch basic_war.json'); return 0; }
 
-  // Log structure of first war object to diagnose field name issues.
-  if (Array.isArray(basicWars) && basicWars.length > 0) {
-    console.log(`basic_war.json: ${basicWars.length} entries`);
-    console.log(`First war object keys: ${Object.keys(basicWars[0]).join(', ')}`);
-    console.log(`First war sample: ${JSON.stringify(basicWars[0]).slice(0, 400)}`);
-  } else if (!Array.isArray(basicWars)) {
-    console.log(`basic_war.json is NOT an array — type: ${typeof basicWars}, keys: ${Object.keys(basicWars ?? {}).join(', ')}`);
-  }
-
-  // Log unique war types so filter problems are obvious in future runs.
-  const seenTypes = [...new Set(basicWars.map(w => w.type))];
-  console.log(`War types (w.type): ${seenTypes.join(', ')}`);
-
-  const warIds = basicWars.filter(w => KEEP_WAR_TYPES.has(w.type)).map(w => w.id);
-  console.log(`Processing ${warIds.length} wars (types: event/eventQuest/permanent/free)`);
+  // Wars in basic_war.json have no category/type string — only an `id`, a
+  // `flags` array, and an `eventId`. There is no reliable war-level flag for
+  // "has farmable quests", so we walk every war and rely on the precise
+  // quest-level filter below (recommendLv ∈ RECOMMEND_LVS, 40 AP, repeatable)
+  // to pick out the farming nodes. Wars with no qualifying quests add nothing.
+  const warIds = basicWars.map(w => w.id).filter(id => id != null);
+  console.log(`Processing ${warIds.length} wars`);
 
   const queue = [];
   for (const warId of warIds) {
