@@ -101,22 +101,6 @@ const FilterSection = ({ sortOrder, setSortOrder, searchQuery, setSearchQuery, s
                 aria-pressed={selectedClass.includes(classItem.key.toLowerCase())}
                 title={`Toggle ${classItem.name} class filter`}
               >
-                <img
-                  src={`${process.env.PUBLIC_URL}/class-icons/${classItem.key}.png`}
-                  alt={classItem.name}
-                  onError={(e) => {
-                    // Fallback: hide the broken image and show full text label in the existing span
-                    try {
-                      e.target.style.display = 'none';
-                      const textSpan = e.target.parentElement.querySelector('.filter-item-text');
-                      if (textSpan) textSpan.textContent = classItem.name;
-                    } catch (err) {
-                      // Last resort: replace innerHTML with the full name
-                      e.target.parentElement.innerHTML = classItem.name;
-                    }
-                  }}
-                  style={{ width: '32px', height: '32px' }}
-                />
                 <span className="filter-item-text">{classItem.name}</span>
               </button>
             ))}

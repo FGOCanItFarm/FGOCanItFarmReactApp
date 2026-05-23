@@ -42,7 +42,7 @@ const ServantAvatar = ({ bgType, servantFace, tagType }) => {
         <div
           className="card-inner"
           style={{
-            backgroundImage: `url(${bgImage})`,
+            backgroundImage: bgImage ? `url(${bgImage})` : 'none',
             backgroundSize: 'cover',
             backgroundPosition: 'center',
             backgroundRepeat: 'no-repeat',

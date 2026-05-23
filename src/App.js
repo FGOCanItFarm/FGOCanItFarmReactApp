@@ -149,12 +149,16 @@ const App = () => {
   useEffect(() => { fetchServants(); }, [fetchServants]);
 
   const handleServantClick = (servant) => {
+    // Roster servants carry a String collectionNo; the Atlas-sourced common
+    // supports carry a numeric one. Normalise so team lookups (strict ===) and
+    // localStorage validation (expects a String) both work.
+    const collectionNo = String(servant.collectionNo);
     const newTeam = [...team];
-    const count = newTeam.filter(s => s.collectionNo === servant.collectionNo).length;
+    const count = newTeam.filter(s => s.collectionNo === collectionNo).length;
     if (count < 2) {
       const emptyIndex = newTeam.findIndex(s => s.collectionNo === '');
       if (emptyIndex !== -1) {
-        newTeam[emptyIndex] = { collectionNo: servant.collectionNo };
+        newTeam[emptyIndex] = { collectionNo };
         setTeam(newTeam);
       } else {
         alert('Your team is full.');

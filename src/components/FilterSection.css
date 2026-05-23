@@ -29,7 +29,7 @@
   color: var(--color-text-dim);
   cursor: pointer;
   transition: border-color 0.14s, background 0.14s, color 0.14s;
-  min-height: 54px;
+  min-height: 40px;
   min-width: 44px;
   font-size: 0.78rem;
 }
@@ -53,9 +53,8 @@
 }
 
 .filter-item-text {
-  font-size: 10px;
+  font-size: 12px;
   text-align: center;
-  margin-top: 3px;
   line-height: 1.2;
   white-space: normal;
   word-break: break-word;
