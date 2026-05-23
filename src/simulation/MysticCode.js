@@ -14,8 +14,7 @@ export class MysticCode {
       const functions = (skill.functions || []).map(func => {
         let svals = func.svals ?? [];
         if (Array.isArray(svals) && svals.length > 0) svals = svals[svals.length - 1];
-        else if (!Array.isArray(svals)) svals = svals;
-        else svals = {};
+        else if (Array.isArray(svals)) svals = {};
         return { ...func, svals };
       });
       return { id: skill.id, num: skill.num, name: skill.name, cooldown, functions };
