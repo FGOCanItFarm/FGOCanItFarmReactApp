@@ -149,3 +149,83 @@
   .sticky-team-grid { grid-template-columns: repeat(6, minmax(40px, 1fr)); }
   .info-pill { font-size: 0.68rem; max-width: 130px; }
 }
+
+/* ── Persistent right-docked Team panel (always visible) ── */
+.team-panel {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 340px;
+  z-index: 1200;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  padding: var(--spacing-md);
+  background: var(--color-surface);
+  border-left: 1px solid var(--color-border);
+  overflow-y: auto;
+}
+
+.team-panel-title {
+  font-weight: 700;
+  margin-bottom: var(--spacing-sm);
+  color: var(--color-text);
+}
+
+.team-panel-body {
+  display: flex;
+  gap: var(--spacing-sm);
+  flex: 1 1 auto;
+}
+
+.team-panel-slots {
+  flex: 0 0 56px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.team-panel-slot {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  overflow: hidden;
+  cursor: pointer;
+  background: var(--color-surface-2);
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.team-panel-slot:hover { border-color: var(--color-border-active); }
+
+.team-panel-slot.selected {
+  border-color: var(--color-gold);
+  box-shadow: 0 0 0 2px var(--color-gold-dim);
+}
+
+.team-panel-slot-num {
+  position: absolute;
+  top: 1px;
+  left: 3px;
+  z-index: 2;
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: var(--color-text);
+  text-shadow: 0 1px 2px rgba(0,0,0,0.8);
+}
+
+.team-panel-slot-empty { width: 100%; height: 100%; background: var(--color-surface-2); }
+
+.team-panel-editor { flex: 1 1 auto; min-width: 0; }
+
+.team-panel-info {
+  margin-top: var(--spacing-sm);
+  padding-top: var(--spacing-sm);
+  border-top: 1px solid var(--color-border);
+}
+
+@media (max-width: 1024px) {
+  .team-panel { width: 300px; }
+}

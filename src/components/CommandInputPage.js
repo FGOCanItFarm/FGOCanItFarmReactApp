@@ -11,7 +11,6 @@ const CommandInputPage = ({
   team, servants, setTeam, activeServant, setActiveServant,
   commands, setCommands, selectedQuest, selectedMysticCode, setSelectedMysticCode,
   handleSubmit, openModal, handleOpenModal, handleCloseModal,
-  servantEffects = [], updateServantEffects, handleTeamServantClick,
   simulationResult, setSimulationResult,
   simulating = false,
   onSubmitRun = null,
@@ -114,9 +113,8 @@ const CommandInputPage = ({
         setSelectedMysticCode={setSelectedMysticCode}
         addCommand={addCommand}
         updateCommands={setCommands}
-        setActiveServant={setActiveServant}
-        servantEffects={servantEffects}
-        updateServantEffects={updateServantEffects}
+        selectedSlot={activeServant}
+        setSelectedSlot={setActiveServant}
         skillInfo={skillInfo}
       />
 

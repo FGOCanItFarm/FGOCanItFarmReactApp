@@ -27,7 +27,7 @@ const App = () => {
   const [selectedMysticCode, setSelectedMysticCode] = useState(null);
   const [openModal, setOpenModal] = useState(false);
   const [servantEffects, setServantEffects] = useState(Array(6).fill({}));
-  const [activeServant, setActiveServant] = useState(null);
+  const [activeServant, setActiveServant] = useState(0);
   const [simulationResult, setSimulationResult] = useState(null);
   const [simulating, setSimulating] = useState(false);
   const [includeEnemyOnly, setIncludeEnemyOnly] = useState(false);
@@ -172,10 +172,6 @@ const App = () => {
     setActiveServant(index);
   };
 
-  const clearActiveServant = useCallback(() => {
-    setActiveServant(null);
-  }, [setActiveServant]);
-
   const clearTeam = () => {
     setTeam(Array.from({ length: 6 }, () => ({ collectionNo: '' })));
   };
@@ -254,7 +250,7 @@ const App = () => {
     <Router>
       <CssBaseline />
       <Sidebar team={team} selectedQuest={selectedQuest} />
-      <Container style={{ marginLeft: 192, padding: '20px' }}>
+      <Container className="app-content" style={{ marginLeft: 192, marginRight: 340, padding: '20px', maxWidth: 'none' }}>
         <Routes>
           <Route path="/instructions" element={<Instructions />} />
           <Route path="/team-selection" element={
@@ -338,9 +334,8 @@ const App = () => {
         selectedQuest={selectedQuest}
         servantEffects={servantEffects}
         updateServantEffects={updateServantEffects}
-        activeServant={activeServant}
-        clearActiveServant={clearActiveServant}
-        setActiveServant={setActiveServant}
+        selectedSlot={activeServant}
+        setSelectedSlot={setActiveServant}
       />
     </Router>
   );
