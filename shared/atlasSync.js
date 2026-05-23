@@ -242,9 +242,18 @@ async function retrieveQuests(supabase) {
   const basicWars = await fetchWithBackoff(`${AA_BASE}/export/JP/basic_war.json`);
   if (!basicWars) { console.error('Failed to fetch basic_war.json'); return 0; }
 
+  // Log structure of first war object to diagnose field name issues.
+  if (Array.isArray(basicWars) && basicWars.length > 0) {
+    console.log(`basic_war.json: ${basicWars.length} entries`);
+    console.log(`First war object keys: ${Object.keys(basicWars[0]).join(', ')}`);
+    console.log(`First war sample: ${JSON.stringify(basicWars[0]).slice(0, 400)}`);
+  } else if (!Array.isArray(basicWars)) {
+    console.log(`basic_war.json is NOT an array — type: ${typeof basicWars}, keys: ${Object.keys(basicWars ?? {}).join(', ')}`);
+  }
+
   // Log unique war types so filter problems are obvious in future runs.
   const seenTypes = [...new Set(basicWars.map(w => w.type))];
-  console.log(`War types in export: ${seenTypes.join(', ')}`);
+  console.log(`War types (w.type): ${seenTypes.join(', ')}`);
 
   const warIds = basicWars.filter(w => KEEP_WAR_TYPES.has(w.type)).map(w => w.id);
   console.log(`Processing ${warIds.length} wars (types: event/eventQuest/permanent/free)`);
