@@ -363,3 +363,5 @@ export default {
     ctx.waitUntil(runUpdate(env));
   },
 };
+
+export { runUpdate };

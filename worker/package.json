@@ -2,9 +2,11 @@
   "name": "fgo-can-it-farm-worker",
   "version": "1.0.0",
   "private": true,
+  "type": "module",
   "scripts": {
     "deploy": "wrangler deploy",
-    "dev": "wrangler dev --test-scheduled"
+    "dev": "wrangler dev --test-scheduled",
+    "seed": "node seed.js"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.39.0"
