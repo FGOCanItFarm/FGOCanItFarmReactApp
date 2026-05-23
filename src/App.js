@@ -312,6 +312,7 @@ const App = () => {
               openModal={openModal}
               handleOpenModal={handleOpenModal}
               handleCloseModal={handleCloseModal}
+              servantEffects={servantEffects}
               updateServantEffects={updateServantEffects}
               handleTeamServantClick={handleTeamServantClick}
               simulationResult={simulationResult}

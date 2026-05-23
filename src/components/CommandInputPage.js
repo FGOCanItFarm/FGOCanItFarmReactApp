@@ -4,12 +4,14 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import '../CommandInputPage.css';
 import SourceTargetCommandInput from './SourceTargetCommandInput';
 import SimulationStats from './SimulationStats';
+import { supabase } from '../supabaseClient';
+import { parseServantSkills } from './skillInfo';
 
 const CommandInputPage = ({
   team, servants, setTeam, activeServant, setActiveServant,
   commands, setCommands, selectedQuest, selectedMysticCode, setSelectedMysticCode,
   handleSubmit, openModal, handleOpenModal, handleCloseModal,
-  updateServantEffects, handleTeamServantClick,
+  servantEffects = [], updateServantEffects, handleTeamServantClick,
   simulationResult, setSimulationResult,
   simulating = false,
   onSubmitRun = null,
@@ -17,6 +19,25 @@ const CommandInputPage = ({
   const [commandsHistory, setCommandsHistory] = React.useState([]);
   const [submitStatus, setSubmitStatus] = React.useState(null);
   const [submitError, setSubmitError] = React.useState('');
+  const [skillInfo, setSkillInfo] = React.useState({}); // collectionNo -> parsed skills
+
+  // Fetch full data for the current team so the builder can label skills and
+  // know which need an ally target. Keyed by the team's collection numbers.
+  const teamKey = team.map(s => s.collectionNo || '').join(',');
+  React.useEffect(() => {
+    const ids = team.map(s => s.collectionNo).filter(Boolean).map(Number);
+    if (ids.length === 0) { setSkillInfo({}); return; }
+    let cancelled = false;
+    (async () => {
+      const { data, error } = await supabase.from('servants').select('collection_no, data').in('collection_no', ids);
+      if (error || cancelled) return;
+      const map = {};
+      for (const row of data || []) map[String(row.collection_no)] = parseServantSkills(row.data);
+      if (!cancelled) setSkillInfo(map);
+    })();
+    return () => { cancelled = true; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [teamKey]);
 
   React.useEffect(() => {
     setSubmitStatus(null);
@@ -94,6 +115,9 @@ const CommandInputPage = ({
         addCommand={addCommand}
         updateCommands={setCommands}
         setActiveServant={setActiveServant}
+        servantEffects={servantEffects}
+        updateServantEffects={updateServantEffects}
+        skillInfo={skillInfo}
       />
 
       <Box mt={4}>
