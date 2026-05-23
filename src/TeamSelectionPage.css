@@ -7,22 +7,30 @@
 
 .filter-common-servants {
   display: flex;
-  align-items: flex-start;
-  gap: 1rem;
-  height: 44rem;
+  align-items: stretch;
+  gap: var(--spacing-lg);
+  flex-wrap: wrap;
+  margin-top: var(--spacing-md);
 }
 
 .filter-common-servants-grid-item {
-  height: 42.5rem;
   align-items: center;
   margin: 0.5rem;
   padding: 0.5rem;
 }
 
 .filter-section {
-  flex: 0 0 400px;
-  min-width: 400px;
+  flex: 0 0 340px;
+  min-width: 300px;
+  max-width: 100%;
   box-sizing: border-box;
+}
+
+@media (max-width: 900px) {
+  .filter-section {
+    flex: 1 1 100%;
+    min-width: 0;
+  }
 }
 
 .team-selection-buttons {
@@ -137,10 +145,13 @@
 .filter-container {
   background: var(--color-surface);
   border: 1px solid var(--color-border);
-  border-radius: 8px;
+  border-radius: 12px;
   padding: var(--spacing-md);
-  min-width: 400px;
+  width: 100%;
   max-width: 100%;
+  box-sizing: border-box;
+  position: sticky;
+  top: var(--spacing-md);
 }
 
 .compact-filter-grid {

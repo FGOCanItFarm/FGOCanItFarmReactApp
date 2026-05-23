@@ -220,14 +220,41 @@ async function retrieveServants(supabase) {
 // Quests
 // ---------------------------------------------------------------------------
 
+// Collect the distinct enemy classes, attributes, and trait names across every
+// wave so the quest browser can filter on them without loading the full data
+// blob. Same field paths the simulation uses (Quest.js): enemy.svt.className /
+// .attribute / .traits[].name.
+function extractEnemyMeta(stages) {
+  const classes    = new Set();
+  const attributes = new Set();
+  const traits     = new Set();
+  for (const stage of stages ?? []) {
+    for (const enemy of stage.enemies ?? []) {
+      const svt = enemy.svt ?? {};
+      if (svt.className) classes.add(svt.className);
+      if (svt.attribute) attributes.add(svt.attribute);
+      for (const t of svt.traits ?? []) {
+        if (t?.name) traits.add(t.name);
+      }
+    }
+  }
+  return {
+    enemy_classes:    [...classes],
+    enemy_attributes: [...attributes],
+    enemy_traits:     [...traits],
+  };
+}
+
 async function upsertQuest(supabase, data, warId, warName) {
   const questId = data.id;
   const stages  = data.stages ?? [];
   if (!questId || stages.length === 0 || !stages[0].enemies) { console.error(`Quest ${questId}: missing id or empty enemies`); return; }
+  const enemyMeta = extractEnemyMeta(stages);
   const { error } = await supabase.from('quests').upsert({
     id: questId, name: data.name ?? '', war_id: warId, war_name: warName,
     recommend_lv: data.recommendLv ?? '', consume: data.consume ?? 0,
     after_clear: data.afterClear ?? '', opened_at: data.openedAt,
+    ...enemyMeta,
     data, updated_at: new Date().toISOString(),
   }, { onConflict: 'id' });
   if (error) throw new Error(`Upsert quest ${questId}: ${error.message}`);
