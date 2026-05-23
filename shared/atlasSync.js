@@ -171,31 +171,28 @@ async function upsertServant(supabase, data, aaHash) {
 }
 
 async function retrieveServants(supabase) {
+  // One request gets every servant + their AA hash.
   const basicList = await fetchWithBackoff(`${AA_BASE}/export/JP/basic_servant.json`);
   if (!basicList) { console.error('Failed to fetch basic_servant.json'); return { checked: 0, updated: 0 }; }
 
-  let checked = 0, updated = 0;
-  for (const entry of basicList) {
-    const collectionNo = entry.collectionNo;
-    const aaHash       = entry.hash ?? '';
-    if (!collectionNo) continue;
-    checked++;
+  // One bulk read instead of one-per-servant — collapses 400+ Supabase calls to 1.
+  const { data: storedList } = await supabase
+    .from('servants').select('collection_no, aa_data_hash');
+  const storedHashes = new Map((storedList ?? []).map(r => [r.collection_no, r.aa_data_hash]));
 
-    const { data: existing } = await supabase
-      .from('servants').select('aa_data_hash')
-      .eq('collection_no', collectionNo).maybeSingle();
+  const toUpdate = basicList.filter(e => e.collectionNo && storedHashes.get(e.collectionNo) !== (e.hash ?? ''));
+  console.log(`Servants: ${basicList.length} total, ${toUpdate.length} changed`);
 
-    if (existing?.aa_data_hash === aaHash) { console.log(`Servant ${collectionNo}: hash unchanged, skipping`); continue; }
-
-    const data = await fetchWithBackoff(`${AA_BASE}/nice/JP/servant/${collectionNo}?lore=true&expand=true&lang=en`);
-    if (!data) { console.error(`Failed to fetch servant ${collectionNo}`); await sleep(500); continue; }
-
-    await upsertServant(supabase, data, aaHash);
-    updated++;
-    console.log(`Upserted servant ${collectionNo}`);
+  for (const entry of toUpdate) {
+    const data = await fetchWithBackoff(
+      `${AA_BASE}/nice/JP/servant/${entry.collectionNo}?lore=true&expand=true&lang=en`
+    );
+    if (!data) { console.error(`Failed to fetch servant ${entry.collectionNo}`); await sleep(500); continue; }
+    await upsertServant(supabase, data, entry.hash ?? '');
+    console.log(`Upserted servant ${entry.collectionNo}`);
     await sleep(500);
   }
-  return { checked, updated };
+  return { checked: basicList.length, updated: toUpdate.length };
 }
 
 // ---------------------------------------------------------------------------
@@ -257,29 +254,26 @@ async function retrieveMysticCodes(supabase) {
   const basicList = await fetchWithBackoff(`${AA_BASE}/export/JP/basic_mystic_code.json`);
   if (!basicList) { console.error('Failed to fetch basic_mystic_code.json'); return 0; }
 
-  let updated = 0;
-  for (const entry of basicList) {
-    const mcId   = entry.id;
-    const aaHash = entry.hash ?? '';
-    if (!mcId) continue;
+  // Bulk hash read — same pattern as servants.
+  const { data: storedList } = await supabase
+    .from('mystic_codes').select('id, aa_data_hash');
+  const storedHashes = new Map((storedList ?? []).map(r => [r.id, r.aa_data_hash]));
 
-    const { data: existing } = await supabase
-      .from('mystic_codes').select('aa_data_hash').eq('id', mcId).maybeSingle();
-    if (existing?.aa_data_hash === aaHash) { console.log(`Mystic code ${mcId}: hash unchanged, skipping`); continue; }
+  const toUpdate = basicList.filter(e => e.id && storedHashes.get(e.id) !== (e.hash ?? ''));
+  console.log(`Mystic codes: ${basicList.length} total, ${toUpdate.length} changed`);
 
-    const data = await fetchWithBackoff(`${AA_BASE}/nice/JP/MC/${mcId}?lang=en`);
-    if (!data) { console.error(`Failed to fetch mystic code ${mcId}`); await sleep(300); continue; }
-
+  for (const entry of toUpdate) {
+    const data = await fetchWithBackoff(`${AA_BASE}/nice/JP/MC/${entry.id}?lang=en`);
+    if (!data) { console.error(`Failed to fetch mystic code ${entry.id}`); await sleep(300); continue; }
     const { error } = await supabase.from('mystic_codes').upsert({
-      id: mcId, name: data.name ?? '', aa_data_hash: aaHash, data,
+      id: entry.id, name: data.name ?? '', aa_data_hash: entry.hash ?? '', data,
       updated_at: new Date().toISOString(),
     }, { onConflict: 'id' });
-    if (error) throw new Error(`Upsert mystic code ${mcId}: ${error.message}`);
-    updated++;
-    console.log(`Upserted mystic code ${mcId}`);
+    if (error) throw new Error(`Upsert mystic code ${entry.id}: ${error.message}`);
+    console.log(`Upserted mystic code ${entry.id}`);
     await sleep(300);
   }
-  return updated;
+  return toUpdate.length;
 }
 
 // ---------------------------------------------------------------------------
