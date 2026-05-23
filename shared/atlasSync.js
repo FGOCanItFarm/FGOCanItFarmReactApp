@@ -247,20 +247,26 @@ async function retrieveQuests(supabase) {
   console.log(`Processing ${warIds.length} wars`);
 
   const queue = [];
+  let scanned = 0;
   for (const warId of warIds) {
     const warData = await fetchWithBackoff(`${AA_BASE}/nice/JP/war/${warId}?lang=en`);
+    scanned++;
     if (!warData) { console.error(`Failed to fetch war ${warId}`); await sleep(300); continue; }
     const warName = warData.longName || warData.name || '';
+    let foundHere = 0;
     for (const spot of warData.spots ?? []) {
       for (const quest of spot.quests ?? []) {
         // Handle both nice-format strings ('repeatLast') and raw numeric values (3).
         // Handle both nice ('consume') and raw ('actConsume') field names.
         const apCost      = quest.consume ?? quest.actConsume;
         const isRepeatable = quest.afterClear === 'repeatLast' || quest.afterClear === 3;
-        if (RECOMMEND_LVS.has(quest.recommendLv) && apCost === 40 && isRepeatable)
+        if (RECOMMEND_LVS.has(quest.recommendLv) && apCost === 40 && isRepeatable) {
           queue.push([quest.id, warId, warName]);
+          foundHere++;
+        }
       }
     }
+    console.log(`War ${warId} [${scanned}/${warIds.length}]: ${foundHere} farmable quest(s)`);
     await sleep(300);
   }
   console.log(`Found ${queue.length} qualifying quests`);
