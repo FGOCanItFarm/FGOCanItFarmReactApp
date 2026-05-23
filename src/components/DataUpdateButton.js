@@ -24,6 +24,7 @@ export default function DataUpdateButton() {
   const [lastUpdated, setLastUpdated] = useState(undefined);
   const [running, setRunning]         = useState(false);
   const [error, setError]             = useState(null);
+  const [notice, setNotice]           = useState(null);
   const [workerOk, setWorkerOk]       = useState(null);
 
   const fetchLastUpdated = useCallback(async () => {
@@ -50,8 +51,14 @@ export default function DataUpdateButton() {
   const handleSync = async () => {
     setRunning(true);
     setError(null);
+    setNotice(null);
     try {
       const res = await fetch(`${WORKER_URL}/run`, { method: 'POST' });
+      const body = await res.json().catch(() => ({}));
+      if (res.status === 429 || body.status === 'skipped') {
+        setNotice('Data is already up to date — try again later.');
+        return;
+      }
       if (!res.ok) throw new Error(`Worker ${res.status}`);
       setTimeout(fetchLastUpdated, 5000);
       setTimeout(fetchLastUpdated, 15000);
@@ -78,6 +85,15 @@ export default function DataUpdateButton() {
             sx={{ fontSize: '0.65rem', height: 20 }}
           />
         </Tooltip>
+      )}
+
+      {notice && (
+        <Chip
+          label={notice}
+          size="small"
+          onDelete={() => setNotice(null)}
+          sx={{ fontSize: '0.65rem', height: 20 }}
+        />
       )}
 
       {ageText && (

@@ -17,6 +17,11 @@ const NP_DAMAGE_FUNC_TYPES = new Set([
 const KEEP_WAR_TYPES = new Set(['eventQuest', 'permanent']);
 const RECOMMEND_LVS  = new Set(['90', '90+', '90++', '90+++', '90★', '90★★', '90★★★']);
 
+// Minimum gap between user-triggered syncs. /run is open (no token) so anyone
+// can press "Sync Game Data", but it no-ops if a sync ran within this window.
+// Override per-deployment with the RUN_COOLDOWN_MINUTES env var.
+const DEFAULT_COOLDOWN_MINUTES = 60;
+
 // ---------------------------------------------------------------------------
 // HTTP helpers
 // ---------------------------------------------------------------------------
@@ -336,6 +341,34 @@ export default {
           return Response.json({ error: 'Unauthorized' }, { status: 401 });
         }
       }
+
+      // Cooldown: skip if a sync ran recently. This is what makes /run safe to
+      // leave open to end users — the request body is ignored (no way to inject
+      // data) and the scraper only writes Atlas Academy data, so the only abuse
+      // vector is spamming the trigger, which this defuses. runUpdate bumps the
+      // metadata timestamp at its very start, so overlapping triggers collapse
+      // into one; the upserts are idempotent regardless.
+      const cooldownMs =
+        (Number(env.RUN_COOLDOWN_MINUTES) || DEFAULT_COOLDOWN_MINUTES) * 60_000;
+      const supabase = createClient(env.SUPABASE_URL, env.SUPABASE_SERVICE_ROLE_KEY, {
+        auth: { persistSession: false },
+      });
+      const { data: meta } = await supabase
+        .from('metadata').select('value').eq('key', 'aa_version').maybeSingle();
+      const lastRunAt = meta?.value?.updated_at
+        ? new Date(meta.value.updated_at).getTime() : 0;
+      const elapsed = Date.now() - lastRunAt;
+      if (lastRunAt && elapsed < cooldownMs) {
+        const retryAfter = Math.ceil((cooldownMs - elapsed) / 1000);
+        return Response.json(
+          { status: 'skipped', reason: 'recently_synced', retry_after_seconds: retryAfter },
+          { status: 429, headers: {
+            'Access-Control-Allow-Origin': '*',
+            'Retry-After': String(retryAfter),
+          }},
+        );
+      }
+
       ctx.waitUntil(runUpdate(env));
       return Response.json({ status: 'started' }, { headers: { 'Access-Control-Allow-Origin': '*' } });
     }
