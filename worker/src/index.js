@@ -30,20 +30,14 @@ async function fetchWithBackoff(url, retries = 3) {
     try {
       const res = await fetch(url);
       if (res.ok) {
-        try {
-          return await res.json();
-        } catch (e) {
-          console.error(`JSONDecodeError for ${url}:`, e.message);
-          return null;
-        }
+        try { return await res.json(); }
+        catch (e) { console.error(`JSONDecodeError for ${url}:`, e.message); return null; }
       }
       console.error(`HTTP ${res.status} for ${url}`);
     } catch (e) {
       console.error(`FetchError for ${url}:`, e.message);
     }
-    if (attempt < retries - 1) {
-      await sleep(2 ** attempt * 1000);
-    }
+    if (attempt < retries - 1) await sleep(2 ** attempt * 1000);
   }
   return null;
 }
@@ -79,13 +73,9 @@ function extractFaceUrl(data) {
   return vals.length > 0 ? vals[0] : null;
 }
 
-/**
- * 5-step pre-parse of raw Atlas Academy servant JSON.
- * Returns a dict of structured column values for public.servants.
- */
 function runGuardrailPipeline(data) {
   const collectionNo = data.collectionNo;
-  const nps = [...(data.noblePhantasms ?? [])].sort((a, b) => (a.id ?? 0) - (b.id ?? 0));
+  const nps      = [...(data.noblePhantasms ?? [])].sort((a, b) => (a.id ?? 0) - (b.id ?? 0));
   const npCardSet = new Set(nps.map(np => np.card).filter(Boolean));
   const npCards   = [...npCardSet].sort();
   const variable  = npCards.length > 1;
@@ -101,7 +91,7 @@ function runGuardrailPipeline(data) {
     face_url:         extractFaceUrl(data),
   };
 
-  // Step 1 — transformServant skills (Jekyll-style one-way transform)
+  // Step 1 — transformServant skills
   const transformSkills = (data.skills ?? []).filter(s =>
     (s.functions ?? []).some(f => f.funcType === 'transformServant')
   );
@@ -113,12 +103,12 @@ function runGuardrailPipeline(data) {
     result.parser_flags.has_transform_servant = true;
   }
 
-  // Step 2 — costumeAdd: Mash hard-coded to Ortinax (most upgraded form)
+  // Step 2 — Mash hard-coded to Ortinax
   if (collectionNo === MASH_COLLECTION_NO) {
     result.parser_flags.mash_ortinax = true;
   }
 
-  // Step 3 — formIdx: Melusine's form-change skill ID → override to irreversible
+  // Step 3 — Melusine's form-change skill ID
   for (const skill of data.skills ?? []) {
     if (skill.id === MELUSINE_FORM_SKILL_ID) {
       result.form_transition = 'irreversible';
@@ -126,23 +116,15 @@ function runGuardrailPipeline(data) {
     }
   }
 
-  // Step 4 — condLimitCount: record ascension-gated skill IDs for the sim engine
-  const gated = (data.skills ?? [])
-    .filter(s => (s.condLimitCount ?? 0) > 0)
-    .map(s => s.id);
-  if (gated.length > 0) {
-    result.parser_flags.ascension_gated_skill_ids = gated;
-  }
+  // Step 4 — ascension-gated skill IDs
+  const gated = (data.skills ?? []).filter(s => (s.condLimitCount ?? 0) > 0).map(s => s.id);
+  if (gated.length > 0) result.parser_flags.ascension_gated_skill_ids = gated;
 
-  // Step 5 — modal NP card choice (Space Ishtar, Emiya etc.)
-  if (variable) {
-    result.parser_flags.requires_choice = true;
-  }
+  // Step 5 — modal NP card choice
+  if (variable) result.parser_flags.requires_choice = true;
 
-  // Aoko: BattleEngine needs to know to apply post-NP transform
-  if (collectionNo === AOKO_COLLECTION_NO) {
-    result.parser_flags.is_aoko = true;
-  }
+  // Aoko post-NP transform
+  if (collectionNo === AOKO_COLLECTION_NO) result.parser_flags.is_aoko = true;
 
   return result;
 }
@@ -168,21 +150,16 @@ async function upsertServant(supabase, data, aaHash) {
     face_url:         parsed.face_url,
     aa_data_hash:     aaHash,
     data,
-    updated_at:       new Date().toISOString(),
+    updated_at: new Date().toISOString(),
   }, { onConflict: 'collection_no' });
   if (error) throw new Error(`Upsert servant ${data.collectionNo}: ${error.message}`);
 }
 
 async function retrieveServants(supabase) {
   const basicList = await fetchWithBackoff(`${AA_BASE}/export/JP/basic_servant.json`);
-  if (!basicList) {
-    console.error('Failed to fetch basic_servant.json');
-    return { checked: 0, updated: 0 };
-  }
+  if (!basicList) { console.error('Failed to fetch basic_servant.json'); return { checked: 0, updated: 0 }; }
 
-  let checked = 0;
-  let updated = 0;
-
+  let checked = 0, updated = 0;
   for (const entry of basicList) {
     const collectionNo = entry.collectionNo;
     const aaHash       = entry.hash ?? '';
@@ -190,31 +167,19 @@ async function retrieveServants(supabase) {
     checked++;
 
     const { data: existing } = await supabase
-      .from('servants')
-      .select('aa_data_hash')
-      .eq('collection_no', collectionNo)
-      .maybeSingle();
+      .from('servants').select('aa_data_hash')
+      .eq('collection_no', collectionNo).maybeSingle();
 
-    if (existing?.aa_data_hash === aaHash) {
-      console.log(`Servant ${collectionNo}: hash unchanged, skipping`);
-      continue;
-    }
+    if (existing?.aa_data_hash === aaHash) { console.log(`Servant ${collectionNo}: hash unchanged, skipping`); continue; }
 
-    const data = await fetchWithBackoff(
-      `${AA_BASE}/nice/JP/servant/${collectionNo}?lore=true&expand=true&lang=en`
-    );
-    if (!data) {
-      console.error(`Failed to fetch servant ${collectionNo}`);
-      await sleep(500);
-      continue;
-    }
+    const data = await fetchWithBackoff(`${AA_BASE}/nice/JP/servant/${collectionNo}?lore=true&expand=true&lang=en`);
+    if (!data) { console.error(`Failed to fetch servant ${collectionNo}`); await sleep(500); continue; }
 
     await upsertServant(supabase, data, aaHash);
     updated++;
     console.log(`Upserted servant ${collectionNo}`);
     await sleep(500);
   }
-
   return { checked, updated };
 }
 
@@ -225,21 +190,12 @@ async function retrieveServants(supabase) {
 async function upsertQuest(supabase, data, warId, warName) {
   const questId = data.id;
   const stages  = data.stages ?? [];
-  if (!questId || stages.length === 0 || !stages[0].enemies) {
-    console.error(`Quest ${questId}: missing id or empty enemies`);
-    return;
-  }
+  if (!questId || stages.length === 0 || !stages[0].enemies) { console.error(`Quest ${questId}: missing id or empty enemies`); return; }
   const { error } = await supabase.from('quests').upsert({
-    id:           questId,
-    name:         data.name ?? '',
-    war_id:       warId,
-    war_name:     warName,
-    recommend_lv: data.recommendLv ?? '',
-    consume:      data.consume ?? 0,
-    after_clear:  data.afterClear ?? '',
-    opened_at:    data.openedAt,
-    data,
-    updated_at:   new Date().toISOString(),
+    id: questId, name: data.name ?? '', war_id: warId, war_name: warName,
+    recommend_lv: data.recommendLv ?? '', consume: data.consume ?? 0,
+    after_clear: data.afterClear ?? '', opened_at: data.openedAt,
+    data, updated_at: new Date().toISOString(),
   }, { onConflict: 'id' });
   if (error) throw new Error(`Upsert quest ${questId}: ${error.message}`);
   console.log(`Upserted quest ${questId}`);
@@ -247,10 +203,7 @@ async function upsertQuest(supabase, data, warId, warName) {
 
 async function retrieveQuests(supabase) {
   const basicWars = await fetchWithBackoff(`${AA_BASE}/export/JP/basic_war.json`);
-  if (!basicWars) {
-    console.error('Failed to fetch basic_war.json');
-    return 0;
-  }
+  if (!basicWars) { console.error('Failed to fetch basic_war.json'); return 0; }
 
   const warIds = basicWars.filter(w => KEEP_WAR_TYPES.has(w.type)).map(w => w.id);
   console.log(`Processing ${warIds.length} wars`);
@@ -258,41 +211,26 @@ async function retrieveQuests(supabase) {
   const queue = [];
   for (const warId of warIds) {
     const warData = await fetchWithBackoff(`${AA_BASE}/nice/JP/war/${warId}?lang=en`);
-    if (!warData) {
-      console.error(`Failed to fetch war ${warId}`);
-      await sleep(300);
-      continue;
-    }
+    if (!warData) { console.error(`Failed to fetch war ${warId}`); await sleep(300); continue; }
     const warName = warData.longName || warData.name || '';
     for (const spot of warData.spots ?? []) {
       for (const quest of spot.quests ?? []) {
-        if (
-          RECOMMEND_LVS.has(quest.recommendLv) &&
-          quest.consume === 40 &&
-          quest.afterClear === 'repeatLast'
-        ) {
+        if (RECOMMEND_LVS.has(quest.recommendLv) && quest.consume === 40 && quest.afterClear === 'repeatLast')
           queue.push([quest.id, warId, warName]);
-        }
       }
     }
     await sleep(300);
   }
-
   console.log(`Found ${queue.length} qualifying quests`);
 
   let updated = 0;
   for (const [questId, warId, warName] of queue) {
     const data = await fetchWithBackoff(`${AA_BASE}/nice/JP/quest/${questId}/1?lang=en`);
-    if (!data) {
-      console.error(`Failed to fetch quest ${questId}`);
-      await sleep(300);
-      continue;
-    }
+    if (!data) { console.error(`Failed to fetch quest ${questId}`); await sleep(300); continue; }
     await upsertQuest(supabase, data, warId, warName);
     updated++;
     await sleep(300);
   }
-
   return updated;
 }
 
@@ -302,10 +240,7 @@ async function retrieveQuests(supabase) {
 
 async function retrieveMysticCodes(supabase) {
   const basicList = await fetchWithBackoff(`${AA_BASE}/export/JP/basic_mystic_code.json`);
-  if (!basicList) {
-    console.error('Failed to fetch basic_mystic_code.json');
-    return 0;
-  }
+  if (!basicList) { console.error('Failed to fetch basic_mystic_code.json'); return 0; }
 
   let updated = 0;
   for (const entry of basicList) {
@@ -314,53 +249,35 @@ async function retrieveMysticCodes(supabase) {
     if (!mcId) continue;
 
     const { data: existing } = await supabase
-      .from('mystic_codes')
-      .select('aa_data_hash')
-      .eq('id', mcId)
-      .maybeSingle();
-
-    if (existing?.aa_data_hash === aaHash) {
-      console.log(`Mystic code ${mcId}: hash unchanged, skipping`);
-      continue;
-    }
+      .from('mystic_codes').select('aa_data_hash').eq('id', mcId).maybeSingle();
+    if (existing?.aa_data_hash === aaHash) { console.log(`Mystic code ${mcId}: hash unchanged, skipping`); continue; }
 
     const data = await fetchWithBackoff(`${AA_BASE}/nice/JP/MC/${mcId}?lang=en`);
-    if (!data) {
-      console.error(`Failed to fetch mystic code ${mcId}`);
-      await sleep(300);
-      continue;
-    }
+    if (!data) { console.error(`Failed to fetch mystic code ${mcId}`); await sleep(300); continue; }
 
     const { error } = await supabase.from('mystic_codes').upsert({
-      id:           mcId,
-      name:         data.name ?? '',
-      aa_data_hash: aaHash,
-      data,
-      updated_at:   new Date().toISOString(),
+      id: mcId, name: data.name ?? '', aa_data_hash: aaHash, data,
+      updated_at: new Date().toISOString(),
     }, { onConflict: 'id' });
     if (error) throw new Error(`Upsert mystic code ${mcId}: ${error.message}`);
     updated++;
     console.log(`Upserted mystic code ${mcId}`);
     await sleep(300);
   }
-
   return updated;
 }
 
 // ---------------------------------------------------------------------------
-// Metadata / version
+// Metadata
 // ---------------------------------------------------------------------------
 
 async function updateJpHash(supabase) {
   const info = await fetchWithBackoff(`${AA_BASE}/info`);
-  if (!info) {
-    console.error('Failed to fetch /info');
-    return '';
-  }
+  if (!info) { console.error('Failed to fetch /info'); return ''; }
   const jpHash = info?.JP?.hash ?? '';
   const { error } = await supabase.from('metadata').upsert({
-    key:        'aa_version',
-    value:      { jp_hash: jpHash, updated_at: new Date().toISOString() },
+    key: 'aa_version',
+    value: { jp_hash: jpHash, updated_at: new Date().toISOString() },
     updated_at: new Date().toISOString(),
   }, { onConflict: 'key' });
   if (error) throw new Error(`Update JP hash: ${error.message}`);
@@ -369,32 +286,69 @@ async function updateJpHash(supabase) {
 }
 
 // ---------------------------------------------------------------------------
-// Entry point
+// Core update flow (shared by fetch + scheduled handlers)
+// ---------------------------------------------------------------------------
+
+async function runUpdate(env) {
+  const supabase = createClient(env.SUPABASE_URL, env.SUPABASE_SERVICE_ROLE_KEY, {
+    auth: { persistSession: false },
+  });
+
+  const start = Date.now();
+  console.log('=== Starting update run ===');
+
+  const newJpHash                          = await updateJpHash(supabase);
+  const { checked: servantsChecked,
+          updated: servantsUpdated }        = await retrieveServants(supabase);
+  const questsUpdated                      = await retrieveQuests(supabase);
+  const mcUpdated                          = await retrieveMysticCodes(supabase);
+
+  const summary = {
+    servants_checked:     servantsChecked,
+    servants_updated:     servantsUpdated,
+    quests_updated:       questsUpdated,
+    mystic_codes_updated: mcUpdated,
+    new_jp_hash:          newJpHash,
+    duration_seconds:     +((Date.now() - start) / 1000).toFixed(2),
+  };
+  console.log('Update complete:', JSON.stringify(summary));
+  return summary;
+}
+
+// ---------------------------------------------------------------------------
+// Entry points
 // ---------------------------------------------------------------------------
 
 export default {
+  // HTTP trigger: POST /run
+  // Optional auth: set TRIGGER_TOKEN worker secret; then send Authorization: Bearer <token>
+  async fetch(request, env, ctx) {
+    const url = new URL(request.url);
+
+    if (request.method === 'OPTIONS') {
+      return new Response(null, { headers: {
+        'Access-Control-Allow-Origin':  '*',
+        'Access-Control-Allow-Methods': 'POST, OPTIONS',
+        'Access-Control-Allow-Headers': 'Authorization, Content-Type',
+      }});
+    }
+
+    if (request.method === 'POST' && url.pathname === '/run') {
+      if (env.TRIGGER_TOKEN) {
+        const auth = request.headers.get('Authorization') ?? '';
+        if (auth !== `Bearer ${env.TRIGGER_TOKEN}`) {
+          return Response.json({ error: 'Unauthorized' }, { status: 401 });
+        }
+      }
+      ctx.waitUntil(runUpdate(env));
+      return Response.json({ status: 'started' }, { headers: { 'Access-Control-Allow-Origin': '*' } });
+    }
+
+    return new Response('Not found', { status: 404 });
+  },
+
+  // Cron trigger: daily at 00:00 UTC
   async scheduled(event, env, ctx) {
-    const supabase = createClient(env.SUPABASE_URL, env.SUPABASE_SERVICE_ROLE_KEY, {
-      auth: { persistSession: false },
-    });
-
-    const start = Date.now();
-    console.log('=== Starting update run ===');
-
-    const newJpHash                          = await updateJpHash(supabase);
-    const { checked: servantsChecked,
-            updated: servantsUpdated }        = await retrieveServants(supabase);
-    const questsUpdated                      = await retrieveQuests(supabase);
-    const mcUpdated                          = await retrieveMysticCodes(supabase);
-
-    const summary = {
-      servants_checked:    servantsChecked,
-      servants_updated:    servantsUpdated,
-      quests_updated:      questsUpdated,
-      mystic_codes_updated: mcUpdated,
-      new_jp_hash:         newJpHash,
-      duration_seconds:    +((Date.now() - start) / 1000).toFixed(2),
-    };
-    console.log('Update complete:', JSON.stringify(summary));
+    ctx.waitUntil(runUpdate(env));
   },
 };

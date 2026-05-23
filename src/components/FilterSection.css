@@ -1,93 +1,68 @@
-/* FilterSection.css - Fixed 7-column filter layout */
-
 .filter-grid-wrapper {
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
-  /* Ensure scrollbar visibility for horizontal scroll */
   scrollbar-width: thin;
-  scrollbar-color: #ccc #f0f0f0;
+  scrollbar-color: rgba(255,255,255,0.15) transparent;
 }
 
-.filter-grid-wrapper::-webkit-scrollbar {
-  height: 8px;
-}
-
-.filter-grid-wrapper::-webkit-scrollbar-track {
-  background: #f0f0f0;
-  border-radius: 4px;
-}
-
-.filter-grid-wrapper::-webkit-scrollbar-thumb {
-  background: #ccc;
-  border-radius: 4px;
-}
-
-.filter-grid-wrapper::-webkit-scrollbar-thumb:hover {
-  background: #999;
-}
+.filter-grid-wrapper::-webkit-scrollbar        { height: 4px; }
+.filter-grid-wrapper::-webkit-scrollbar-track  { background: transparent; }
+.filter-grid-wrapper::-webkit-scrollbar-thumb  { background: rgba(255,255,255,0.15); border-radius: 2px; }
+.filter-grid-wrapper::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.28); }
 
 .filter-grid {
   display: grid;
-  /* Allow more room for text labels by using 5 flexible columns that can grow */
   grid-template-columns: repeat(5, minmax(48px, 1fr));
-  gap: var(--filter-gap, 1rem);
+  gap: var(--filter-gap, 6px);
   box-sizing: border-box;
 }
 
-/* Ensure filter items maintain consistent sizing */
 .filter-grid .filter-item {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: var(--spacing-xs, 4px);
-  border: 2px solid #dee2e6;
+  padding: 6px 4px;
+  border: 1px solid var(--color-border);
   border-radius: 6px;
-  background: white;
+  background: var(--color-surface-2);
+  color: var(--color-text-dim);
   cursor: pointer;
-  transition: all 0.2s ease;
-  min-height: 60px;
-  min-width: 50px;
-  position: relative;
+  transition: border-color 0.14s, background 0.14s, color 0.14s;
+  min-height: 54px;
+  min-width: 44px;
+  font-size: 0.78rem;
 }
 
 .filter-grid .filter-item:hover {
-  border-color: #007bff;
-  background: #e7f3ff;
+  border-color: rgba(201,168,67,0.45);
+  color: var(--color-text);
+  background: rgba(201,168,67,0.06);
 }
 
 .filter-grid .filter-item:focus {
-  outline: 2px solid #007bff;
+  outline: 2px solid var(--color-gold);
   outline-offset: 2px;
 }
 
 .filter-grid .filter-item.active {
-  border-color: #007bff !important;
-  background: #007bff !important;
-  color: white !important;
+  border-color: var(--color-gold)   !important;
+  background:   var(--color-gold-dim) !important;
+  color:        var(--color-gold)   !important;
+  font-weight: 600;
 }
 
 .filter-item-text {
-  font-size: 12px;
+  font-size: 10px;
   text-align: center;
-  margin-top: 4px;
-  line-height: 1.1;
+  margin-top: 3px;
+  line-height: 1.2;
   white-space: normal;
   word-break: break-word;
 }
 
-/* Narrow screen adjustments */
 @media (max-width: 420px) {
-  .filter-grid {
-    grid-template-columns: repeat(7, minmax(30px, 1fr));
-  }
-  
-  .filter-grid .filter-item {
-    min-height: 50px;
-    padding: 2px;
-  }
-  
-  .filter-item-text {
-    font-size: 8px;
-  }
+  .filter-grid { grid-template-columns: repeat(7, minmax(30px, 1fr)); }
+  .filter-grid .filter-item { min-height: 46px; padding: 2px; }
+  .filter-item-text { font-size: 8px; }
 }
