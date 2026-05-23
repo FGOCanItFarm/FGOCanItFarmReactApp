@@ -20,13 +20,14 @@
 }
 
 .filter-section {
-  flex: 0 0 340px;
-  min-width: 300px;
+  flex: 0 0 300px;
+  min-width: 280px;
   max-width: 100%;
+  align-self: flex-start;
   box-sizing: border-box;
 }
 
-@media (max-width: 900px) {
+@media (max-width: 640px) {
   .filter-section {
     flex: 1 1 100%;
     min-width: 0;

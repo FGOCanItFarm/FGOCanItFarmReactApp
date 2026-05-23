@@ -28,6 +28,14 @@ const prettify = (s) =>
     .replace(/([a-z])([A-Z])/g, '$1 $2')
     .replace(/^./, c => c.toUpperCase());
 
+// Compact HP formatting: 1_240_000 -> "1.24M", 280_000 -> "280k".
+const formatHp = (n) => {
+  if (!n || n <= 0) return '0';
+  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(2).replace(/\.?0+$/, '')}M`;
+  if (n >= 1_000) return `${Math.round(n / 1_000)}k`;
+  return String(n);
+};
+
 // Canonical class display order; anything unlisted sorts to the end alphabetically.
 const CLASS_ORDER = [
   'saber', 'archer', 'lancer', 'rider', 'caster', 'assassin', 'berserker',
@@ -141,7 +149,7 @@ const QuestSelection = ({ setSelectedQuest, selectedQuest }) => {
     setLoading(true);
     const { data, error } = await supabase
       .from('quests')
-      .select('id, name, war_name, recommend_lv, opened_at, enemy_classes, enemy_attributes, enemy_traits')
+      .select('id, name, war_name, recommend_lv, opened_at, enemy_classes, enemy_attributes, enemy_traits, wave_count, wave_hps')
       .order('id');
 
     if (error) {
@@ -156,6 +164,8 @@ const QuestSelection = ({ setSelectedQuest, selectedQuest }) => {
         enemyClasses:     q.enemy_classes || [],
         enemyAttributes:  q.enemy_attributes || [],
         enemyTraits:      q.enemy_traits || [],
+        waveCount:        q.wave_count || (q.wave_hps ? q.wave_hps.length : 0),
+        waveHps:          q.wave_hps || [],
       })));
     }
     setLoading(false);
@@ -282,9 +292,45 @@ const QuestSelection = ({ setSelectedQuest, selectedQuest }) => {
                         <Card>
                           <CardContent>
                             <Typography variant="h6">{quest.name}</Typography>
-                            <Typography variant="body2">Recommended Lv: {quest.recommendLv}</Typography>
+                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap', mb: 1 }}>
+                              <Chip size="small" label={quest.recommendLv || '—'} color="primary" variant="outlined" />
+                              {quest.waveCount > 0 && (
+                                <Typography variant="caption" sx={{ color: 'var(--color-text-dim)' }}>
+                                  {quest.waveCount} wave{quest.waveCount === 1 ? '' : 's'}
+                                </Typography>
+                              )}
+                            </Box>
+
+                            {quest.enemyClasses.length > 0 && (
+                              <Box sx={{ mb: 0.5 }}>
+                                <Typography variant="caption" sx={{ color: 'var(--color-text-dim)', mr: 0.5 }}>Classes:</Typography>
+                                <Box sx={{ display: 'inline-flex', flexWrap: 'wrap', gap: 0.5, verticalAlign: 'middle' }}>
+                                  {quest.enemyClasses.map(c => (
+                                    <Chip key={c} size="small" label={prettify(c)} variant="outlined" />
+                                  ))}
+                                </Box>
+                              </Box>
+                            )}
+
+                            {quest.enemyAttributes.length > 0 && (
+                              <Box sx={{ mb: 0.5 }}>
+                                <Typography variant="caption" sx={{ color: 'var(--color-text-dim)', mr: 0.5 }}>Attribute:</Typography>
+                                {quest.enemyAttributes.map(a => (
+                                  <Chip key={a} size="small" label={prettify(a)} variant="outlined" sx={{ mr: 0.5 }} />
+                                ))}
+                              </Box>
+                            )}
+
+                            {quest.waveHps.length > 0 && (
+                              <Typography variant="caption" sx={{ display: 'block', color: 'var(--color-text-dim)', mt: 0.5 }}>
+                                HP: {quest.waveHps.map((hp, i) => (
+                                  <span key={i}>{i > 0 ? ' · ' : ''}W{i + 1} {formatHp(hp)}</span>
+                                ))}
+                              </Typography>
+                            )}
+
                             {selectedQuest?.id === quest.id && (
-                              <Typography variant="caption" color="primary">&#10003; Selected</Typography>
+                              <Typography variant="caption" color="primary" sx={{ display: 'block', mt: 0.5 }}>&#10003; Selected</Typography>
                             )}
                           </CardContent>
 

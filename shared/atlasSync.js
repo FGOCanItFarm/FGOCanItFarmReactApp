@@ -228,7 +228,9 @@ function extractEnemyMeta(stages) {
   const classes    = new Set();
   const attributes = new Set();
   const traits     = new Set();
+  const waveHps    = [];
   for (const stage of stages ?? []) {
+    let stageHp = 0;
     for (const enemy of stage.enemies ?? []) {
       const svt = enemy.svt ?? {};
       if (svt.className) classes.add(svt.className);
@@ -236,12 +238,16 @@ function extractEnemyMeta(stages) {
       for (const t of svt.traits ?? []) {
         if (t?.name) traits.add(t.name);
       }
+      stageHp += Number(enemy.hp) || 0;
     }
+    waveHps.push(stageHp);
   }
   return {
     enemy_classes:    [...classes],
     enemy_attributes: [...attributes],
     enemy_traits:     [...traits],
+    wave_count:       waveHps.length,
+    wave_hps:         waveHps,
   };
 }
 
