@@ -23,7 +23,7 @@ shared/atlasSync.js  ← Atlas Academy → Supabase pipeline (single source of t
 
 Supabase (Postgres + REST + RPC)
   ├─ servants       — game data synced from Atlas Academy
-  ├─ quests         — 90/90+/90++ free quests with enemy stage data
+  ├─ quests         — 90++/90+++/90★ free quests with enemy stage data
   ├─ mystic_codes   — MC skill data
   ├─ saved_runs     — community-submitted clear runs
   └─ metadata       — key/value (aa_version JP hash, last_updated)
@@ -218,7 +218,7 @@ User clicks Run
 | `id` | int PK | Atlas Academy quest ID |
 | `name` | text | |
 | `war_name` | text | |
-| `recommend_lv` | text | '90', '90+', '90++', '90+++', '90★', '90★★', '90★★★' |
+| `recommend_lv` | text | '90++', '90+++', '90★', '90★★', '90★★★' |
 | `consume` | int | AP cost (always 40 for qualifying quests) |
 | `opened_at` | timestamptz | |
 | `data` | jsonb | Full Atlas Academy nice quest object (used by simulation) |
