@@ -2,9 +2,20 @@ name = "fgo-can-it-farm-worker"
 main = "src/index.js"
 compatibility_date = "2024-09-23"
 
-# Secrets (set via `wrangler secret put`):
+# Serve the React build as static assets.
+# The Worker intercepts /health and /run; everything else falls through to the
+# built React app.  `not_found_handling = "single-page-application"` makes
+# HashRouter work by serving index.html for any path that isn't a real file.
+[assets]
+directory = "../build"
+binding = "ASSETS"
+not_found_handling = "single-page-application"
+run_worker_first = true
+
+# Secrets (set once with `wrangler secret put` from the worker/ directory):
 #   SUPABASE_URL
 #   SUPABASE_SERVICE_ROLE_KEY
+#   TRIGGER_TOKEN  (optional — gates POST /run)
 
 [triggers]
 crons = ["0 0 * * *"]

@@ -9,6 +9,7 @@ import Instructions from './components/Instructions';
 import SearchPage from './components/SearchPage';
 import StickyTeamBar from './components/StickyTeamBar';
 import { supabase } from './supabaseClient';
+import { runSimulation } from './simulation/RunAdapter';
 import './ui-vars.css';
 
 const App = () => {
@@ -28,13 +29,13 @@ const App = () => {
   const [servantEffects, setServantEffects] = useState(Array(6).fill({}));
   const [activeServant, setActiveServant] = useState(null);
   const [simulationResult, setSimulationResult] = useState(null);
+  const [simulating, setSimulating] = useState(false);
   const [includeEnemyOnly, setIncludeEnemyOnly] = useState(false);
 
   const ENEMY_ONLY_BLACKLIST = new Set([
     '240', '436', '83', '411', '149', '443', '333'
   ]);
 
-  // Function to save data to local storage
   const saveToLocalStorage = (key, value) => {
     localStorage.setItem(key, JSON.stringify(value));
   };
@@ -134,8 +135,6 @@ const App = () => {
       is_enemy_only: s.is_enemy_only,
       face_url:     s.face_url,
       parser_flags: s.parser_flags,
-      // Backward-compat shape so existing filter logic (noblePhantasms) works unchanged.
-      // Variable-NP servants expose all possible cards so they match any card filter.
       noblePhantasms: (s.np_card_variable && s.np_card_options)
         ? s.np_card_options.map(card => ({ card, effectFlags: s.attack_type ? [s.attack_type] : [] }))
         : s.np_card
@@ -209,16 +208,39 @@ const App = () => {
   };
 
   const handleSubmit = async () => {
-    // TODO: Wire to client-side simulation engine.
-    // Flow:
-    //   1. Build token string from commands[]
-    //   2. Fetch full servant data from Supabase for each team slot
-    //   3. Fetch full quest data from Supabase for selectedQuest.id
-    //   4. Fetch mystic code data from Supabase for selectedMysticCode
-    //   5. Call Driver.run(tokenString, { servants, quest, mc })
-    //   6. Display results and offer submit_run() RPC
-    console.log('Simulation wiring pending — see TODO in handleSubmit');
     setOpenModal(false);
+    setSimulationResult(null);
+    setSimulating(true);
+    const result = await runSimulation({ team, commands, selectedQuest, selectedMysticCode, servantEffects });
+    setSimulationResult(result);
+    setSimulating(false);
+  };
+
+  const handleSubmitRun = async () => {
+    const filledSlots = team
+      .map((slot, i) => ({ slot, index: i }))
+      .filter(({ slot }) => slot.collectionNo);
+
+    const p_servant_collection_nos = filledSlots.map(({ slot }) => Number(slot.collectionNo));
+    const p_np_levels = filledSlots.map(({ index }) =>
+      Number(servantEffects[index]?.np ?? servantEffects[index]?.npLevel ?? 1)
+    );
+    const p_total_np_cost = commands.filter(c => ['4', '5', '6'].includes(c)).length;
+    const p_token_string = commands.join(' ');
+    const p_quest_id = selectedQuest?.id ?? null;
+    const p_wave_results = simulationResult?.stats?.waves ?? {};
+
+    const { error } = await supabase.rpc('submit_run', {
+      p_quest_id,
+      p_servant_collection_nos,
+      p_np_levels,
+      p_total_np_cost,
+      p_token_string,
+      p_wave_results,
+    });
+
+    if (error) return { success: false, error: error.message };
+    return { success: true };
   };
 
   const handleOpenModal  = () => setOpenModal(true);
@@ -290,6 +312,8 @@ const App = () => {
               handleTeamServantClick={handleTeamServantClick}
               simulationResult={simulationResult}
               setSimulationResult={setSimulationResult}
+              simulating={simulating}
+              onSubmitRun={handleSubmitRun}
             />
           } />
           <Route path="/search" element={

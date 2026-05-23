@@ -1,5 +1,6 @@
 import React from 'react';
-import { Button, Typography, Box, Container, Modal } from '@mui/material';
+import { Button, Typography, Box, Container, Modal, Chip, CircularProgress, Alert } from '@mui/material';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import '../CommandInputPage.css';
 import SourceTargetCommandInput from './SourceTargetCommandInput';
 import SimulationStats from './SimulationStats';
@@ -9,9 +10,21 @@ const CommandInputPage = ({
   commands, setCommands, selectedQuest, selectedMysticCode, setSelectedMysticCode,
   handleSubmit, openModal, handleOpenModal, handleCloseModal,
   updateServantEffects, handleTeamServantClick,
-  simulationResult, setSimulationResult
+  simulationResult, setSimulationResult,
+  simulating = false,
+  onSubmitRun = null,
 }) => {
   const [commandsHistory, setCommandsHistory] = React.useState([]);
+  const [submitStatus, setSubmitStatus] = React.useState(null);
+  const [submitError, setSubmitError] = React.useState('');
+
+  React.useEffect(() => {
+    setSubmitStatus(null);
+    setSubmitError('');
+  }, [simulationResult]);
+
+  const filledCount = team.filter(s => s.collectionNo).length;
+  const canRun = commands.length > 0 && !!selectedQuest && filledCount > 0;
 
   const addCommand = (command) => {
     setCommands(prev => {
@@ -58,6 +71,18 @@ const CommandInputPage = ({
     }
   };
 
+  const handleCommunitySubmit = async () => {
+    if (!onSubmitRun) return;
+    setSubmitStatus('submitting');
+    const result = await onSubmitRun();
+    if (result?.success) {
+      setSubmitStatus('done');
+    } else {
+      setSubmitStatus('error');
+      setSubmitError(result?.error || 'Unknown error');
+    }
+  };
+
   return (
     <Container className="command-input-container">
       <SourceTargetCommandInput
@@ -73,6 +98,27 @@ const CommandInputPage = ({
 
       <Box mt={4}>
         <Typography variant="h6">Commands</Typography>
+
+        <Box display="flex" gap={1} mb={1} flexWrap="wrap">
+          <Chip
+            size="small"
+            variant="outlined"
+            label={selectedQuest?.name || 'No quest selected'}
+            color={selectedQuest ? 'success' : 'warning'}
+          />
+          <Chip
+            size="small"
+            variant="outlined"
+            label={`${filledCount} / 6 servants`}
+            color={filledCount >= 3 ? 'success' : 'warning'}
+          />
+          <Chip
+            size="small"
+            variant="outlined"
+            label={`${commands.length} tokens`}
+          />
+        </Box>
+
         <textarea
           aria-label="Commands editor"
           value={commands.join(' ')}
@@ -97,27 +143,85 @@ const CommandInputPage = ({
               if (setSimulationResult) setSimulationResult(null);
               handleOpenModal();
             }}
+            disabled={!canRun || simulating}
+            startIcon={simulating ? <CircularProgress size={16} color="inherit" /> : null}
           >
-            Submit Team
+            {simulating ? 'Simulating…' : 'Submit Team'}
           </Button>
         </Box>
       </Box>
 
       <SimulationStats result={simulationResult} />
 
+      {simulationResult?.success && simulationResult?.quest_cleared && (
+        <Box
+          mt={3}
+          p={2}
+          sx={{
+            backgroundColor: 'color-mix(in srgb, var(--color-success) 8%, transparent)',
+            border: '1px solid color-mix(in srgb, var(--color-success) 30%, transparent)',
+            borderRadius: 2,
+          }}
+        >
+          <Box display="flex" alignItems="center" gap={1} mb={1}>
+            <CheckCircleIcon sx={{ color: 'var(--color-success)' }} />
+            <Typography variant="h6" sx={{ color: 'var(--color-success)' }}>
+              Quest Cleared!
+            </Typography>
+          </Box>
+          <Typography variant="body2" mb={2}>
+            Your team successfully cleared this quest. Share your strategy with the community!
+          </Typography>
+          {submitStatus === 'done' && (
+            <Alert severity="success" sx={{ mb: 1 }}>Run submitted successfully!</Alert>
+          )}
+          {submitStatus === 'error' && (
+            <Alert severity="error" sx={{ mb: 1 }}>{submitError}</Alert>
+          )}
+          {onSubmitRun && (
+            <Button
+              variant="contained"
+              disabled={submitStatus === 'submitting' || submitStatus === 'done'}
+              onClick={handleCommunitySubmit}
+              startIcon={submitStatus === 'submitting' ? <CircularProgress size={16} color="inherit" /> : null}
+              sx={{
+                backgroundColor: 'var(--color-success)',
+                '&:hover': { backgroundColor: 'color-mix(in srgb, var(--color-success) 80%, black)' },
+                '&.Mui-disabled': { opacity: 0.5 },
+              }}
+            >
+              {submitStatus === 'submitting' ? 'Submitting…' : 'Submit to Community'}
+            </Button>
+          )}
+        </Box>
+      )}
+
       <Modal open={openModal} onClose={handleCloseModal}>
         <Box
           p={4}
-          bgcolor="white"
           borderRadius="8px"
           boxShadow={3}
           style={{ margin: 'auto', marginTop: '10%', width: '50%' }}
+          sx={{ backgroundColor: 'var(--color-surface)' }}
         >
-          <Typography variant="h6">Confirm Submission</Typography>
-          <Typography variant="body1"><strong>Team:</strong> {JSON.stringify(team, null, 2)}</Typography>
-          <Typography variant="body1"><strong>Mystic Code ID:</strong> {selectedMysticCode}</Typography>
-          <Typography variant="body1"><strong>Quest ID:</strong> {selectedQuest?.id}</Typography>
-          <Typography variant="body1"><strong>Commands:</strong> {commands.join(' ')}</Typography>
+          <Typography variant="h6">Confirm Simulation</Typography>
+          <Typography variant="body2" mt={1} mb={0.5}>
+            <strong>Quest:</strong> {selectedQuest?.name || 'None'}
+          </Typography>
+          <Box display="flex" gap={0.5} flexWrap="wrap" mb={1}>
+            {team.filter(s => s.collectionNo).map((s, i) => (
+              <Chip key={i} size="small" label={`#${s.collectionNo}`} variant="outlined" />
+            ))}
+          </Box>
+          <Typography variant="body2" mb={1}>
+            <strong>Mystic Code:</strong> {selectedMysticCode || 'None'}
+          </Typography>
+          <Typography variant="body2" mb={2}>
+            <strong>Tokens:</strong>{' '}
+            <code style={{ fontSize: '0.75rem' }}>
+              {commands.slice(0, 24).join(' ')}{commands.length > 24 ? ' …' : ''}
+            </code>
+          </Typography>
           <Box mt={2}>
             <Button variant="contained" color="primary" onClick={handleSubmit} style={{ marginRight: '10px' }}>
               Confirm

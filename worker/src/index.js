@@ -15,7 +15,7 @@ const NP_DAMAGE_FUNC_TYPES = new Set([
 ]);
 
 const KEEP_WAR_TYPES = new Set(['eventQuest', 'permanent']);
-const RECOMMEND_LVS  = new Set(['90', '90+', '90++', '90★', '90★★']);
+const RECOMMEND_LVS  = new Set(['90', '90+', '90++', '90+++', '90★', '90★★', '90★★★']);
 
 // ---------------------------------------------------------------------------
 // HTTP helpers
@@ -91,7 +91,6 @@ function runGuardrailPipeline(data) {
     face_url:         extractFaceUrl(data),
   };
 
-  // Step 1 — transformServant skills
   const transformSkills = (data.skills ?? []).filter(s =>
     (s.functions ?? []).some(f => f.funcType === 'transformServant')
   );
@@ -103,12 +102,10 @@ function runGuardrailPipeline(data) {
     result.parser_flags.has_transform_servant = true;
   }
 
-  // Step 2 — Mash hard-coded to Ortinax
   if (collectionNo === MASH_COLLECTION_NO) {
     result.parser_flags.mash_ortinax = true;
   }
 
-  // Step 3 — Melusine's form-change skill ID
   for (const skill of data.skills ?? []) {
     if (skill.id === MELUSINE_FORM_SKILL_ID) {
       result.form_transition = 'irreversible';
@@ -116,14 +113,11 @@ function runGuardrailPipeline(data) {
     }
   }
 
-  // Step 4 — ascension-gated skill IDs
   const gated = (data.skills ?? []).filter(s => (s.condLimitCount ?? 0) > 0).map(s => s.id);
   if (gated.length > 0) result.parser_flags.ascension_gated_skill_ids = gated;
 
-  // Step 5 — modal NP card choice
   if (variable) result.parser_flags.requires_choice = true;
 
-  // Aoko post-NP transform
   if (collectionNo === AOKO_COLLECTION_NO) result.parser_flags.is_aoko = true;
 
   return result;
@@ -286,7 +280,7 @@ async function updateJpHash(supabase) {
 }
 
 // ---------------------------------------------------------------------------
-// Core update flow (shared by fetch + scheduled handlers)
+// Core update flow
 // ---------------------------------------------------------------------------
 
 async function runUpdate(env) {
@@ -320,17 +314,19 @@ async function runUpdate(env) {
 // ---------------------------------------------------------------------------
 
 export default {
-  // HTTP trigger: POST /run
-  // Optional auth: set TRIGGER_TOKEN worker secret; then send Authorization: Bearer <token>
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
 
     if (request.method === 'OPTIONS') {
       return new Response(null, { headers: {
         'Access-Control-Allow-Origin':  '*',
-        'Access-Control-Allow-Methods': 'POST, OPTIONS',
+        'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
         'Access-Control-Allow-Headers': 'Authorization, Content-Type',
       }});
+    }
+
+    if (request.method === 'GET' && url.pathname === '/health') {
+      return Response.json({ ok: true }, { headers: { 'Access-Control-Allow-Origin': '*' } });
     }
 
     if (request.method === 'POST' && url.pathname === '/run') {
@@ -344,10 +340,25 @@ export default {
       return Response.json({ status: 'started' }, { headers: { 'Access-Control-Allow-Origin': '*' } });
     }
 
-    return new Response('Not found', { status: 404 });
+    // Proxy Atlas Academy servant data for the common servants quick-picker.
+    if (request.method === 'GET' && url.pathname.startsWith('/api/servants/')) {
+      const parts = url.pathname.split('/');
+      const collectionNo = parts[parts.length - 1];
+      if (/^\d+$/.test(collectionNo)) {
+        const res = await fetch(`${AA_BASE}/nice/JP/servant/${collectionNo}?lang=en`);
+        const body = res.ok ? await res.json() : { error: 'not found' };
+        return Response.json(body, {
+          status: res.ok ? 200 : res.status,
+          headers: { 'Access-Control-Allow-Origin': '*' },
+        });
+      }
+    }
+
+    // All other requests — serve the React app static assets.
+    // The ASSETS binding handles SPA fallback (index.html for unknown paths).
+    return env.ASSETS.fetch(request);
   },
 
-  // Cron trigger: daily at 00:00 UTC
   async scheduled(event, env, ctx) {
     ctx.waitUntil(runUpdate(env));
   },
