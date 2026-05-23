@@ -1,180 +1,106 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
-import {
-  Button,
-  CircularProgress,
-  Chip,
-  Typography,
-  Box,
-  Tooltip,
-} from '@mui/material';
+import React, { useState, useEffect, useCallback } from 'react';
+import { Button, CircularProgress, Typography, Box, Chip } from '@mui/material';
+import SyncIcon from '@mui/icons-material/Sync';
+import { supabase } from '../supabaseClient';
 
-const POLL_INTERVAL_MS = 5000;
+const WORKER_URL = process.env.REACT_APP_WORKER_URL;
 
-function formatCountdown(seconds) {
-  const h = Math.floor(seconds / 3600);
-  const m = Math.floor((seconds % 3600) / 60);
-  const s = seconds % 60;
-  return [
-    String(h).padStart(2, '0'),
-    String(m).padStart(2, '0'),
-    String(s).padStart(2, '0'),
-  ].join(':');
-}
-
-function formatRelativeTime(isoString) {
-  if (!isoString) return '';
-  const diffMs = Date.now() - new Date(isoString).getTime();
-  const diffMins = Math.floor(diffMs / 60000);
-  if (diffMins < 1) return 'just now';
-  if (diffMins < 60) return `${diffMins} minute${diffMins !== 1 ? 's' : ''} ago`;
-  const diffHours = Math.floor(diffMins / 60);
-  if (diffHours < 24) return `${diffHours} hour${diffHours !== 1 ? 's' : ''} ago`;
-  const diffDays = Math.floor(diffHours / 24);
-  return `${diffDays} day${diffDays !== 1 ? 's' : ''} ago`;
+function fmtAge(iso) {
+  if (!iso) return null;
+  const m = Math.floor((Date.now() - new Date(iso).getTime()) / 60000);
+  if (m < 1)  return 'just now';
+  if (m < 60) return `${m}m ago`;
+  const h = Math.floor(m / 60);
+  if (h < 24) return `${h}h ago`;
+  return `${Math.floor(h / 24)}d ago`;
 }
 
 export default function DataUpdateButton() {
-  const [statusInfo, setStatusInfo] = useState(null);
-  const [countdown, setCountdown] = useState(0);
-  const pollTimerRef = useRef(null);
-  const countdownTimerRef = useRef(null);
+  const [lastUpdated, setLastUpdated] = useState(undefined); // undefined = loading
+  const [running, setRunning]         = useState(false);
+  const [error, setError]             = useState(null);
 
-  const fetchStatus = useCallback(async () => {
+  const fetchLastUpdated = useCallback(async () => {
     try {
-      const res = await fetch('/api/update-status');
-      if (!res.ok) return;
-      const data = await res.json();
-      setStatusInfo(data);
-      if (data.wait_seconds > 0) {
-        setCountdown(data.wait_seconds);
-      }
-      return data;
-    } catch (err) {
-      console.error('Failed to fetch update status', err);
+      const { data } = await supabase
+        .from('metadata')
+        .select('value')
+        .eq('key', 'aa_version')
+        .maybeSingle();
+      setLastUpdated(data?.value?.updated_at ?? null);
+    } catch {
+      setLastUpdated(null);
     }
   }, []);
 
-  // Start / stop polling while running
-  const startPolling = useCallback(() => {
-    if (pollTimerRef.current) return;
-    pollTimerRef.current = setInterval(async () => {
-      const data = await fetchStatus();
-      if (data && data.status !== 'running') {
-        clearInterval(pollTimerRef.current);
-        pollTimerRef.current = null;
-      }
-    }, POLL_INTERVAL_MS);
-  }, [fetchStatus]);
+  useEffect(() => { fetchLastUpdated(); }, [fetchLastUpdated]);
 
-  const stopPolling = useCallback(() => {
-    if (pollTimerRef.current) {
-      clearInterval(pollTimerRef.current);
-      pollTimerRef.current = null;
-    }
-  }, []);
-
-  // Countdown tick
-  useEffect(() => {
-    if (countdown > 0) {
-      countdownTimerRef.current = setInterval(() => {
-        setCountdown((prev) => {
-          if (prev <= 1) {
-            clearInterval(countdownTimerRef.current);
-            countdownTimerRef.current = null;
-            // Refresh status when cooldown expires
-            fetchStatus();
-            return 0;
-          }
-          return prev - 1;
-        });
-      }, 1000);
-    }
-    return () => {
-      if (countdownTimerRef.current) {
-        clearInterval(countdownTimerRef.current);
-        countdownTimerRef.current = null;
-      }
-    };
-  }, [countdown, fetchStatus]);
-
-  // Initial fetch on mount; resume polling if already running
-  useEffect(() => {
-    fetchStatus().then((data) => {
-      if (data && data.status === 'running') {
-        startPolling();
-      }
-    });
-    return () => {
-      stopPolling();
-    };
-  }, [fetchStatus, startPolling, stopPolling]);
-
-  const handleClick = async () => {
+  const handleSync = async () => {
+    if (!WORKER_URL) return;
+    setRunning(true);
+    setError(null);
     try {
-      const res = await fetch('/api/trigger-update', { method: 'POST' });
-      if (res.status === 429) {
-        const data = await res.json();
-        setStatusInfo((prev) => ({ ...prev, status: data.status, wait_seconds: data.wait_seconds, ready: false }));
-        setCountdown(data.wait_seconds);
-        return;
-      }
-      if (res.status === 202) {
-        setStatusInfo((prev) => ({ ...prev, status: 'running', ready: false }));
-        startPolling();
-      }
-    } catch (err) {
-      console.error('Failed to trigger update', err);
+      const res = await fetch(`${WORKER_URL}/run`, { method: 'POST' });
+      if (!res.ok) throw new Error(`Worker ${res.status}`);
+      // Give the worker a moment to write the metadata record, then refresh
+      setTimeout(fetchLastUpdated, 4000);
+    } catch (e) {
+      setError(e.message);
+    } finally {
+      setRunning(false);
     }
   };
 
-  if (!statusInfo) {
-    return (
-      <Box sx={{ p: 2 }}>
-        <CircularProgress size={20} />
-      </Box>
-    );
-  }
-
-  const { status, last_complete } = statusInfo;
-  const inCooldown = countdown > 0;
-  const isRunning = status === 'running';
-  const isFailed = status === 'failed';
-  const buttonDisabled = isRunning || inCooldown;
+  const ageText = lastUpdated === undefined ? null
+    : lastUpdated ? `Updated ${fmtAge(lastUpdated)}`
+    : 'Never synced';
 
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-      {isFailed && (
+    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.6 }}>
+      {error && (
         <Chip
-          label="Last update failed"
-          color="error"
+          label={error}
           size="small"
-          sx={{ alignSelf: 'flex-start' }}
+          color="error"
+          onDelete={() => setError(null)}
+          sx={{ fontSize: '0.65rem', height: 20 }}
         />
       )}
-      {!isRunning && last_complete && !inCooldown && (
-        <Typography variant="caption" color="text.secondary">
-          Last updated: {formatRelativeTime(last_complete)}
+      {ageText && !running && (
+        <Typography sx={{ fontSize: '0.7rem', color: 'var(--color-text-dim)', lineHeight: 1.3 }}>
+          {ageText}
         </Typography>
       )}
-      {inCooldown && (
-        <Typography variant="caption" color="text.secondary">
-          Next update in {formatCountdown(countdown)}
+      {!WORKER_URL ? (
+        <Typography sx={{ fontSize: '0.68rem', color: 'var(--color-text-dim)', lineHeight: 1.4 }}>
+          Set REACT_APP_WORKER_URL to enable sync
         </Typography>
+      ) : (
+        <Button
+          variant="outlined"
+          size="small"
+          onClick={handleSync}
+          disabled={running}
+          startIcon={
+            running
+              ? <CircularProgress size={12} color="inherit" />
+              : <SyncIcon sx={{ fontSize: '14px !important' }} />
+          }
+          sx={{
+            fontSize: '0.75rem',
+            py: 0.6,
+            borderColor: 'var(--color-border-active)',
+            color: 'var(--color-gold)',
+            '&:hover': {
+              borderColor: 'var(--color-gold)',
+              backgroundColor: 'var(--color-gold-dim)',
+            },
+            '&.Mui-disabled': { opacity: 0.5 },
+          }}
+        >
+          {running ? 'Syncing…' : 'Sync Game Data'}
+        </Button>
       )}
-      <Tooltip title="Syncs servant, quest, and mystic code data from Atlas Academy">
-        <span>
-          <Button
-            variant="outlined"
-            size="small"
-            onClick={handleClick}
-            disabled={buttonDisabled}
-            startIcon={isRunning ? <CircularProgress size={14} color="inherit" /> : null}
-            sx={{ width: '100%' }}
-          >
-            {isRunning ? 'Updating…' : 'Update Game Data'}
-          </Button>
-        </span>
-      </Tooltip>
     </Box>
   );
 }

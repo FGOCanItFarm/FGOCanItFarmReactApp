@@ -1,34 +1,17 @@
-/* ServantSelection.css - Fixed 7×3 viewport with horizontal scroll */
-
 .servant-selection-viewport {
   width: 100%;
   overflow-x: auto;
   overflow-y: hidden;
   -webkit-overflow-scrolling: touch;
-  /* Ensure scrollbar visibility for horizontal scroll */
   scrollbar-width: thin;
-  scrollbar-color: #ccc #f0f0f0;
-  /* Add gradient overlays to indicate scrollable content */
+  scrollbar-color: rgba(255,255,255,0.15) transparent;
   position: relative;
 }
 
-.servant-selection-viewport::-webkit-scrollbar {
-  height: 8px;
-}
-
-.servant-selection-viewport::-webkit-scrollbar-track {
-  background: #f0f0f0;
-  border-radius: 4px;
-}
-
-.servant-selection-viewport::-webkit-scrollbar-thumb {
-  background: #ccc;
-  border-radius: 4px;
-}
-
-.servant-selection-viewport::-webkit-scrollbar-thumb:hover {
-  background: #999;
-}
+.servant-selection-viewport::-webkit-scrollbar        { height: 6px; }
+.servant-selection-viewport::-webkit-scrollbar-track  { background: transparent; }
+.servant-selection-viewport::-webkit-scrollbar-thumb  { background: rgba(255,255,255,0.15); border-radius: 3px; }
+.servant-selection-viewport::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.28); }
 
 .servant-grid {
   display: grid;
@@ -50,26 +33,24 @@
   align-items: center;
   justify-content: center;
   box-sizing: border-box;
-  border: 2px solid transparent;
+  border: 1px solid var(--color-border);
   border-radius: 8px;
-  transition: all 0.16s ease;
-  background: white;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.06);
+  transition: border-color 0.14s, transform 0.14s, box-shadow 0.14s;
+  background: var(--color-surface-2);
   overflow: hidden;
 }
 
 .servant-grid-item:hover {
-  border-color: var(--primary, #007bff);
-  transform: translateY(-4px) scale(1.03);
-  box-shadow: 0 6px 12px rgba(0,0,0,0.12);
+  border-color: var(--color-gold);
+  transform: translateY(-3px) scale(1.03);
+  box-shadow: 0 8px 18px rgba(0,0,0,0.4);
 }
 
 .servant-grid-item:focus {
-  outline: 2px solid #007bff;
+  outline: 2px solid var(--color-gold);
   outline-offset: 2px;
 }
 
-/* Ensure ServantAvatar fills the slot properly */
 .servant-grid-item .servant-avatar {
   width: var(--servant-slot-size);
   height: var(--servant-row-height);
@@ -77,50 +58,44 @@
   display: block;
 }
 
-/* Reusable highlight class to apply to other servant lists */
 .servant-item-highlight {
-  border: 2px solid transparent;
+  border: 1px solid var(--color-border);
   border-radius: 8px;
-  transition: all 0.16s ease;
-  background: white;
+  transition: border-color 0.14s, transform 0.14s, box-shadow 0.14s;
+  background: var(--color-surface-2);
 }
 
 .servant-item-highlight:hover {
-  border-color: var(--primary, #007bff);
-  transform: translateY(-4px) scale(1.03);
-  box-shadow: 0 6px 12px rgba(0,0,0,0.12);
+  border-color: var(--color-gold);
+  transform: translateY(-3px) scale(1.03);
+  box-shadow: 0 8px 18px rgba(0,0,0,0.4);
 }
 
-/* Gradient overlays for scroll indication */
+/* Edge-fade overlays to indicate horizontal scroll */
 .servant-selection-viewport::before,
 .servant-selection-viewport::after {
   content: '';
   position: absolute;
-  top: 0;
-  bottom: 0;
-  width: 20px;
+  top: 0; bottom: 0;
+  width: 24px;
   pointer-events: none;
   z-index: 10;
-  transition: opacity 0.3s ease;
+  transition: opacity 0.3s;
 }
 
 .servant-selection-viewport::before {
   left: 0;
-  background: linear-gradient(to right, rgba(255,255,255,0.8), transparent);
+  background: linear-gradient(to right, var(--color-bg, #0e1220), transparent);
 }
 
 .servant-selection-viewport::after {
   right: 0;
-  background: linear-gradient(to left, rgba(255,255,255,0.8), transparent);
+  background: linear-gradient(to left, var(--color-bg, #0e1220), transparent);
 }
 
-/* Hide gradients when not needed */
 .servant-selection-viewport:not(.has-scroll)::before,
-.servant-selection-viewport:not(.has-scroll)::after {
-  opacity: 0;
-}
+.servant-selection-viewport:not(.has-scroll)::after { opacity: 0; }
 
-/* Mobile responsive adjustments */
 @media (max-width: 768px) {
   .servant-grid {
     grid-auto-columns: calc(var(--servant-slot-size) * 0.8);

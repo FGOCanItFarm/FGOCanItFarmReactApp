@@ -1,38 +1,55 @@
-/* UI Variables for consistent spacing and sizing */
 :root {
-  /* Button sizing */
-  --btn-min-width: 100px;
-  --btn-min-height: 44px;
-  --btn-small-min-width: 60px;
-  --btn-small-min-height: 32px;
-  
-  /* Spacing */
+  /* ── Color palette ── */
+  --color-bg:             #0e1220;
+  --color-surface:        #1a2035;
+  --color-surface-2:      #202840;
+  --color-border:         rgba(255,255,255,0.08);
+  --color-border-mid:     rgba(255,255,255,0.14);
+  --color-border-active:  rgba(201,168,67,0.6);
+  --color-gold:           #c9a843;
+  --color-gold-dim:       rgba(201,168,67,0.12);
+  --color-blue:           #4488ee;
+  --color-text:           #e8ecf4;
+  --color-text-dim:       #8899bb;
+  --color-success:        #4caf72;
+  --color-error:          #e05454;
+
+  /* NP card accent colors */
+  --color-buster: #cc3333;
+  --color-arts:   #3377dd;
+  --color-quick:  #33aa44;
+
+  /* ── Button sizing ── */
+  --btn-min-width:        100px;
+  --btn-min-height:        44px;
+  --btn-small-min-width:   60px;
+  --btn-small-min-height:  32px;
+
+  /* ── Spacing ── */
   --spacing-xs: 4px;
   --spacing-sm: 8px;
   --spacing-md: 16px;
   --spacing-lg: 24px;
   --spacing-xl: 32px;
-  
-  /* Sticky team bar */
-  --sticky-team-height: 8rem;
-  --sticky-team-expanded-height: 9rem;
-  --sticky-team-width: 100%;
-  --sticky-team-max-width: 760px; /* increased for larger panel */
-  --servant-compact-size: 64px;
-  
-  /* Servant avatar sizing for consistent layout */
-  --servant-slot-size: 7rem;
-  --servant-row-height: var(--servant-slot-size);
-  /* Gap between servant items (used by grids/lists) */
-  --servant-gap: 1rem;
-  
-  /* Z-index layers */
-  --z-sticky: 1000;
+
+  /* ── Sticky team bar ── */
+  --sticky-team-height:           8rem;
+  --sticky-team-expanded-height:  9rem;
+  --sticky-team-width:            100%;
+  --sticky-team-max-width:        760px;
+  --servant-compact-size:          64px;
+
+  /* ── Servant avatar sizing ── */
+  --servant-slot-size:   7rem;
+  --servant-row-height:  var(--servant-slot-size);
+  --servant-gap:         1rem;
+
+  /* ── Z-index layers ── */
+  --z-sticky:  1000;
   --z-tooltip: 1100;
   --z-popover: 1200;
-  --z-modal: 1300;
-  
-  /* Filter and servant grid sizing */
-  --filter-gap: 8px;
-  /* Ensure the final values used across the app match the intended slot size */
+  --z-modal:   1300;
+
+  /* ── Filter grid ── */
+  --filter-gap: 6px;
 }

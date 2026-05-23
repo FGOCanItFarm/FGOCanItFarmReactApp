@@ -8,7 +8,6 @@
 .filter-common-servants {
   display: flex;
   align-items: flex-start;
-  /* explicit gap between filter column and servants area */
   gap: 1rem;
   height: 44rem;
 }
@@ -20,12 +19,8 @@
   padding: 0.5rem;
 }
 
-/* Keep filter visually on top when adjacent content overflows */
 .filter-section {
-  /* Align the flex-basis with the inner container's min-width to avoid overflow
-     (filter-container has min-width: 400px). Removing the z-index prevents the
-     filter background from sitting above the servant area. */
-  flex: 0 0 400px; /* fixed basis matching .filter-container */
+  flex: 0 0 400px;
   min-width: 400px;
   box-sizing: border-box;
 }
@@ -36,24 +31,16 @@
   justify-content: space-between;
 }
 
-/* New vertical layout for common servants and servant selection */
 .servants-container {
-  /* Flexible area for servant lists; allow children to overflow horizontally */
   flex: 1 1 auto;
   display: flex;
   flex-direction: column;
   gap: var(--spacing-lg);
-  min-width: 0; /* allow overflow children to trigger scroll instead of growing layout */
-}
-
-/* Ensure the servant area doesn't render on top of the filter column
-   — wide grids should scroll inside this container instead of overflowing */
-.servants-container {
+  min-width: 0;
   overflow: hidden;
   box-sizing: border-box;
 }
 
-/* Constrain wrappers so their internal scrolling is contained */
 .common-servants-wrapper,
 .servant-selection-wrapper {
   overflow: hidden;
@@ -61,22 +48,17 @@
   box-sizing: border-box;
 }
 
-/* Make horizontal servant lists respect their parent's width and scroll internally */
 .common-servants-horizontal,
 .servant-selection-horizontal {
   max-width: 100%;
   box-sizing: border-box;
 }
 
-/* common-servants-wrapper intentionally left unstyled; parent rules handle layout */
-
 .servant-selection-wrapper {
-  /* Bottom section for servant selection */
   flex: 1 1 auto;
-  min-width: 0; /* important so child viewport can overflow */
+  min-width: 0;
 }
 
-/* Horizontal layout for common servants */
 .common-servants-grid {
   display: flex;
   flex-direction: column;
@@ -101,21 +83,19 @@
   align-items: center;
   justify-content: center;
   box-sizing: border-box;
-  border: 2px solid transparent;
+  border: 1px solid var(--color-border);
   border-radius: 8px;
-  transition: all 0.16s ease;
-  background: white;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.06);
+  transition: border-color 0.15s, transform 0.15s, box-shadow 0.15s;
+  background: var(--color-surface-2);
   overflow: hidden;
 }
 
 .common-servant-item:hover {
-  border-color: var(--primary, #007bff);
-  transform: translateY(-4px) scale(1.03);
-  box-shadow: 0 6px 12px rgba(0,0,0,0.12);
+  border-color: var(--color-gold);
+  transform: translateY(-3px) scale(1.03);
+  box-shadow: 0 6px 14px rgba(0,0,0,0.35);
 }
 
-/* Horizontal layout for servant selection */
 .servant-selection {
   display: flex;
   flex-direction: column;
@@ -131,29 +111,14 @@
   overflow-x: auto;
   overflow-y: hidden;
   -webkit-overflow-scrolling: touch;
-  /* Add a subtle scrollbar styling */
   scrollbar-width: thin;
-  scrollbar-color: #ccc #f0f0f0;
+  scrollbar-color: rgba(255,255,255,0.15) transparent;
 }
 
-/* WebKit scrollbar styling for servant selection */
-.servant-selection-horizontal::-webkit-scrollbar {
-  height: 8px;
-}
-
-.servant-selection-horizontal::-webkit-scrollbar-track {
-  background: #f0f0f0;
-  border-radius: 4px;
-}
-
-.servant-selection-horizontal::-webkit-scrollbar-thumb {
-  background: #ccc;
-  border-radius: 4px;
-}
-
-.servant-selection-horizontal::-webkit-scrollbar-thumb:hover {
-  background: #999;
-}
+.servant-selection-horizontal::-webkit-scrollbar        { height: 6px; }
+.servant-selection-horizontal::-webkit-scrollbar-track  { background: transparent; }
+.servant-selection-horizontal::-webkit-scrollbar-thumb  { background: rgba(255,255,255,0.15); border-radius: 3px; }
+.servant-selection-horizontal::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.28); }
 
 .servant-selection-item {
   flex: 0 0 var(--servant-slot-size);
@@ -166,14 +131,12 @@
   margin-top: 2rem;
 }
 
-.mystic-code-selection {
-  flex: 1;
-}
+.mystic-code-selection { flex: 1; }
 
-/* Compact Filter UI Styles */
+/* ── Filter container ── */
 .filter-container {
-  background: #f8f9fa;
-  border: 1px solid #e9ecef;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
   border-radius: 8px;
   padding: var(--spacing-md);
   min-width: 400px;
@@ -200,68 +163,39 @@
   align-items: center;
   justify-content: center;
   padding: var(--spacing-xs);
-  border: 2px solid #dee2e6;
+  border: 1px solid var(--color-border);
   border-radius: 6px;
-  background: white;
+  background: var(--color-surface-2);
+  color: var(--color-text-dim);
   cursor: pointer;
-  transition: all 0.2s ease;
-  min-height: 60px;
-  position: relative;
+  transition: border-color 0.14s, background 0.14s, color 0.14s;
+  min-height: 56px;
 }
 
 .filter-button:hover {
-  border-color: #007bff;
-  background: #e7f3ff;
+  border-color: rgba(201,168,67,0.45);
+  color: var(--color-text);
+  background: rgba(201,168,67,0.06);
 }
 
 .filter-button:focus {
-  outline: 2px solid #007bff;
+  outline: 2px solid var(--color-gold);
   outline-offset: 2px;
 }
 
 .filter-button-active {
-  border-color: #007bff !important;
-  background: #007bff !important;
-  color: white !important;
+  border-color: var(--color-gold)    !important;
+  background:   var(--color-gold-dim) !important;
+  color:        var(--color-gold)    !important;
+  font-weight: 600;
 }
 
-.filter-button-text {
-  font-size: 10px;
-  text-align: center;
-  margin-top: 2px;
-  line-height: 1.1;
-}
-
-.filter-button-small {
-  min-height: 40px;
-  min-width: 50px;
-  font-weight: bold;
-}
-
+.filter-button-text  { font-size: 10px; text-align: center; margin-top: 2px; line-height: 1.1; }
+.filter-button-small { min-height: 40px; min-width: 50px; font-weight: bold; }
 .filter-button-np,
-.filter-button-attack {
-  min-height: 40px;
-  font-size: 12px;
-  font-weight: 500;
-}
+.filter-button-attack { min-height: 40px; font-size: 12px; font-weight: 500; }
 
-/* Responsive adjustments for compact filters */
-@media (max-width: 768px) {
-  .compact-filter-grid {
-    grid-template-columns: repeat(auto-fit, minmax(60px, 1fr));
-  }
-  
-  .filter-button {
-    min-height: 50px;
-    padding: var(--spacing-xs) 2px;
-  }
-  
-  .filter-button-text {
-    font-size: 8px;
-  }
-}
-
-/* Two Team View Styles */
+/* ── Two-team / command-input layout ── */
 .two-team-view {
   display: flex;
   flex-direction: column;
@@ -275,8 +209,8 @@
 .mystic-code-center {
   width: 100%;
   text-align: center;
-  background: #f8f9fa;
-  border: 1px solid #e9ecef;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
   border-radius: 8px;
   padding: var(--spacing-md);
 }
@@ -290,23 +224,23 @@
 }
 
 .left-full-team {
-  background: #fff;
-  border: 2px solid #e9ecef;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
   border-radius: 12px;
   padding: var(--spacing-md);
 }
 
 .center-menu {
-  background: #f8f9fa;
-  border: 2px solid #dee2e6;
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-border);
   border-radius: 12px;
   padding: var(--spacing-md);
   text-align: center;
 }
 
 .right-preview {
-  background: #fff;
-  border: 2px solid #e9ecef;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
   border-radius: 12px;
   padding: var(--spacing-md);
 }
@@ -333,17 +267,17 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: white;
+  background: var(--color-surface-2);
   position: relative;
 }
 
 .team-servant-slot:hover {
-  border-color: #007bff;
+  border-color: var(--color-gold);
   transform: scale(1.05);
 }
 
 .team-servant-slot:focus {
-  outline: 2px solid #007bff;
+  outline: 2px solid var(--color-gold);
   outline-offset: 2px;
 }
 
@@ -353,26 +287,14 @@
   outline: none;
 }
 
-/* Left stripe to indicate selection without covering the edit control */
-.selected-source {
-  border-left: 6px solid rgba(40,167,69,0.95);
-  box-shadow: 0 2px 6px rgba(0,0,0,0.06);
-}
+.selected-source { border-left: 6px solid rgba(40,167,69,0.95); box-shadow: 0 2px 6px rgba(0,0,0,0.15); }
+.selected-target { border-left: 6px solid rgba(220,53,69,0.95);  box-shadow: 0 2px 6px rgba(0,0,0,0.15); }
 
-.selected-target {
-  border-left: 6px solid rgba(220,53,69,0.95);
-  box-shadow: 0 2px 6px rgba(0,0,0,0.06);
-}
-
-/* Top-left badge (S or T) placed away from edit icon */
-.selected-source::before,
-.selected-target::before {
+.selected-source::before, .selected-target::before {
   content: '';
   position: absolute;
-  top: 6px;
-  left: 6px;
-  min-width: 16px;
-  height: 16px;
+  top: 6px; left: 6px;
+  min-width: 16px; height: 16px;
   padding: 0 4px;
   border-radius: 10px;
   color: #fff;
@@ -380,21 +302,21 @@
   line-height: 16px;
   text-align: center;
   display: inline-block;
-  box-shadow: 0 1px 0 rgba(0,0,0,0.12);
+  box-shadow: 0 1px 0 rgba(0,0,0,0.18);
 }
 
 .selected-source::before { content: 'S'; background: rgba(40,167,69,0.95); }
-.selected-target::before { content: 'T'; background: rgba(220,53,69,0.95); }
+.selected-target::before  { content: 'T'; background: rgba(220,53,69,0.95); }
 
 .empty-slot {
-  width: 100%;
-  height: 100%;
+  width: 100%; height: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #f8f9fa;
+  background: var(--color-surface-2);
   border-radius: 6px;
-  color: #6c757d;
+  color: var(--color-text-dim);
+  font-size: 0.75rem;
 }
 
 .skill-buttons-grid {
@@ -410,7 +332,7 @@
 }
 
 .menu-controls {
-  background: #e9ecef;
+  background: var(--color-surface-2);
   border-radius: 6px;
   padding: var(--spacing-sm);
   font-size: 0.875rem;
@@ -419,8 +341,8 @@
 .general-commands {
   width: 100%;
   text-align: center;
-  background: #f8f9fa;
-  border: 1px solid #e9ecef;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
   border-radius: 8px;
   padding: var(--spacing-md);
 }
@@ -438,31 +360,10 @@
   font-weight: 600;
 }
 
-/* Mobile responsive adjustments */
 @media (max-width: 768px) {
-  .three-column-layout {
-    grid-template-columns: 1fr;
-    gap: var(--spacing-md);
-  }
-  
-  .full-team-grid {
-    grid-template-columns: repeat(2, 1fr);
-    grid-template-rows: repeat(3, 1fr);
-    max-width: 300px;
-    margin: 0 auto;
-  }
-  
-  .preview-team-grid {
-    max-width: 250px;
-    margin: 0 auto;
-  }
-  
-  .general-commands-row {
-    flex-direction: column;
-    align-items: center;
-  }
-  
-  .general-command-button {
-    width: 200px;
-  }
+  .three-column-layout { grid-template-columns: 1fr; gap: var(--spacing-md); }
+  .full-team-grid { grid-template-columns: repeat(2,1fr); grid-template-rows: repeat(3,1fr); max-width: 300px; margin: 0 auto; }
+  .preview-team-grid { max-width: 250px; margin: 0 auto; }
+  .general-commands-row { flex-direction: column; align-items: center; }
+  .general-command-button { width: 200px; }
 }
