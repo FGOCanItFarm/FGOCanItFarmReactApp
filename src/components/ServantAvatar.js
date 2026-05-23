@@ -1,71 +1,34 @@
 import React from 'react';
 import '../avatar.css';
-import { ReactComponent as AoESvg } from '../AoE.svg'; // Adjust the path as necessary
-import { ReactComponent as SingleTargetSvg } from '../SingleTarget.svg'; // Adjust the path as necessary
-import { ReactComponent as SupportSvg } from '../Support.svg'; // Adjust the path as necessary
+
+// NP card type → accent colour (FGO convention: Buster red, Arts blue, Quick green)
+const CARD_ACCENT = {
+  buster: 'var(--color-buster)',
+  arts:   'var(--color-arts)',
+  quick:  'var(--color-quick)',
+};
+
+// NP target type → short readable label
+const TARGET_LABEL = {
+  attackEnemyAll: 'AoE',
+  attackEnemyOne: 'ST',
+  support:        'Support',
+};
 
 const ServantAvatar = ({ bgType, servantFace, tagType }) => {
-
-  let TagImage;
-  switch (tagType) {
-    case "attackEnemyAll":
-      TagImage = AoESvg;
-      break;
-    case "attackEnemyOne":
-      TagImage = SingleTargetSvg;
-      break;
-    case "support":
-      TagImage = SupportSvg;
-      break;
-    default:
-      TagImage = null; // don't show a tag for empty/unknown types
-  }
-
-  let bgImage;
-  switch (bgType) {
-    case "buster":
-      bgImage = `${process.env.PUBLIC_URL}/busterbg.svg`;
-      break;
-    case "arts":
-      bgImage = `${process.env.PUBLIC_URL}/artsbg.svg`;
-      break;
-    case "quick":
-      bgImage = `${process.env.PUBLIC_URL}/quickbg.svg`;
-      break;
-    default:
-      bgImage = null;
-  }
+  const accent   = CARD_ACCENT[bgType] || 'var(--color-border-mid)';
+  const cardName = bgType ? bgType.charAt(0).toUpperCase() + bgType.slice(1) : null;
+  const target   = TARGET_LABEL[tagType] || null;
+  const label    = [cardName, target].filter(Boolean).join(' · ');
 
   return (
-    <div className="container">
-      <div className="card">
-        <div
-          className="card-inner"
-          style={{
-            backgroundImage: bgImage ? `url(${bgImage})` : 'none',
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-            backgroundRepeat: 'no-repeat',
-          }}
-        >
-          <div className="box">
-            <div className="imgBox">
-              {servantFace ? (
-                <img
-                  src={servantFace}
-                  className="custom-avatar"
-                  alt="servant icon"
-                />
-              ) : (
-                <div className="empty-avatar" aria-hidden="true" />
-              )}
-            </div>
-            <div className="tag">
-              {TagImage ? <TagImage className={"TagImage"} /> : null}
-            </div>
-          </div>
-        </div>
-      </div>
+    <div className="servant-card" style={{ '--card-accent': accent }}>
+      {servantFace ? (
+        <img className="servant-card__face" src={servantFace} alt="servant" />
+      ) : (
+        <div className="servant-card__face servant-card__face--empty" aria-hidden="true" />
+      )}
+      {label && <span className="servant-card__label">{label}</span>}
     </div>
   );
 };
