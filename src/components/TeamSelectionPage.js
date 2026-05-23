@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Button, Typography, Box, Container, Tooltip } from '@mui/material';
 import FilterSection from './FilterSection';
 import ServantSelection from './ServantSelection';
@@ -7,8 +7,10 @@ import { useNavigate } from 'react-router-dom';
 import '../TeamSelectionPage.css';
 import '../ui-vars.css';
 
-const TeamSelectionPage = ({ team, setTeam, servants, filteredServants, setFilteredServants, handleServantClick, handleTeamServantClick, updateServantEffects, clearTeam, sortOrder, setSortOrder, searchQuery, setSearchQuery, selectedRarity, setSelectedRarity, selectedClass, setSelectedClass, selectedNpType, setSelectedNpType, selectedAttackType, setSelectedAttackType, capitalize, handleCheckboxChange, attackTypeLabels, selectedMysticCode, setSelectedMysticCode, includeEnemyOnly = false, setIncludeEnemyOnly = () => {}, enemyOnlyBlacklist = new Set() }) => {
+const TeamSelectionPage = ({ team, setTeam, servants, setFilteredServants, handleServantClick, handleTeamServantClick, updateServantEffects, clearTeam, sortOrder, setSortOrder, searchQuery, setSearchQuery, selectedRarity, setSelectedRarity, selectedClass, setSelectedClass, selectedNpType, setSelectedNpType, selectedAttackType, setSelectedAttackType, capitalize, handleCheckboxChange, attackTypeLabels, selectedMysticCode, setSelectedMysticCode, includeEnemyOnly = false, setIncludeEnemyOnly = () => {}, enemyOnlyBlacklist = new Set() }) => {
   const navigate = useNavigate();
+  const [displayList, setDisplayList] = useState([]);
+  const [matchSet, setMatchSet] = useState(null);
 
   const handleGotoQuest = () => {
     navigate('/quest-selection');
@@ -21,61 +23,40 @@ const TeamSelectionPage = ({ team, setTeam, servants, filteredServants, setFilte
   
 
   useEffect(() => {
-    const filterServants = () => {
-      let filtered = servants;
+    // Base list: full roster minus enemy-only servants (unless opted in), sorted.
+    let base = servants;
+    if (!includeEnemyOnly && enemyOnlyBlacklist && enemyOnlyBlacklist.size > 0) {
+      base = base.filter(servant => !enemyOnlyBlacklist.has(String(servant.collectionNo)));
+    }
+    if (sortOrder) {
+      base = [...base].sort((a, b) => String(a[sortOrder] ?? '').localeCompare(String(b[sortOrder] ?? '')));
+    }
 
-      if (selectedRarity.length > 0) {
-        filtered = filtered.filter(servant => selectedRarity.includes(servant.rarity.toString()));
-      }
+    // Filters no longer remove cards — they build the set of matching ids so
+    // the grid can dim everything else while keeping the full roster visible.
+    const passes = (servant) => {
+      if (selectedRarity.length > 0 && !selectedRarity.includes(String(servant.rarity))) return false;
       if (selectedClass.length > 0) {
-        filtered = filtered.filter(servant => {
-          const cls = (servant.className || '').toLowerCase();
-          // Allow matches where the servant class contains or startsWith the selected class
-          return selectedClass.some(sel => cls === sel || cls.startsWith(sel) || cls.includes(sel));
-        });
+        const cls = (servant.className || '').toLowerCase();
+        if (!selectedClass.some(sel => cls === sel || cls.startsWith(sel) || cls.includes(sel))) return false;
       }
       if (selectedNpType.length > 0) {
-        filtered = filtered.filter(servant =>
-          servant.noblePhantasms &&
-          servant.noblePhantasms.some(np => selectedNpType.includes(np.card.toLowerCase()))
-        );
+        if (!servant.noblePhantasms?.some(np => selectedNpType.includes(np.card?.toLowerCase()))) return false;
       }
       if (selectedAttackType.length > 0) {
-        filtered = filtered.filter(servant =>
-          servant.noblePhantasms &&
-          servant.noblePhantasms.some(np =>
-            np.effectFlags &&
-            np.effectFlags.some(flag => selectedAttackType.includes(flag))
-          )
-        );
+        if (!servant.noblePhantasms?.some(np => np.effectFlags?.some(flag => selectedAttackType.includes(flag)))) return false;
       }
-      if (searchQuery) {
-        filtered = filtered.filter(servant => servant.name.toLowerCase().includes(searchQuery.toLowerCase()));
-      }
-      if (sortOrder) {
-        filtered = filtered.sort((a, b) => a[sortOrder].localeCompare(b[sortOrder]));
-      }
-
-      // Exclude known enemy-only servants unless the user explicitly includes them
-      if (!includeEnemyOnly && enemyOnlyBlacklist && enemyOnlyBlacklist.size > 0) {
-        filtered = filtered.filter(servant => !enemyOnlyBlacklist.has(String(servant.collectionNo)));
-      }
-
-      // By default do NOT force-include team members into the filtered list.
-      // Previously we always merged team members which caused them to show
-      // regardless of active filters. Make this behavior optional via
-      // `includeTeamMembers` so it can be enabled deliberately if desired.
-      const includeTeamMembers = false; // set to true to preserve old behavior
-      if (includeTeamMembers) {
-        const teamMembers = servants.filter(servant => team.includes(servant.collectionNo));
-        filtered = [...new Set([...filtered, ...teamMembers])];
-      }
-
-      setFilteredServants(filtered);
+      if (searchQuery && !servant.name.toLowerCase().includes(searchQuery.toLowerCase())) return false;
+      return true;
     };
 
-    filterServants();
-  }, [selectedRarity, selectedClass, selectedNpType, selectedAttackType, searchQuery, sortOrder, servants, team, setFilteredServants, includeEnemyOnly, enemyOnlyBlacklist]);
+    const anyFilter = selectedRarity.length || selectedClass.length || selectedNpType.length || selectedAttackType.length || searchQuery;
+    const matched = anyFilter ? new Set(base.filter(passes).map(s => String(s.collectionNo))) : null;
+
+    setDisplayList(base);
+    setMatchSet(matched);
+    setFilteredServants(matched ? base.filter(s => matched.has(String(s.collectionNo))) : base);
+  }, [selectedRarity, selectedClass, selectedNpType, selectedAttackType, searchQuery, sortOrder, servants, setFilteredServants, includeEnemyOnly, enemyOnlyBlacklist]);
 
   return (
     <Container>
@@ -113,7 +94,8 @@ const TeamSelectionPage = ({ team, setTeam, servants, filteredServants, setFilte
               </div>
               <div className="servant-selection-wrapper">
                 <ServantSelection
-                  servants={filteredServants}
+                  servants={displayList}
+                  matchSet={matchSet}
                   handleServantClick={handleServantClick}
                 />
               </div>

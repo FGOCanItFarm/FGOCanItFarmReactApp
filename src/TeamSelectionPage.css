@@ -75,6 +75,13 @@
   padding-left: 0.25rem;
 }
 
+.common-servants-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-sm);
+  align-items: flex-start;
+}
+
 .common-servants-horizontal {
   display: flex;
   flex-wrap: wrap;

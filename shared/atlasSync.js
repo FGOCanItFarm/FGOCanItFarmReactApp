@@ -86,7 +86,9 @@ function extractAttackType(data) {
 
 function extractFaceUrl(data) {
   const ascension = data?.extraAssets?.faces?.ascension ?? {};
-  for (const key of ['4', '3', '2', '1']) {
+  // Prefer the base (1st ascension) face — the iconic, most recognisable look.
+  // Final-ascension art (4) is often a dramatic redesign that's hard to ID.
+  for (const key of ['1', '2', '3', '4']) {
     if (ascension[key]) return ascension[key];
   }
   const vals = Object.values(ascension);
