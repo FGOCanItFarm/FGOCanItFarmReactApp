@@ -24,7 +24,7 @@ const NP_DAMAGE_FUNC_TYPES = new Set([
   'damageNpIndividualSum',
 ]);
 
-const RECOMMEND_LVS = new Set(['90', '90+', '90++', '90+++', '90★', '90★★', '90★★★']);
+const RECOMMEND_LVS = new Set(['90++', '90+++', '90★', '90★★', '90★★★']);
 
 // Minimum gap between user-triggered syncs. The trigger endpoint is open (no
 // token) so anyone can press "Sync Game Data", but it no-ops if a sync ran
