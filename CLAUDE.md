@@ -12,7 +12,14 @@ Browser
 
 Cloudflare Pages
   ├─ Serves the built React app (build/)
-  └─ functions/api/servants/[id].js  ← Pages Function, proxies Atlas Academy
+  ├─ functions/api/servants/[id].js  ← Pages Function, proxies Atlas Academy
+  └─ functions/api/sync.js           ← Pages Function, on-demand data sync
+       GET  /api/sync → status (last_updated, jp_hash)
+       POST /api/sync → trigger incremental sync (cooldown + hash-gated)
+       Reads SUPABASE_SERVICE_ROLE_KEY from Pages env (server-side only)
+
+shared/atlasSync.js  ← Atlas Academy → Supabase pipeline (single source of truth)
+  Used by functions/api/sync.js, worker/src/index.js, and worker/seed.js
 
 Supabase (Postgres + REST + RPC)
   ├─ servants       — game data synced from Atlas Academy
@@ -21,9 +28,9 @@ Supabase (Postgres + REST + RPC)
   ├─ saved_runs     — community-submitted clear runs
   └─ metadata       — key/value (aa_version JP hash, last_updated)
 
-worker/ (standalone Cloudflare Worker — optional, for data sync only)
-  └─ Cron job + POST /run that pulls Atlas Academy → Supabase
-     Not needed for the React app to function.
+worker/ (standalone Cloudflare Worker — OPTIONAL, for scheduled cron only)
+  └─ Cron job that calls runUpdate from shared/atlasSync.js
+     The React app does NOT require this — sync runs as a Pages Function.
 ```
 
 ## Tech Stack
@@ -89,20 +96,33 @@ fgocanitfarmreactapp/
 │       ├─ SimulationStats.js   Collapsible wave result cards (colour-coded)
 │       ├─ SearchPage.js        Community runs browser:
 │       │                        quest picker → saved_runs query → RunCards
-│       ├─ DataUpdateButton.js  Admin: triggers worker data sync, shows status
+│       ├─ DataUpdateButton.js  Any user can trigger GET/POST /api/sync;
+│       │                        shows last-updated age + cooldown notices
 │       ├─ Instructions.js      Landing / help page
 │       ├─ ResultsTable.js      Simple results table (legacy)
 │       └─ SummaryCard.js       Single-stat summary chip
 │
-├─ functions/                   Cloudflare Pages Functions (edge, server-side)
-│   └─ api/servants/[id].js     Proxies GET /api/servants/:id → Atlas Academy
-│                               Needed by CommonServantsGrid quick-picker
+├─ shared/
+│   └─ atlasSync.js             Atlas Academy → Supabase sync pipeline
+│                               Single source of truth; imported by
+│                               functions/api/sync.js, worker/, and seed.js
+│                               Bulk hash-diffs servants/MCs before fetching
+│                               full data — O(1) Supabase reads per sync
 │
-└─ worker/                      Standalone Cloudflare Worker (data sync only)
-    ├─ src/index.js             Cron + POST /run → pulls AA data → Supabase
-    │                           Also has GET /health and an asset fallback
-    │                           for an all-in-one deployment (optional)
-    └─ wrangler.toml            Worker config; [assets] points to ../build
+├─ functions/                   Cloudflare Pages Functions (edge, server-side)
+│   └─ api/
+│       ├─ servants/[id].js     Proxies GET /api/servants/:id → Atlas Academy
+│       │                       Needed by CommonServantsGrid quick-picker
+│       └─ sync.js              GET  → sync status (last_updated, jp_hash)
+│                               POST → trigger incremental sync
+│                               Requires SUPABASE_SERVICE_ROLE_KEY Pages env var
+│
+└─ worker/                      Standalone Cloudflare Worker (OPTIONAL — cron only)
+    ├─ src/index.js             Thin handler; imports pipeline from shared/
+    │                           Cron (daily) + POST /run for manual trigger
+    ├─ seed.js                  One-time local bulk load (no request limits)
+    │                           Run with: cd worker && npm run seed
+    └─ wrangler.toml            Worker config; cron = "0 0 * * *"
 ```
 
 ## Global State (App.js)
@@ -248,17 +268,26 @@ CREATE POLICY "anon_select" ON saved_runs   FOR SELECT TO anon USING (true);
 | `REACT_APP_SUPABASE_ANON_KEY` | Supabase anon/public key (browser-safe) |
 | `REACT_APP_WORKER_URL` | Optional. Defaults to `''` (relative). Set to `http://localhost:8787` for local dev against `wrangler dev` |
 
-### Worker (set via `wrangler secret put` from `worker/` directory)
+### Cloudflare Pages (set in Pages → Settings → Environment variables)
+| Variable | Notes |
+|---|---|
+| `SUPABASE_URL` | Same project URL — server-side, used by `functions/api/sync.js` |
+| `SUPABASE_SERVICE_ROLE_KEY` | **Mark as Secret/encrypted.** Bypasses RLS; never sent to browser (no `REACT_APP_` prefix) |
+| `RUN_COOLDOWN_MINUTES` | Optional. Default 60. Min gap between user-triggered syncs. |
+
+### Worker (optional — only if deploying the cron Worker)
+Set via `wrangler secret put` from `worker/` directory:
 | Variable | Used for |
 |---|---|
-| `SUPABASE_URL` | Same project URL — but used server-side |
-| `SUPABASE_SERVICE_ROLE_KEY` | Service role key — can bypass RLS, never expose to browser |
+| `SUPABASE_URL` | Same as above |
+| `SUPABASE_SERVICE_ROLE_KEY` | Same as above |
 | `TRIGGER_TOKEN` | Optional. If set, POST /run requires `Authorization: Bearer <token>` |
+| `RUN_COOLDOWN_MINUTES` | Optional. Default 60. |
 
 ## Development
 
 ```bash
-# Install dependencies
+# Install root dependencies (required — shared/atlasSync.js resolves from here)
 npm install
 
 # Start dev server (port 3000)
@@ -269,15 +298,10 @@ npm run build
 
 # Run tests
 npm test
-```
 
-For local dev with the worker running too:
-```bash
-# Terminal 1
-REACT_APP_WORKER_URL=http://localhost:8787 npm start
-
-# Terminal 2 — requires SUPABASE_URL + SUPABASE_SERVICE_ROLE_KEY in worker/.dev.vars
-cd worker && wrangler dev
+# One-time initial DB population (takes several minutes; no request-count limits)
+# Requires SUPABASE_URL + SUPABASE_SERVICE_ROLE_KEY in worker/.dev.vars
+cd worker && npm install && npm run seed
 ```
 
 ## Deployment
@@ -285,9 +309,11 @@ cd worker && wrangler dev
 The app auto-deploys to Cloudflare Pages on every push to `main`. Cloudflare Pages handles:
 - Building (`npm run build`)
 - Serving `build/` as static assets
-- Running `functions/` as edge functions
+- Running `functions/` as edge functions (including `functions/api/sync.js`)
 
-To also deploy the data-sync Worker (optional, for the cron job):
+Add `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` (as a Secret) in Pages → Settings → Environment variables so `POST /api/sync` can write to the database.
+
+To also deploy the optional cron Worker:
 ```bash
 npm run deploy:worker   # builds React then runs wrangler deploy from worker/
 ```

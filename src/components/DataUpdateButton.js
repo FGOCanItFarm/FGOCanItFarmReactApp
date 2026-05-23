@@ -5,10 +5,10 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import WarningIcon from '@mui/icons-material/Warning';
 import { supabase } from '../supabaseClient';
 
-// When deployed as a single Cloudflare Worker, REACT_APP_WORKER_URL is not
-// needed — /health and /run are served by the same origin.  Set it only for
-// local development to point at `wrangler dev` (e.g. http://localhost:8787).
-const WORKER_URL = process.env.REACT_APP_WORKER_URL || '';
+// Sync runs as a Cloudflare Pages Function at /api/sync (same origin as the
+// app), so no separate Worker URL is needed. REACT_APP_WORKER_URL only matters
+// for local dev if you proxy the function from another origin.
+const SYNC_URL = `${process.env.REACT_APP_WORKER_URL || ''}/api/sync`;
 
 function fmtAge(iso) {
   if (!iso) return null;
@@ -24,6 +24,7 @@ export default function DataUpdateButton() {
   const [lastUpdated, setLastUpdated] = useState(undefined);
   const [running, setRunning]         = useState(false);
   const [error, setError]             = useState(null);
+  const [notice, setNotice]           = useState(null);
   const [workerOk, setWorkerOk]       = useState(null);
 
   const fetchLastUpdated = useCallback(async () => {
@@ -42,7 +43,7 @@ export default function DataUpdateButton() {
   useEffect(() => { fetchLastUpdated(); }, [fetchLastUpdated]);
 
   useEffect(() => {
-    fetch(`${WORKER_URL}/health`)
+    fetch(SYNC_URL)
       .then(r => setWorkerOk(r.ok))
       .catch(() => setWorkerOk(false));
   }, []);
@@ -50,9 +51,19 @@ export default function DataUpdateButton() {
   const handleSync = async () => {
     setRunning(true);
     setError(null);
+    setNotice(null);
     try {
-      const res = await fetch(`${WORKER_URL}/run`, { method: 'POST' });
-      if (!res.ok) throw new Error(`Worker ${res.status}`);
+      const res = await fetch(SYNC_URL, { method: 'POST' });
+      const body = await res.json().catch(() => ({}));
+      if (res.status === 429 || body.status === 'skipped') {
+        setNotice('Data is already up to date — try again later.');
+        return;
+      }
+      if (body.status === 'up_to_date') {
+        setNotice('Already on the latest game version.');
+        return;
+      }
+      if (!res.ok) throw new Error(`Sync ${res.status}`);
       setTimeout(fetchLastUpdated, 5000);
       setTimeout(fetchLastUpdated, 15000);
     } catch (e) {
@@ -78,6 +89,15 @@ export default function DataUpdateButton() {
             sx={{ fontSize: '0.65rem', height: 20 }}
           />
         </Tooltip>
+      )}
+
+      {notice && (
+        <Chip
+          label={notice}
+          size="small"
+          onDelete={() => setNotice(null)}
+          sx={{ fontSize: '0.65rem', height: 20 }}
+        />
       )}
 
       {ageText && (
