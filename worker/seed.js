@@ -4,8 +4,10 @@
 // (worker/src/index.js `runUpdate`), but locally via Node. This keeps the
 // service-role key on your machine instead of exposing a public POST /run.
 //
-// Usage (from the worker/ directory):
-//   npm install
+// Usage:
+//   npm install            # at the repo root — installs @supabase used by
+//                          # ../shared/atlasSync.js
+//   cd worker && npm install
 //   SUPABASE_URL=... SUPABASE_SERVICE_ROLE_KEY=... npm run seed
 //
 // Or put those two values in worker/.dev.vars (KEY=value, one per line) and run:
@@ -17,7 +19,7 @@
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
-import { runUpdate } from './src/index.js';
+import { runUpdate } from '../shared/atlasSync.js';
 
 const here = dirname(fileURLToPath(import.meta.url));
 
