@@ -151,6 +151,26 @@ function runGuardrailPipeline(data) {
 // Servants
 // ---------------------------------------------------------------------------
 
+// Fields the simulation engine never reads, dropped before storing to keep the
+// servants.data blob small. Verified against src/simulation/* — the engine only
+// uses: collectionNo, name, className, classId, gender, attribute, rarity,
+// traits, cards, atkGrowth, skills, noblePhantasms, classPassive. Everything
+// here is flavour/metadata (lore text, image URLs, material costs, scripts).
+// face_url is extracted into its own column before trimming, so dropping
+// extraAssets is safe.
+const SERVANT_DROP_FIELDS = [
+  'profile', 'extraAssets', 'ascensionMaterials', 'skillMaterials',
+  'appendSkillMaterials', 'costumeMaterials', 'coin', 'script', 'charaScripts',
+  'valentineEquip', 'valentineScript', 'bondEquip', 'bondEquipOwner',
+  'trialQuestIds', 'relateQuestIds', 'ascensionAdd', 'svtChange',
+];
+
+function stripServantData(data) {
+  const out = { ...data };
+  for (const key of SERVANT_DROP_FIELDS) delete out[key];
+  return out;
+}
+
 async function upsertServant(supabase, data, aaHash) {
   const parsed = runGuardrailPipeline(data);
   const { error } = await supabase.from('servants').upsert({
@@ -167,7 +187,7 @@ async function upsertServant(supabase, data, aaHash) {
     parser_flags:     parsed.parser_flags,
     face_url:         parsed.face_url,
     aa_data_hash:     aaHash,
-    data,
+    data:             stripServantData(data),
     updated_at: new Date().toISOString(),
   }, { onConflict: 'collection_no' });
   if (error) throw new Error(`Upsert servant ${data.collectionNo}: ${error.message}`);
@@ -187,8 +207,10 @@ async function retrieveServants(supabase) {
   console.log(`Servants: ${basicList.length} total, ${toUpdate.length} changed`);
 
   for (const entry of toUpdate) {
+    // expand=true keeps inline skill/NP function+buff detail (engine needs it);
+    // lore is dropped — profile text is large and never read by the simulation.
     const data = await fetchWithBackoff(
-      `${AA_BASE}/nice/JP/servant/${entry.collectionNo}?lore=true&expand=true&lang=en`
+      `${AA_BASE}/nice/JP/servant/${entry.collectionNo}?expand=true&lang=en`
     );
     if (!data) { console.error(`Failed to fetch servant ${entry.collectionNo}`); await sleep(500); continue; }
     await upsertServant(supabase, data, entry.hash ?? '');
