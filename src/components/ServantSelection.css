@@ -37,6 +37,7 @@
 .servant-grid-item.dimmed:hover { opacity: 0.5; }
 
 .servant-portrait {
+  position: relative;
   width: var(--servant-thumb);
   height: var(--servant-thumb);
   border: 1px solid var(--color-border);
@@ -44,6 +45,23 @@
   overflow: hidden;
   background: var(--color-surface-2);
   transition: border-color 0.14s, box-shadow 0.14s;
+}
+
+.servant-pick-count {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  z-index: 2;
+  min-width: 16px;
+  padding: 0 4px;
+  border-radius: 8px;
+  font-size: 0.6rem;
+  font-weight: 700;
+  line-height: 16px;
+  text-align: center;
+  color: var(--color-bg);
+  background: var(--color-gold);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.5);
 }
 
 .servant-grid-item:hover .servant-portrait {

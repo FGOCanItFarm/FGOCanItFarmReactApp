@@ -7,8 +7,9 @@ import './ServantSelection.css';
 // remove cards — non-matching servants are dimmed (like AppMedia) so the grid
 // stays stable and the full roster is always visible. `matchSet` (collectionNo
 // strings) marks which pass the active filters; null/empty => all match.
-const ServantSelection = ({ servants = [], handleServantClick, matchSet = null }) => {
+const ServantSelection = ({ servants = [], handleServantClick, matchSet = null, popularity = null }) => {
   const isMatch = (servant) => !matchSet || matchSet.has(String(servant.collectionNo));
+  const pickCount = (servant) => (popularity ? (popularity.get(servant.collectionNo) || 0) : 0);
 
   return (
     <div className="servant-selection">
@@ -39,6 +40,11 @@ const ServantSelection = ({ servants = [], handleServantClick, matchSet = null }
             >
               <div className="servant-portrait">
                 <ServantAvatar servantFace={servant.face_url} />
+                {pickCount(servant) > 0 && (
+                  <span className="servant-pick-count" title={`Used in ${pickCount(servant)} community run(s)`}>
+                    {pickCount(servant)}
+                  </span>
+                )}
               </div>
               <div className="servant-name">{servant.name}</div>
             </div>

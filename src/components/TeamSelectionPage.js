@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { Button, Typography, Box, Container, Tooltip } from '@mui/material';
+import { Button, Typography, Box, Tooltip } from '@mui/material';
 import FilterSection from './FilterSection';
 import ServantSelection from './ServantSelection';
-import CommonServantsGrid from './CommonServantsGrid';
 import { useNavigate } from 'react-router-dom';
+import { supabase } from '../supabaseClient';
 import '../TeamSelectionPage.css';
 import '../ui-vars.css';
 
@@ -11,6 +11,25 @@ const TeamSelectionPage = ({ team, setTeam, servants, setFilteredServants, handl
   const navigate = useNavigate();
   const [displayList, setDisplayList] = useState([]);
   const [matchSet, setMatchSet] = useState(null);
+  const [popularity, setPopularity] = useState(null); // Map<collectionNo, pickCount>
+
+  // Build a usage-based ranking from community runs so the grid reads like a
+  // tier list — most-picked servants float to the top by default.
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      const { data, error } = await supabase.from('saved_runs').select('servant_collection_nos');
+      if (error || cancelled || !data) return;
+      const counts = new Map();
+      for (const row of data) {
+        for (const cn of row.servant_collection_nos || []) {
+          counts.set(cn, (counts.get(cn) || 0) + 1);
+        }
+      }
+      if (!cancelled) setPopularity(counts);
+    })();
+    return () => { cancelled = true; };
+  }, []);
 
   const handleGotoQuest = () => {
     navigate('/quest-selection');
@@ -30,6 +49,14 @@ const TeamSelectionPage = ({ team, setTeam, servants, setFilteredServants, handl
     }
     if (sortOrder) {
       base = [...base].sort((a, b) => String(a[sortOrder] ?? '').localeCompare(String(b[sortOrder] ?? '')));
+    } else if (popularity) {
+      // Default: tier-list order by community pick count, ties broken by id.
+      base = [...base].sort((a, b) => {
+        const pa = popularity.get(a.collectionNo) || 0;
+        const pb = popularity.get(b.collectionNo) || 0;
+        if (pb !== pa) return pb - pa;
+        return (a.collectionNo || 0) - (b.collectionNo || 0);
+      });
     }
 
     // Filters no longer remove cards — they build the set of matching ids so
@@ -56,10 +83,10 @@ const TeamSelectionPage = ({ team, setTeam, servants, setFilteredServants, handl
     setDisplayList(base);
     setMatchSet(matched);
     setFilteredServants(matched ? base.filter(s => matched.has(String(s.collectionNo))) : base);
-  }, [selectedRarity, selectedClass, selectedNpType, selectedAttackType, searchQuery, sortOrder, servants, setFilteredServants, includeEnemyOnly, enemyOnlyBlacklist]);
+  }, [selectedRarity, selectedClass, selectedNpType, selectedAttackType, searchQuery, sortOrder, servants, setFilteredServants, includeEnemyOnly, enemyOnlyBlacklist, popularity]);
 
   return (
-    <Container>
+    <Box sx={{ width: '100%' }}>
       <Typography variant="h4">Select Your Team</Typography>
       
       {/* Normal View */}
@@ -87,15 +114,11 @@ const TeamSelectionPage = ({ team, setTeam, servants, setFilteredServants, handl
               />
             </div>
             <div className="servants-container">
-              <div className="common-servants-wrapper">
-                <CommonServantsGrid
-                  handleServantClick={handleServantClick}
-                />
-              </div>
               <div className="servant-selection-wrapper">
                 <ServantSelection
                   servants={displayList}
                   matchSet={matchSet}
+                  popularity={popularity}
                   handleServantClick={handleServantClick}
                 />
               </div>
@@ -179,7 +202,7 @@ const TeamSelectionPage = ({ team, setTeam, servants, setFilteredServants, handl
       </div>
 
       {/* Commands display removed from this page; CommandInputPage owns command list */}
-    </Container>
+    </Box>
   );
 };
 
