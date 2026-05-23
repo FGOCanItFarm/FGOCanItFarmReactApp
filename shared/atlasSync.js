@@ -24,7 +24,10 @@ const NP_DAMAGE_FUNC_TYPES = new Set([
   'damageNpIndividualSum',
 ]);
 
-const KEEP_WAR_TYPES = new Set(['eventQuest', 'permanent']);
+// AA nice API uses 'event' for time-limited wars and 'permanent' for always-open
+// ones. 'eventQuest' was the old incorrect assumption; both are kept in case AA
+// ever changes the naming. 'free' covers some permanent farming war categories.
+const KEEP_WAR_TYPES = new Set(['event', 'eventQuest', 'permanent', 'free']);
 const RECOMMEND_LVS  = new Set(['90', '90+', '90++', '90+++', '90★', '90★★', '90★★★']);
 
 // Minimum gap between user-triggered syncs. The trigger endpoint is open (no
@@ -217,8 +220,12 @@ async function retrieveQuests(supabase) {
   const basicWars = await fetchWithBackoff(`${AA_BASE}/export/JP/basic_war.json`);
   if (!basicWars) { console.error('Failed to fetch basic_war.json'); return 0; }
 
+  // Log unique war types so filter problems are obvious in future runs.
+  const seenTypes = [...new Set(basicWars.map(w => w.type))];
+  console.log(`War types in export: ${seenTypes.join(', ')}`);
+
   const warIds = basicWars.filter(w => KEEP_WAR_TYPES.has(w.type)).map(w => w.id);
-  console.log(`Processing ${warIds.length} wars`);
+  console.log(`Processing ${warIds.length} wars (types: event/eventQuest/permanent/free)`);
 
   const queue = [];
   for (const warId of warIds) {
@@ -227,7 +234,11 @@ async function retrieveQuests(supabase) {
     const warName = warData.longName || warData.name || '';
     for (const spot of warData.spots ?? []) {
       for (const quest of spot.quests ?? []) {
-        if (RECOMMEND_LVS.has(quest.recommendLv) && quest.consume === 40 && quest.afterClear === 'repeatLast')
+        // Handle both nice-format strings ('repeatLast') and raw numeric values (3).
+        // Handle both nice ('consume') and raw ('actConsume') field names.
+        const apCost      = quest.consume ?? quest.actConsume;
+        const isRepeatable = quest.afterClear === 'repeatLast' || quest.afterClear === 3;
+        if (RECOMMEND_LVS.has(quest.recommendLv) && apCost === 40 && isRepeatable)
           queue.push([quest.id, warId, warName]);
       }
     }
