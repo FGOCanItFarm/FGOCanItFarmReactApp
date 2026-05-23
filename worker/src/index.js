@@ -340,6 +340,20 @@ export default {
       return Response.json({ status: 'started' }, { headers: { 'Access-Control-Allow-Origin': '*' } });
     }
 
+    // Proxy Atlas Academy servant data for the common servants quick-picker.
+    if (request.method === 'GET' && url.pathname.startsWith('/api/servants/')) {
+      const parts = url.pathname.split('/');
+      const collectionNo = parts[parts.length - 1];
+      if (/^\d+$/.test(collectionNo)) {
+        const res = await fetch(`${AA_BASE}/nice/JP/servant/${collectionNo}?lang=en`);
+        const body = res.ok ? await res.json() : { error: 'not found' };
+        return Response.json(body, {
+          status: res.ok ? 200 : res.status,
+          headers: { 'Access-Control-Allow-Origin': '*' },
+        });
+      }
+    }
+
     // All other requests — serve the React app static assets.
     // The ASSETS binding handles SPA fallback (index.html for unknown paths).
     return env.ASSETS.fetch(request);
