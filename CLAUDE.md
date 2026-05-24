@@ -272,6 +272,15 @@ CREATE POLICY "anon_select" ON saved_runs   FOR SELECT TO anon USING (true);
 ```
 `submit_run` is an RPC function; its own security definer controls write access.
 
+## Supabase Access (Claude Code sessions)
+
+Claude Code on the web has a **Supabase MCP server connector** configured for the
+FGO-can-it-farm project — read access to the live DB (inspect schema, run SELECT
+queries) with no credentials checked into the repo. Use it for schema/data
+lookups. Caveat: MCP results flow into the model's context, so don't pull large
+`data` blobs (servants/quests) through it — `curl` PostgREST to a file, or rely
+on the trimmed rows.
+
 ## Data Blob Trimming (sync pipeline)
 
 `shared/atlasSync.js` trims each `data` blob before upsert so the engine gets
@@ -281,6 +290,12 @@ corruption).** Re-seed semantics differ: **quests** are re-upserted every sync
 (`retrieveQuests` has no hash-skip) so they re-trim on the next sync;
 **servants/MCs** are hash-skipped, so a servant-trim change needs a full
 `npm run seed` (or hash bust) to apply to existing rows.
+
+> **Immediate next step — re-seed servants:** the current servant trim (max-level
+> skills, NPs whole, `ascensionAdd`/`svtChange` kept, `extraAssets`→faces) is
+> committed but applies only to new upserts. **Truncate the `servants` table, then
+> run `cd worker && npm run seed`** — it re-fetches every servant from Atlas
+> Academy and applies the new trim on upsert.
 
 ### Servants — `stripServantData`
 - **Drops** (flavour/material/growth): profile, ascensionMaterials, skillMaterials,
