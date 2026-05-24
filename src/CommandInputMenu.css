@@ -36,6 +36,7 @@
   display: flex;
   justify-content: space-between;
   gap: 1rem; /* Add a gap to control the minimum space between items */
+
 }
 
 .skill-container > * {

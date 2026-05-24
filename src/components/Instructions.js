@@ -3,7 +3,7 @@ import { Box, Typography, List, ListItem, Divider } from '@mui/material';
 
 const Instructions = () => {
   return (
-    <Box sx={{ p: 3, maxWidth: 920, mx: 'auto' }}>
+    <Box sx={{ p: 3, maxWidth: 920, mr: 'auto' }}>
       <Typography variant="h4" component="h1" gutterBottom>
         FGOCanItFarm — Quick Instructions
       </Typography>

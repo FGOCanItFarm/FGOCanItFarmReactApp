@@ -229,7 +229,7 @@ const QuestSelection = ({ setSelectedQuest, selectedQuest }) => {
   );
 
   return (
-    <Box sx={{ p: 2, borderRadius: 1 }}>
+    <Box sx={{ p: 2, borderRadius: 1 }} style={{ marginRight: 'var(--team-panel-width)' }} >
       <Box component={Paper} sx={{ p: 1.5, mb: 2 }}>
         <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 1 }}>
           <Typography variant="subtitle2">Filter by enemies</Typography>

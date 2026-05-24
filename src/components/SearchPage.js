@@ -265,7 +265,7 @@ const SearchPage = ({ team, selectedQuest: activeQuest }) => {
     : runs;
 
   return (
-    <Box>
+    <Box style={{ marginRight: 'var(--team-panel-width)' }} >
       <Typography variant="h5" mb={3}>Community Runs</Typography>
 
       <Box display="flex" gap={2} flexWrap="wrap" mb={3} alignItems="flex-end">

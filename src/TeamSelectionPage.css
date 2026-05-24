@@ -53,7 +53,8 @@
 .common-servants-wrapper,
 .servant-selection-wrapper {
   overflow: hidden;
-  max-width: 100%;
+  max-width: calc( 100vw - var(--team-panel-width) );
+  margin-right: var(--team-panel-width);
   box-sizing: border-box;
 }
 
