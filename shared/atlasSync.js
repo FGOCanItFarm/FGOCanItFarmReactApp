@@ -253,6 +253,37 @@ function extractEnemyMeta(stages) {
   };
 }
 
+// The simulation (Quest.js) reads only individuality[].id and, per enemy,
+// name/hp/deathRate/state + svt.{className,attribute,traits[].id}. enemyMeta is
+// extracted from the FULL stages in upsertQuest BEFORE this runs, so dropping
+// everything else (drops, enemy ai/skills/noblePhantasm/deck/enemyScript, all
+// cosmetic svt fields, and top-level metadata that already lives in its own
+// columns) is safe and shrinks the blob ~20×. enemyHash/availableEnemyHashes are
+// kept (tiny) so a stored quest records which wave-variation spawn it represents.
+function stripQuestData(data) {
+  return {
+    id:                   data.id,
+    name:                 data.name ?? '',
+    recommendLv:          data.recommendLv ?? '',
+    enemyHash:            data.enemyHash ?? null,
+    availableEnemyHashes: data.availableEnemyHashes ?? null,
+    individuality:        data.individuality ?? [],
+    stages: (data.stages ?? []).map(stage => ({
+      enemies: (stage.enemies ?? []).map(e => ({
+        name:      e.name,
+        hp:        e.hp,
+        deathRate: e.deathRate,
+        state:     e.state ?? null,
+        svt: {
+          className: e.svt?.className,
+          attribute: e.svt?.attribute,
+          traits:    (e.svt?.traits ?? []).map(t => ({ id: t.id })),
+        },
+      })),
+    })),
+  };
+}
+
 async function upsertQuest(supabase, data, warId, warName) {
   const questId = data.id;
   const stages  = data.stages ?? [];
@@ -263,7 +294,7 @@ async function upsertQuest(supabase, data, warId, warName) {
     recommend_lv: data.recommendLv ?? '', consume: data.consume ?? 0,
     after_clear: data.afterClear ?? '', opened_at: data.openedAt,
     ...enemyMeta,
-    data, updated_at: new Date().toISOString(),
+    data: stripQuestData(data), updated_at: new Date().toISOString(),
   }, { onConflict: 'id' });
   if (error) throw new Error(`Upsert quest ${questId}: ${error.message}`);
   console.log(`Upserted quest ${questId}`);
