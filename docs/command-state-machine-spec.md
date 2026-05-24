@@ -42,12 +42,22 @@ command page into a readable combat dashboard.
 - Skill letters map a–i → servant 0/1/2 × skill 0/1/2 (`SKILL_MAP`, `Driver.js:8`).
 - **The numeric target suffix is always an ALLY slot.** There is no enemy-target token.
 
-### 2.2 Step granularity
+### 2.2 Step granularity — the engine is ONE-WAY (forward only)
 - `Driver.run(str)` calls `reset()` (new `BattleEngine`) then loops `executeToken`,
   returning `false` on the first failure, else the engine (`Driver.js:40–48`).
 - `executeToken` is public and executes exactly one token, mutating the engine
-  in place. There is **no snapshot/step-state API** — re-running a prefix from
-  scratch is the supported way to get "state after token k".
+  in place. There is **no snapshot/step-state API and no rewind** — and there is
+  no plan to add reverse stepping. **Do not attempt to undo engine state.**
+- The supported model is therefore "**never go backward — replay forward from a
+  fresh engine**":
+  - **Append** a token (the common case): keep the live engine instance and call
+    `engine.executeToken(newToken)` — a single forward step, no `reset()`. The
+    one-way machine is ideal here.
+  - **Undo / delete / insert / any non-append edit**: discard the engine,
+    construct a fresh `BattleEngine`, and **replay tokens `0..k` forward**. Never
+    reverse the machine.
+  - This is what makes the builder robust against a forward-only engine: undo is
+    a *rebuild-and-replay*, not a *step-back*.
 
 ### 2.3 State available for legality checks
 - Skill ready: `engine.servants[i].skills.skillAvailable(num)` (1-based) (`Skills.js:87`).
@@ -116,9 +126,17 @@ command page into a readable combat dashboard.
 
 ### FR-1 Engine introspection (read-only)
 - New module `src/simulation/CommandState.js` (additive; does not modify engine logic):
-  - `buildEngineAt(simInputs, tokens) → { engine, ok, failedIndex }`
-    - Runs `driver.run(tokens.join(' '))`; if it returns `false`, re-step to find
-      the first failing index. Memoize by `tokens.join(' ')`.
+  - `buildEngineAt(simInputs, tokens, prev?) → { engine, ok, failedIndex }`
+    - **Forward-only, never rewind** (see §2.2). The engine has no reverse.
+    - **Append fast-path:** if `tokens` is `prev.tokens` + one extra token, keep
+      `prev.engine` and call `engine.executeToken(extra)` — a single forward step,
+      no `reset()`.
+    - **Rebuild path (undo/delete/insert/edit):** construct a fresh engine and
+      replay `tokens` forward via `driver.run(tokens.join(' '))`; if it returns
+      `false`, re-step to find `failedIndex`.
+    - **`simInputs` MUST be cached by the caller** (fetched once — no Supabase /
+      parse per edit) so rebuild+replay is pure in-memory and smooth. Memoize
+      results by `tokens.join(' ')`.
   - `legalNextTokens(engine) → Array<TokenOption>` where
     `TokenOption = { token, kind, targetClass, servantSlot, skillNum, label, reason }`
     - `kind ∈ skill | np | mc | swap | endTurn | choice`
@@ -188,8 +206,10 @@ command page into a readable combat dashboard.
     transforms correctly the dashboard reflects it **live for free**.
 
 ### FR-6 Undo / delete / edit
-- Command array is the single source of truth; engine re-runs from scratch on any
-  change (deterministic, sub-ms; memoized).
+- Command array is the single source of truth. The engine is **forward-only**
+  (§2.2): append = one forward `executeToken` on the live engine; undo/delete/
+  insert/edit = discard the engine and **replay forward from a fresh one**. The
+  engine is never rewound. Deterministic; in-memory; memoized by prefix.
 - Operations: undo (pop last), delete-at-index, insert, clear.
 - After any edit, re-validate by stepping. The **first token that makes `run()`
   fail** is highlighted; tokens after it are shown "invalidated" (greyed) but NOT
@@ -234,8 +254,12 @@ command page into a readable combat dashboard.
 
 ## 5. Non-functional requirements
 - Determinism: identical inputs → identical state; safe to re-run for undo/view.
-- Performance: memoize `buildEngineAt` by token string; only the last prefix
-  changes on append. Target < 16ms per keystroke for typical teams.
+- **One-way engine:** never rewind; undo = rebuild a fresh engine and replay
+  forward (§2.2). No reverse-step API is to be added.
+- Performance: cache `simInputs` once (no per-edit Supabase fetch/parse); use the
+  append fast-path for the common case and rebuild+replay only on non-append
+  edits; memoize `buildEngineAt` by token string. Target < 16ms per keystroke for
+  typical teams (rebuild+replay of a full sequence is in-memory and sub-ms).
 - No regressions to the simulation results for existing saved runs (verify with
   a snapshot test over a set of known token strings before/after engine changes).
 - Engine changes confined to `Driver.js`, `BattleEngine.js`, `Skills.js`,
