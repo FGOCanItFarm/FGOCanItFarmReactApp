@@ -50,3 +50,8 @@ yarn-error.log*
 
 .env
 env
+
+# Captured real-data regression fixtures (see scripts/captureFixtures.js).
+# Generated locally from Supabase; commit deliberately if you want them shared.
+/src/simulation/__fixtures__/real/realFixtures.generated.json
+/scripts/fixtures.manifest.json

@@ -149,23 +149,64 @@ function runGuardrailPipeline(data) {
 // Servants
 // ---------------------------------------------------------------------------
 
-// Fields the simulation engine never reads, dropped before storing to keep the
-// servants.data blob small. Verified against src/simulation/* — the engine only
-// uses: collectionNo, name, className, classId, gender, attribute, rarity,
-// traits, cards, atkGrowth, skills, noblePhantasms, classPassive. Everything
-// here is flavour/metadata (lore text, image URLs, material costs, scripts).
-// face_url is extracted into its own column before trimming, so dropping
-// extraAssets is safe.
+// Trim the servant nice object before storing. The simulation engine reads only
+// collectionNo, name, className, classId, gender, attribute, rarity, traits,
+// atkGrowth, skills, noblePhantasms, classPassive — but per product decision we
+// also keep lightweight stat/display fields (atk/hp base+growth, cards,
+// cardDetails, hitsDistribution, star*) and ascensionAdd (some servants' chosen
+// ascension changes attribute/skill effects, e.g. Melusine 312). skills and
+// noblePhantasms are kept WHOLE (their svals/buff arrays are damage-critical).
+// We drop the heavy flavour/material/growth-curve fields below and reduce
+// extraAssets to just the face thumbnails (full art is the biggest offender;
+// face_url is also extracted into its own column).
 const SERVANT_DROP_FIELDS = [
-  'profile', 'extraAssets', 'ascensionMaterials', 'skillMaterials',
-  'appendSkillMaterials', 'costumeMaterials', 'coin', 'script', 'charaScripts',
-  'valentineEquip', 'valentineScript', 'bondEquip', 'bondEquipOwner',
-  'trialQuestIds', 'relateQuestIds', 'ascensionAdd', 'svtChange',
+  'profile', 'ascensionMaterials', 'skillMaterials', 'appendSkillMaterials',
+  'costumeMaterials', 'coin', 'charaScripts', 'extraPassive',
+  'valentineEquip', 'valentineScript', 'bondEquip', 'bondEquips',
+  'bondEquipOwner', 'bondGifts', 'bondGrowth', 'expGrowth', 'expFeed',
+  'growthCurve', 'limits',
 ];
 
-function stripServantData(data) {
+// Mirror the engine's per-level selection so we can store only the max-level
+// numbers. Skills.safeSval (Skills.js:12-16) and the coolDown picker
+// (Skills.js:21-24) both read index 9 when an array has >9 entries, else the
+// last element. Collapsing a skill's coolDown / function svals / buff svals to
+// that single entry is therefore identical to the engine at runtime — every
+// skill variant and function is kept, just the level-10 values.
+function collapseLevelArray(arr) {
+  if (!Array.isArray(arr) || arr.length === 0) return arr;
+  return [arr.length > 9 ? arr[9] : arr[arr.length - 1]];
+}
+
+// Active-skill trim ONLY. noblePhantasms are left whole: NP damage indexes
+// svals/svals2..svals5 by NP level and reads NP-buff svals at [9], so the full
+// 5 NP-level × 5 overcharge grid must survive. classPassive/appendPassive are
+// also left whole (passives read svals[0], not [9]).
+function trimSkillsToMaxLevel(skills) {
+  if (!Array.isArray(skills)) return skills;
+  return skills.map((skill) => ({
+    ...skill,
+    coolDown: collapseLevelArray(skill.coolDown),
+    functions: (skill.functions || []).map((func) => ({
+      ...func,
+      svals: collapseLevelArray(func.svals),
+      buffs: (func.buffs || []).map((buff) => ({
+        ...buff,
+        svals: collapseLevelArray(buff.svals),
+      })),
+    })),
+  }));
+}
+
+export function stripServantData(data) {
   const out = { ...data };
   for (const key of SERVANT_DROP_FIELDS) delete out[key];
+  // Keep only the small face/thumbnail icons; drop full-size art
+  // (charaGraph/charaFigure*/narrowFigure/commands/status/spriteModel/…).
+  if (out.extraAssets && typeof out.extraAssets === 'object') {
+    out.extraAssets = out.extraAssets.faces ? { faces: out.extraAssets.faces } : {};
+  }
+  if (Array.isArray(out.skills)) out.skills = trimSkillsToMaxLevel(out.skills);
   return out;
 }
 
@@ -253,6 +294,37 @@ function extractEnemyMeta(stages) {
   };
 }
 
+// The simulation (Quest.js) reads only individuality[].id and, per enemy,
+// name/hp/deathRate/state + svt.{className,attribute,traits[].id}. enemyMeta is
+// extracted from the FULL stages in upsertQuest BEFORE this runs, so dropping
+// everything else (drops, enemy ai/skills/noblePhantasm/deck/enemyScript, all
+// cosmetic svt fields, and top-level metadata that already lives in its own
+// columns) is safe and shrinks the blob ~20×. enemyHash/availableEnemyHashes are
+// kept (tiny) so a stored quest records which wave-variation spawn it represents.
+function stripQuestData(data) {
+  return {
+    id:                   data.id,
+    name:                 data.name ?? '',
+    recommendLv:          data.recommendLv ?? '',
+    enemyHash:            data.enemyHash ?? null,
+    availableEnemyHashes: data.availableEnemyHashes ?? null,
+    individuality:        data.individuality ?? [],
+    stages: (data.stages ?? []).map(stage => ({
+      enemies: (stage.enemies ?? []).map(e => ({
+        name:      e.name,
+        hp:        e.hp,
+        deathRate: e.deathRate,
+        state:     e.state ?? null,
+        svt: {
+          className: e.svt?.className,
+          attribute: e.svt?.attribute,
+          traits:    (e.svt?.traits ?? []).map(t => ({ id: t.id })),
+        },
+      })),
+    })),
+  };
+}
+
 async function upsertQuest(supabase, data, warId, warName) {
   const questId = data.id;
   const stages  = data.stages ?? [];
@@ -263,7 +335,7 @@ async function upsertQuest(supabase, data, warId, warName) {
     recommend_lv: data.recommendLv ?? '', consume: data.consume ?? 0,
     after_clear: data.afterClear ?? '', opened_at: data.openedAt,
     ...enemyMeta,
-    data, updated_at: new Date().toISOString(),
+    data: stripQuestData(data), updated_at: new Date().toISOString(),
   }, { onConflict: 'id' });
   if (error) throw new Error(`Upsert quest ${questId}: ${error.message}`);
   console.log(`Upserted quest ${questId}`);

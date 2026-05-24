@@ -208,20 +208,33 @@ User clicks Run
 | `attack_type` | text | attackEnemyOne / attackEnemyAll / support |
 | `is_enemy_only` | bool | |
 | `face_url` | text | CDN URL for servant face icon |
-| `parser_flags` | jsonb | mash_ortinax, has_transform_servant, … |
-| `data` | jsonb | Full Atlas Academy nice servant object |
-| `aa_data_hash` | text | Used by worker to skip unchanged servants |
+| `form_transition` | text | null / 'irreversible' / 'reversible' — transform servants (FR-5) |
+| `parser_flags` | jsonb | mash_ortinax, has_transform_servant, melusine_form_skill, … |
+| `data` | jsonb | **Trimmed** nice servant object — see "Data Blob Trimming" |
+| `aa_data_hash` | text | Bulk hash-diffed to skip unchanged servants on sync |
+| `updated_at` | timestamptz | |
 
 ### `quests`
 | Column | Type | Notes |
 |---|---|---|
 | `id` | int PK | Atlas Academy quest ID |
 | `name` | text | |
+| `war_id` | int | |
 | `war_name` | text | |
 | `recommend_lv` | text | '90++', '90+++', '90★', '90★★', '90★★★' |
 | `consume` | int | AP cost (always 40 for qualifying quests) |
+| `after_clear` | text | 'repeatLast' for repeatable farming nodes |
 | `opened_at` | timestamptz | |
-| `data` | jsonb | Full Atlas Academy nice quest object (used by simulation) |
+| `enemy_classes` | text[] | Distinct enemy classes across waves (quest-browser filters) |
+| `enemy_attributes` | text[] | Distinct enemy attributes |
+| `enemy_traits` | text[] | Distinct enemy trait names |
+| `wave_count` | int | Number of waves |
+| `wave_hps` | int[] | Total HP per wave |
+| `data` | jsonb | **Trimmed** nice quest object (~45× smaller) — see "Data Blob Trimming" |
+| `updated_at` | timestamptz | |
+
+> A quest id can have several enemy-spawn **variations** (`data.availableEnemyHashes`);
+> the stored blob is one of them (`data.enemyHash`). Fixtures/tests must note which.
 
 ### `mystic_codes`
 | Column | Type | Notes |
@@ -258,6 +271,90 @@ CREATE POLICY "anon_select" ON mystic_codes FOR SELECT TO anon USING (true);
 CREATE POLICY "anon_select" ON saved_runs   FOR SELECT TO anon USING (true);
 ```
 `submit_run` is an RPC function; its own security definer controls write access.
+
+## Supabase Access (Claude Code sessions)
+
+Claude Code on the web has a **Supabase MCP server connector** configured for the
+FGO-can-it-farm project — read access to the live DB (inspect schema, run SELECT
+queries) with no credentials checked into the repo. Use it for schema/data
+lookups. Caveat: MCP results flow into the model's context, so don't pull large
+`data` blobs (servants/quests) through it — `curl` PostgREST to a file, or rely
+on the trimmed rows.
+
+## Data Blob Trimming (sync pipeline)
+
+`shared/atlasSync.js` trims each `data` blob before upsert so the engine gets
+exactly what it needs and rows stay small/copyable. **Trimming is a whitelist of
+what the engine reads — never drop a field the simulation consumes (silent damage
+corruption).** Re-seed semantics differ: **quests** are re-upserted every sync
+(`retrieveQuests` has no hash-skip) so they re-trim on the next sync;
+**servants/MCs** are hash-skipped, so a servant-trim change needs a full
+`npm run seed` (or hash bust) to apply to existing rows.
+
+> **Immediate next step — re-seed servants:** the current servant trim (max-level
+> skills, NPs whole, `ascensionAdd`/`svtChange` kept, `extraAssets`→faces) is
+> committed but applies only to new upserts. **Truncate the `servants` table, then
+> run `cd worker && npm run seed`** — it re-fetches every servant from Atlas
+> Academy and applies the new trim on upsert.
+
+### Servants — `stripServantData`
+- **Drops** (flavour/material/growth): profile, ascensionMaterials, skillMaterials,
+  appendSkillMaterials, costumeMaterials, coin, charaScripts, extraPassive,
+  valentineEquip/Script, bondEquip(s)/bondEquipOwner/bondGifts/bondGrowth,
+  expGrowth, expFeed, growthCurve, limits.
+- **`extraAssets` → `{ faces }` only** (face thumbnails; full art dropped).
+  `face_url` is also extracted into its own column.
+- **Keeps `ascensionAdd` + `svtChange`** — required by FR-5 (ascension-dependent
+  attribute/skill effects; e.g. Mash reads as 4★ Shielder, Melusine 312).
+- **Skills collapsed to max level**: each active skill's `coolDown`, function
+  `svals`, and buff `svals` are reduced to the single entry the engine selects
+  (`Skills.safeSval` / coolDown picker read index 9, else last — `Skills.js:12-24`).
+  All skill *variants* and functions are kept; only per-level arrays shrink.
+- **NoblePhantasms kept WHOLE** — NP damage indexes `svals`/`svals2..svals5` by NP
+  level and reads NP-buff `svals[9]`, so the full 5 NP-level × 5 OC grid must
+  survive. classPassive/appendPassive untouched (passives read `svals[0]`).
+
+### Quests — `stripQuestData`
+Keeps only `individuality[].id` + per-enemy `{name, hp, deathRate, state,
+svt.{className, attribute, traits[].id}}` (+ `enemyHash`/`availableEnemyHashes`).
+~45× smaller. Runs after `extractEnemyMeta` (which reads full stages for the
+`enemy_*`/`wave_*` columns), so trimming is safe.
+
+### Field read-map traps (verified against `src/simulation/*`)
+- Engine-read servant fields: `collectionNo, name, className, classId, gender,
+  attribute, rarity, traits[].id, atkGrowth, skills, noblePhantasms, classPassive`.
+- `atkGrowth` is indexed at a **rarity-dependent** level (1→54, 2→59, 3→64, 4→79,
+  5→89; `Stats.js`) — keep the array through index 89.
+- `traits[].id` is read; `traits[].name` is not.
+
+## Testing & Regression Fixtures
+
+Run with `npm test` (or `CI=true npx react-scripts test --watchAll=false`).
+`src/simulation/__tests__/`:
+- `regression.test.js` — golden **snapshot** of wave outcomes for known token
+  strings; the differential safety net for engine changes (FR-4/5/8). Update
+  deliberately with `jest -u` and call out intentional changes.
+- `commandState.test.js` — FR-1 introspection (legality, snapshots, humanize).
+- `servantTrim.test.js` / `realQuestFixture.test.js` — guard the data trims
+  (projection + `safeSval` equivalence; trimmed quest through `Quest.js`).
+
+Fixtures:
+- `__fixtures__/regressionFixtures.js` — **synthetic** blobs; always-on baseline,
+  no external data.
+- `__fixtures__/real/{servants,quests,mysticCodes}/<id>.json` — **real** Atlas
+  blobs committed for high-fidelity tests + new-user command examples, loaded via
+  `__fixtures__/realData.js` (`buildSimInputs`/`loadServant`/`loadQuest`/
+  `loadMysticCode`). Owner-provided Python engine tests are being translated into
+  Jest tests against these.
+
+## Command Builder Roadmap
+
+`docs/command-state-machine-spec.md` is the authoritative brief (FR-1…FR-9) for
+the engine-driven command builder. Phase 0 (FR-1 `CommandState.js`, FR-2
+`prepareSimInputs`) is implemented + snapshot-tested. FR-4 (enemy targeting),
+FR-5 (transform/form registry — unblocked by keeping `ascensionAdd`/`svtChange`),
+and FR-8 (granular per-enemy stats) are approved engine extensions; extend the
+regression suite before each.
 
 ## Environment Variables
 
@@ -353,5 +450,5 @@ border: 1px solid color-mix(in srgb, var(--color-success) 30%, transparent);
 - `selectedQuest._fullData` is populated at quest-selection time by `QuestSelection.js`; `RunAdapter` reads it directly — no re-fetch
 - `team` is always length 6; empty slots have `collectionNo: ''`
 - `servantEffects` is always length 6 (parallel to `team`)
-- Command tokens: `'1'–'6'` are servant skills (1-3 = servant 1, 4-6 = servant 2, etc. — see Driver.js for full spec); `'4'`, `'5'`, `'6'` doubled as NP tokens in `handleSubmitRun` count
+- Command grammar (see `Driver.js`): `a`–`i` = frontline servant skills (`a/b/c`→servant 1, `d/e/f`→servant 2, `g/h/i`→servant 3); `j`/`k`/`l` = mystic-code skills; `4`/`5`/`6` = fire NP for frontline slot 1/2/3; `a1` = skill targeting ally slot 1–3; `x12` = swap frontline 1 ↔ backline 2; `#` = end turn; `a[Ch1A]` / `a([Ch1A]2)` = choice tokens (parsed but currently inert). NP tokens (`4`/`5`/`6`) are counted for `total_np_cost` in saved runs. Unknown tokens are silently ignored (`Driver.js:110`).
 - The `supabase` export from `supabaseClient.js` is always defined (uses placeholder URL if env vars missing); check `supabaseMisconfigured` export if you need to warn the user
