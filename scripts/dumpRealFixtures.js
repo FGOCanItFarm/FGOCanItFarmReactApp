@@ -99,8 +99,20 @@ async function main() {
     fs.mkdirSync(outDir, { recursive: true });
 
     for (const id of wanted) {
-      const blob = found.get(id);
-      if (!blob) { console.warn(`  MISSING ${table} ${id} — skipped`); continue; }
+      let blob = found.get(id);
+      if (blob == null) { console.warn(`  MISSING ${kind} ${id} — skipped`); continue; }
+      // A jsonb column may arrive already-parsed (REST) or as a JSON string (dashboard export).
+      if (typeof blob === 'string') {
+        try {
+          blob = JSON.parse(blob);
+        } catch (e) {
+          throw new Error(
+            `${kind} ${id}: data is a truncated/invalid JSON string (len ${blob.length}). ` +
+            `Dashboard table-editor exports cap long cells (~10KB) — re-export full rows via ` +
+            `PostgREST or run this script against Supabase directly.`
+          );
+        }
+      }
       fs.writeFileSync(path.join(outDir, `${id}.json`), JSON.stringify(blob));
       written++;
       console.log(`  wrote real/${dir}/${id}.json`);
