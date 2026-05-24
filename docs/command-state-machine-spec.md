@@ -110,9 +110,11 @@ command page into a readable combat dashboard.
 
 1. **Enemy targeting:** EXTEND THE ENGINE now (grammar + `useNp`/skill enemy target).
    Touching `Driver.js` / `BattleEngine.js` is approved for this work.
-2. **Transforms:** Build a ROBUST, GENERAL transform/form/stance/gender-change
-   system — not per-id hacks. Must cover Mash, the Aoko cases, and the newer
-   servants (≈ id > 460) with form/stance/gender changes that alter skills/NP.
+2. **Transforms:** REGISTRY-FIRST (no universal model). Commit to one state-aware
+   resolve seam (`activeSkill`/`activeNp` from live state); list the handful of
+   troublemaker servants in a **declarative, community-maintainable registry**
+   (JSON schema and/or Supabase table). A general data-driven parser is a later
+   "graduation" step, not a prerequisite. See FR-5.
 3. **Saved runs:** Store the token string + granular stats (damage per enemy per
    wave, NP refund per enemy/per hit per wave, etc.), and **re-run the sim** to
    reconstruct. Persist computed results so the community can spot
@@ -185,25 +187,63 @@ command page into a readable combat dashboard.
   identically.
 
 ### FR-5 Transform / form-change system (ENGINE EXTENSION — approved)
-- Replace per-id hacks with a general mechanism. Requirements:
-  - A servant can have **multiple skill/NP variant sets** keyed by an active
-    "form/stance/state" (e.g., Mash "Holy Sword Loaded", gender/stance changes).
-  - A transform is **triggered** by a state/buff (often granted by the servant's
-    own NP or skill), has a **duration** (e.g., 3 turns) and **reverts**.
-  - While active, `getSkillByNum` and NP resolution must return the **variant for
-    the current state**; cooldown side-effects (e.g., Mash S2 −5) must apply.
-  - Must be **data-driven**: keyed off Atlas data (`script`, conditional
-    `noblePhantasms`, skill `num` arrays, `funcType: transformServant`,
-    `ascensionAdd`/form data) + `parser_flags`. The implementing AI must research
-    how Atlas encodes these for: Mash (id 1), Aoko (413/4132), Melusine (888550),
-    and the newer form/stance/gender-change servants (≈ id > 460 — enumerate them
-    from the data during implementation).
-  - Generalise the existing seams: `Skills.getSkillByNum` variant selection and
-    the `transformServant` effect handler (currently a no-op). Prefer a
-    lightweight "active variant" selector over Aoko's full-object swap where
-    possible; keep Aoko working.
-  - The introspection layer (FR-1) reads post-token state, so once the engine
-    transforms correctly the dashboard reflects it **live for free**.
+
+**Decision: registry-first. There is no one-size-fits-all model — do not try to
+build one.** Commit only to a single resolve seam; let each troublemaker servant
+declare its behavior in a declarative registry. A general data-driven parser is a
+LATER optimization servants "graduate" into, not a prerequisite.
+
+- **The one thing to commit to — the resolve seam.** All variant selection flows
+  through state-aware resolution evaluated against the servant's LIVE state every
+  time it's asked (never "return the last variant"):
+  ```
+  activeSkill(servant, num):
+    for v in variants[num] (priority order):
+      if v.formCond matches servant.currentForm AND
+         (v.stateCond == null OR servant.buffs.has(v.stateCond)):
+        return v
+    return defaultVariantFor(servant.currentForm)
+
+  activeNp(servant):
+    group = np.script.tdTypeChangeIDs            # NP swap group (survives the sync trim)
+    buff  = servant.buffs.firstOfType('tdTypeChange')   # e.g. "Holy Sword Loaded"
+    return group ? npById(buff ? buff.targetNpId : group.default) : np.default
+  ```
+  Because it reads live buffs, expiry handles reversion for free. Replace
+  `Skills.getSkillByNum` last-variant logic and `NP.getNpById` default with this.
+  The introspection layer (FR-1) then reflects "before vs after Holy Sword"
+  **live for free** — the builder needs zero per-servant code.
+
+- **Registry (Layer 1, build this first):** a DECLARATIVE per-servant override
+  table keyed by `collectionNo`, listing only the handful of servants that
+  actually transform (start with: Mash 1, Aoko 413/4132, Melusine 888550, Space
+  Ishtar, plus the newer form/stance/gender-change servants ≈ id > 460 that are
+  actually farmed — enumerate as needed, NOT all 400). Each entry declares its
+  variants + activation predicates (form/state buff) and any side-effects (e.g.
+  Mash S2 cooldown −5, 3-turn duration). Keep Aoko's full-object swap as one
+  registry "kind" (`transformServant`); Melusine first-use as another.
+
+- **Community-maintainable:** the registry MUST be data, not code, so non-devs can
+  contribute. Use a documented JSON schema (and/or a Supabase `servant_overrides`
+  table) with validation, so a community member can add a troublemaker via a small
+  PR / row without touching engine internals. Document the schema and a worked
+  example (Mash) in this repo.
+
+- **Layer 2 (later graduation):** once a registry pattern repeats ≥3 times,
+  teach the general parser to derive it from Atlas data
+  (`script.tdTypeChangeIDs`, `buffType: 'tdTypeChange'`, skill `num` arrays gated
+  by `condLimitCount`/`condQuestId`, `funcType: transformServant`) and retire
+  those registry entries. Optional; do not block on it.
+
+- **Data caveat (verified):** `stripServantData` (`atlasSync.js:166–169`) deletes
+  only TOP-LEVEL keys, so per-skill / per-NP `script` (incl. `tdTypeChangeIDs`)
+  **survives** — but top-level `ascensionAdd` and `svtChange` are dropped.
+  `ascensionAdd` holds form-specific class/rarity/traits (this is why Mash reads
+  as 4★ Shielder). To model forms + show Mash correctly, **stop trimming
+  `ascensionAdd`** (and keep `svtChange` for transform targets) and reseed.
+  `form_transition` / `parser_flags.has_transform_servant` already exist
+  (`atlasSync.js:111–124`) and can flag which servants need a registry entry.
+
 
 ### FR-6 Undo / delete / edit
 - Command array is the single source of truth. The engine is **forward-only**
@@ -345,10 +385,13 @@ command page into a readable combat dashboard.
 > `src/simulation/CommandState.js` exposing `buildEngineAt`, `legalNextTokens`,
 > `engineSnapshot`, `humanizeToken`; (3) undo/delete/edit with first-invalid-token
 > flagging; (4) the enemy-target grammar (choose a non-colliding delimiter, keep
-> bare `4` = highest-HP); (5) the data-driven transform system (research how Atlas
-> encodes forms/conditional skills/NPs; enumerate affected servants ≈ id > 460;
-> generalise `getSkillByNum` variant selection + the `transformServant` no-op
-> handler; keep Aoko working; make Mash correct from data); (6) the in-combat
+> bare `4` = highest-HP); (5) the transform system REGISTRY-FIRST per FR-5 — build
+> the state-aware resolve seam (`activeSkill`/`activeNp`) + a declarative,
+> community-maintainable override registry (JSON schema / Supabase table) covering
+> only the handful of troublemakers (Mash, Aoko 413/4132, Melusine 888550, Space
+> Ishtar, farmed id > 460 form-changers); keep Aoko working; make Mash correct
+> (stop trimming `ascensionAdd`, reseed); treat the general data-driven parser as
+> an optional later graduation step, not a blocker; (6) the in-combat
 > dashboard (enemies left/clickable, allies right with NP/CD, state-driven
 > palette); (7) saved-run = token + granular summary with re-sim reconstruction
 > and a bug-report path on divergence. Meet every item in §7.
@@ -361,5 +404,8 @@ command page into a readable combat dashboard.
 ## 10. Open questions for the owner
 - Enemy-target delimiter preference (e.g., `4e2` for NP, `a~2` for skills)?
 - Choice-effect dispatch: in scope for this work, or a separate task?
+- Transform override registry storage: JSON file in-repo (PR-based community
+  upkeep) vs. a Supabase `servant_overrides` table (live community edits, needs
+  moderation/validation)? Who may submit?
 - `bug_reports`: new Supabase table vs. existing channel? Who can submit (anon)?
 - Keep `wave_results` column for back-compat or migrate fully to `summary`?
