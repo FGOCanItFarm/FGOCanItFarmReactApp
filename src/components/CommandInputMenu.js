@@ -401,7 +401,7 @@ const CommandInputMenu = ({ activeServant, updateCommands, team }) => {
   const isDisabled = activeServant >= 3; // Disable buttons for servants in row 2 (index 3, 4, 5)
 
   return (
-    <Box mt={4} p={2} border="1px solid gray" bgcolor="#f0f0f0" minHeight="400px">
+    <Box mt={4} p={2} border="1px solid gray" bgcolor="#f0f0f0" minHeight="400px" style={{ marginRight: 'var(--team-panel-width)' }}>
       <Typography variant="h6">
         Menu Options for {team[activeServant]?.name} (Position {activeServant + 1})
       </Typography>
