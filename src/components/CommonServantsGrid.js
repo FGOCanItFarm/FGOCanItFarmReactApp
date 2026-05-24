@@ -29,19 +29,19 @@ const CommonServantsGrid = ({ handleServantClick, team }) => {
 
   return (
     <div className="common-servants-grid">
-      <Typography variant="h6" style={{ marginBottom: "1rem" }}>Common Servants</Typography>
-      <div className="common-servants-horizontal">
+      <Typography variant="h6" sx={{ mb: 1 }}>Common Servants</Typography>
+      <div className="common-servants-row">
         {servants.map((servant, index) => (
           <div
             key={index}
-            className="common-servant-item"
+            className="servant-grid-item"
             onClick={() => handleServantClick(servant)}
+            title={servant.name}
           >
-            <ServantAvatar
-              servantFace={servant.extraAssets?.faces?.ascension?.['4']}
-              bgType={servant.noblePhantasms?.['0']?.card}
-              tagType={servant.noblePhantasms?.['0']?.effectFlags?.['0']}
-            />
+            <div className="servant-portrait">
+              <ServantAvatar servantFace={servant.extraAssets?.faces?.ascension?.['1']} />
+            </div>
+            <div className="servant-name">{servant.name}</div>
           </div>
         ))}
       </div>

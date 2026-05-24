@@ -49,31 +49,34 @@
   gap: 0.5rem;
 }
 
+/* Theme the skill/choice buttons to match the dark UI (was bright magenta/blue
+   /coral with white text). Use !important to defeat the inline lightgray border
+   set on these buttons in CommandInputMenu.js. */
 .skill-buttons .servant-1,
 .skill-buttons .servant-2,
 .skill-buttons .servant-3,
 .choice-skill-buttons .servant-1,
 .choice-skill-buttons .servant-2,
 .choice-skill-buttons .servant-3 {
-  color: white;
-  border-radius: 0.25rem;
-  outline: 1px solid black;
-  font-size: 0.75rem;
+  color: var(--color-text) !important;
+  background-color: var(--color-surface-2) !important;
+  border: 1px solid var(--color-border) !important;
+  outline: none !important;
+  border-radius: 6px !important;
+  font-size: 0.72rem;
+  text-transform: none;
+  margin: 2px 0 !important;
 }
 
-.skill-buttons .servant-1,
-.choice-skill-buttons .servant-1 {
-  background-color: #9a3269;
-}
-
-.skill-buttons .servant-2,
-.choice-skill-buttons .servant-2 {
-  background-color: #184FA1;
-}
-
-.skill-buttons .servant-3,
-.choice-skill-buttons .servant-3 {
-  background-color: #E26769;
+.skill-buttons .servant-1:hover,
+.skill-buttons .servant-2:hover,
+.skill-buttons .servant-3:hover,
+.choice-skill-buttons .servant-1:hover,
+.choice-skill-buttons .servant-2:hover,
+.choice-skill-buttons .servant-3:hover {
+  border-color: var(--color-gold) !important;
+  background-color: var(--color-gold-dim) !important;
+  color: var(--color-gold) !important;
 }
 
 .margin-left-grid {

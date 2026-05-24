@@ -1,12 +1,26 @@
 import React, { useState } from 'react';
-import { Button, Typography, Tooltip, IconButton, Box, Divider } from '@mui/material';
-import EditIcon from '@mui/icons-material/Edit';
-import ServantAvatar from './ServantAvatar';
+import { Button, Typography, Box, Chip, Divider } from '@mui/material';
 import MysticCodeCommand from './MysticCodeCommand';
 import '../ui-vars.css';
-import { generateSkillCommand, generateChoiceCommand, generateChoiceTargetCommand } from './CommandInputMenu';
+import '../CommandInputPage.css';
+import { generateSkillCommand, ChoiceSelector } from './CommandInputMenu';
 
-// Single, clean SourceTargetCommandInput component.
+// Servants whose skills open a choice/target sub-menu (handled by ChoiceSelector
+// so the generated tokens match the simulation grammar exactly).
+const isChoiceSkill = (collectionNo, skillIndex) => {
+  const num = Number(collectionNo);
+  switch (num) {
+    case 373: return true;
+    case 428: return skillIndex === 1;
+    case 268: return skillIndex === 2;
+    case 421: case 11: case 391: case 424: case 425: case 414: case 259:
+      return skillIndex === 3;
+    default: return false;
+  }
+};
+
+// Command controls for the unit currently selected in the right-hand Team panel.
+// Skills/NP/MC only — the team column and stat editing live in StickyTeamBar.
 const SourceTargetCommandInput = ({
   team = [],
   servants = [],
@@ -15,200 +29,149 @@ const SourceTargetCommandInput = ({
   setSelectedMysticCode = () => {},
   addCommand = () => {},
   updateCommands = () => {},
-  setActiveServant = () => {}
+  selectedSlot = 0,
+  setSelectedSlot = () => {},
+  skillInfo = {},
 }) => {
-  const [selectedSource, setSelectedSource] = useState(null);
-  const [selectedTarget, setSelectedTarget] = useState(null);
-  const [choiceState, setChoiceState] = useState({ open: false, servantIndex: null, skillIndex: null, targetIndex: null });
+  const [pendingSkill, setPendingSkill] = useState(null); // skill awaiting an ally target
+  const [choiceSkill, setChoiceSkill] = useState(null);    // skill showing the choice sub-menu
 
-  const handleSourceClick = (index) => {
-    const hasCollection = Boolean(team[index]?.collectionNo);
-    console.debug('[STCI] handleSourceClick', { index, hasCollection, slot: team[index] });
-    if (hasCollection) setSelectedSource(prev => (prev === index ? null : index));
-    else setSelectedSource(null);
+  const slotServant = (idx) => {
+    const s = team[idx];
+    return s && s.collectionNo ? servants.find(x => String(x.collectionNo) === String(s.collectionNo)) : null;
   };
 
-  const handleTargetClick = (index) => setSelectedTarget(prev => (prev === index ? null : index));
+  const namedTeam = team.map(s => {
+    const serv = s && s.collectionNo ? servants.find(x => String(x.collectionNo) === String(s.collectionNo)) : null;
+    return { ...s, name: serv?.name };
+  });
 
-  const openEditorFor = (index, e) => {
-    if (e && e.stopPropagation) e.stopPropagation();
-    try { setActiveServant(index); } catch (err) {}
-    window.dispatchEvent(new CustomEvent('fgocif:open-edit', { detail: { index } }));
-  };
+  const selectedServant = slotServant(selectedSlot);
+  const selectedSkills = (selectedServant && skillInfo[String(selectedServant.collectionNo)]) || null;
+  const isFrontRow = selectedSlot >= 0 && selectedSlot < 3;
 
-  const isChoiceSkill = (servantCollectionNo, skillIndex) => {
-    if (!servantCollectionNo) return false;
-    const num = Number(servantCollectionNo);
-    switch (num) {
-      // 373 has choice behavior on skills 1 and 3 (3-way) and skill 2 is a 2-choice-with-target
-      case 373: return true;
-      case 428: return skillIndex === 1;
-      case 268: return skillIndex === 2;
-      case 421:
-      case 11:
-      case 391:
-      case 424:
-      case 425:
-      case 414:
-      case 259:
-        return skillIndex === 3;
-      default: return false;
-    }
+  const fireSkill = (skillIndex, targetIndex = null) => {
+    addCommand(generateSkillCommand(selectedSlot, skillIndex, targetIndex));
+    setPendingSkill(null);
+    setChoiceSkill(null);
   };
 
   const handleSkillClick = (skillIndex) => {
-    console.debug('[STCI] handleSkillClick', { skillIndex, selectedSource, selectedTarget });
-    if (selectedSource === null) return;
-    const src = team[selectedSource];
-    const sourceServant = src && src.collectionNo ? servants.find(s => String(s.collectionNo) === String(src.collectionNo)) : null;
-    if (!sourceServant) return;
-
-    const choiceCheck = isChoiceSkill(sourceServant.collectionNo, skillIndex);
-    console.debug('[STCI] sourceServant', { collectionNo: sourceServant.collectionNo, choiceCheck });
-    if (choiceCheck) {
-      console.debug('[STCI] opening choiceState', { servantIndex: selectedSource, skillIndex, targetIndex: selectedTarget });
-      setChoiceState({ open: true, servantIndex: selectedSource, skillIndex, targetIndex: selectedTarget });
+    if (!isFrontRow || !selectedServant) return;
+    setPendingSkill(null);
+    if (isChoiceSkill(selectedServant.collectionNo, skillIndex)) {
+      setChoiceSkill(prev => (prev === skillIndex ? null : skillIndex));
       return;
     }
-
-    const cmd = generateSkillCommand(selectedSource, skillIndex, selectedTarget);
-    addCommand(cmd);
-    setSelectedSource(null);
-    setSelectedTarget(null);
-  };
-
-  const handleEndTurn = () => addCommand('#');
-  const handleNP = (npIndex) => addCommand(String(3 + Number(npIndex)));
-
-  // performChoice now accepts the chosen option (1-based) and the optionsCount (2 or 3)
-  const performChoice = (choice, optionsCount = 3) => {
-    const { servantIndex, skillIndex, targetIndex } = choiceState;
-    if (servantIndex === null || skillIndex === null) return;
-    const collectionNo = team?.[servantIndex]?.collectionNo ? Number(team[servantIndex].collectionNo) : null;
-
-    // Map user's choice into the internal code expected by generators (e.g., 12, 22, 13, 23, 33)
-    const choiceCode = Number(`${choice}${optionsCount}`);
-
-    const isTwoChoiceWithTarget = (collectionNo === 373 && skillIndex === 2);
-
-    let cmd;
-    if (isTwoChoiceWithTarget && optionsCount === 2 && targetIndex !== null) {
-      // For the special two-choice-with-target case, use the target-specific generator
-      // generateChoiceTargetCommand expects a 1-based target index
-      cmd = generateChoiceTargetCommand(servantIndex, skillIndex, choiceCode, targetIndex + 1);
-    } else {
-      // General case: generateChoiceCommand will append targetIndex (0-based) if provided
-      cmd = generateChoiceCommand(servantIndex, skillIndex, choiceCode, targetIndex);
+    setChoiceSkill(null);
+    const info = selectedSkills ? selectedSkills[skillIndex - 1] : null;
+    if (info && info.needsAllyTarget) {
+      setPendingSkill(skillIndex);
+      return;
     }
-
-    console.debug('[STCI] performChoice ->', { servantIndex, skillIndex, targetIndex, choice, optionsCount, choiceCode, cmd });
-
-    addCommand(cmd);
-    setChoiceState({ open: false, servantIndex: null, skillIndex: null, targetIndex: null });
-    setSelectedSource(null);
-    setSelectedTarget(null);
+    fireSkill(skillIndex, null);
   };
+
+  const handleNP = (slot) => addCommand(String(4 + slot)); // slot 0->4, 1->5, 2->6
+  const handleEndTurn = () => addCommand('#');
+
+  const skillLabel = (skillIndex) => selectedSkills?.[skillIndex - 1]?.name || `Skill ${skillIndex}`;
+  const skillTargetLabel = (skillIndex) => selectedSkills?.[skillIndex - 1]?.label || '';
 
   return (
-    <div className="two-team-view">
-      <div className="three-column-layout">
-        <div className="left-full-team">
-          <Typography variant="h6" gutterBottom>Team (Select Source)</Typography>
-          <div className="full-team-grid">
-            {team.map((servantObj, index) => {
-              const servant = servants.find(s => String(s.collectionNo) === String(servantObj.collectionNo));
-              const isSelected = selectedSource === index;
-              return (
-                <div key={index} className={`team-servant-slot ${isSelected ? 'selected-source' : ''}`} onClick={() => handleSourceClick(index)} role="button" tabIndex={0}>
-                  <div style={{ position: 'relative' }}>
-                    <ServantAvatar
-                      servantFace={servant?.extraAssets?.faces?.ascension?.['4']}
-                      bgType={servant?.noblePhantasms?.[0]?.card}
-                      tagType={servant?.noblePhantasms?.[0]?.effectFlags?.[0]}
-                    />
-                    <IconButton size="small" aria-label={`Edit slot ${index + 1}`} sx={{ position: 'absolute', top: 6, right: 6 }} onClick={(e) => openEditorFor(index, e)}>
-                      <EditIcon fontSize="small" />
-                    </IconButton>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
+    <div className="cmd-main">
+      <Typography variant="h6" gutterBottom>
+        Commands{selectedServant ? ` — ${selectedServant.name} (Slot ${selectedSlot + 1})` : ''}
+      </Typography>
 
-        <div className="center-menu">
-          <Typography variant="h6" gutterBottom>Skills</Typography>
-          <div className="skill-buttons-grid">
-            {[1,2,3].map(si => (
-              <Tooltip key={si} title={`Use skill ${si}`} enterDelay={300}>
-                <Button variant="outlined" onClick={() => handleSkillClick(si)} disabled={selectedSource === null || !(team[selectedSource] && team[selectedSource].collectionNo)} className="skill-button">Skill {si}</Button>
-              </Tooltip>
-            ))}
-          </div>
-          <div className="menu-controls">
-            <Typography variant="subtitle2" gutterBottom style={{ marginTop: '1rem' }}>Selection: {selectedSource !== null ? `Source: ${selectedSource + 1}` : 'No source'}{selectedTarget !== null ? `, Target: ${selectedTarget + 1}` : ''}</Typography>
-          </div>
-        </div>
+      <Typography variant="subtitle2" gutterBottom>Skills</Typography>
 
-        <div className="right-preview">
-          <Typography variant="h6" gutterBottom>Targets (First 3)</Typography>
-          <div className="preview-team-grid">
-            {team.slice(0,3).map((servantObj, index) => {
-              const servant = servants.find(s => String(s.collectionNo) === String(servantObj.collectionNo));
-              const isSelected = selectedTarget === index;
-              return (
-                <div key={index} className={`team-servant-slot ${isSelected ? 'selected-target' : ''}`} onClick={() => handleTargetClick(index)} role="button" tabIndex={0}>
-                  <div style={{ position: 'relative' }}>
-                    <ServantAvatar servantFace={servant?.extraAssets?.faces?.ascension?.['4']} bgType={servant?.noblePhantasms?.[0]?.card} tagType={servant?.noblePhantasms?.[0]?.effectFlags?.[0]} />
-                    <IconButton size="small" aria-label={`Edit slot ${index + 1}`} sx={{ position: 'absolute', top: 6, right: 6 }} onClick={(e) => openEditorFor(index, e)}>
-                      <EditIcon fontSize="small" />
-                    </IconButton>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-
-          <div style={{ marginTop: '1rem' }}>
-            <MysticCodeCommand team={team} servants={servants} setTeam={setTeam} updateCommands={updateCommands} selectedMysticCode={selectedMysticCode} setSelectedMysticCode={setSelectedMysticCode} onSwap={(topIndex, bottomIndex) => { if (bottomIndex >= 0 && bottomIndex < 3) setSelectedSource(bottomIndex); else if (topIndex >= 0 && topIndex < 3) setSelectedSource(topIndex); }} />
-          </div>
-        </div>
-      </div>
-
-      {/* Inline Choice bar (renders only when a choice skill was triggered) */}
-      {choiceState.open && (
-          <Box sx={{ mt: 2, p: 1, display: 'flex', gap: 1, alignItems: 'center', justifyContent: 'center' }}>
-            <Typography>Choose option:</Typography>
-            {/* 2-choice group */}
-            <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
-              <Button variant="outlined" onClick={() => performChoice(1, 2)}>Choice 1</Button>
-              <Button variant="outlined" onClick={() => performChoice(2, 2)}>Choice 2</Button>
-            </Box>
-            {/* vertical divider between groups */}
-            <Divider orientation="vertical" flexItem sx={{ mx: 1 }} />
-            {/* 3-choice group */}
-            <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
-              <Button variant="outlined" onClick={() => performChoice(1, 3)}>Choice 1</Button>
-              <Button variant="outlined" onClick={() => performChoice(2, 3)}>Choice 2</Button>
-              <Button variant="outlined" onClick={() => performChoice(3, 3)}>Choice 3</Button>
-            </Box>
-            <Button onClick={() => setChoiceState({ open: false, servantIndex: null, skillIndex: null, targetIndex: null })}>Cancel</Button>
-          </Box>
+      {!isFrontRow && (
+        <Typography variant="body2" sx={{ color: 'var(--color-text-dim)' }}>
+          Backline unit selected. Swap it into positions 1–3 (Mystic Code below) to use its skills.
+        </Typography>
       )}
 
-      <div className="general-commands">
-        <Typography variant="h6" align="center" gutterBottom>General Commands</Typography>
-        <div className="general-commands-row">
-          <Tooltip title="End the current turn" enterDelay={300}>
-            <Button variant="contained" onClick={handleEndTurn} className="general-command-button" aria-label="End Turn">End Turn</Button>
-          </Tooltip>
-          {[1,2,3].map(npIndex => (
-            <Tooltip key={npIndex} title={`Use NP ${npIndex}`} enterDelay={300}>
-              <Button variant="outlined" onClick={() => handleNP(npIndex)} className="general-command-button" aria-label={`NP ${npIndex}`}>NP {npIndex}</Button>
-            </Tooltip>
+      {isFrontRow && !selectedServant && (
+        <Typography variant="body2" sx={{ color: 'var(--color-text-dim)' }}>
+          Empty slot — add a servant from Team Selection, or pick a filled slot in the Team panel on the right.
+        </Typography>
+      )}
+
+      {isFrontRow && selectedServant && (
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, maxWidth: 460 }}>
+          {!selectedSkills && (
+            <Typography variant="caption" sx={{ color: 'var(--color-text-dim)' }}>Loading skill details…</Typography>
+          )}
+          {[1, 2, 3].map(si => (
+            <div key={si}>
+              <Button
+                fullWidth
+                variant={choiceSkill === si || pendingSkill === si ? 'contained' : 'outlined'}
+                onClick={() => handleSkillClick(si)}
+                sx={{ justifyContent: 'space-between', textTransform: 'none' }}
+              >
+                <span>S{si} · {skillLabel(si)}</span>
+                {skillTargetLabel(si) && (
+                  <Chip size="small" label={skillTargetLabel(si)} sx={{ ml: 1, height: 18, fontSize: '0.65rem' }} />
+                )}
+              </Button>
+
+              {pendingSkill === si && (
+                <Box sx={{ display: 'flex', gap: 0.5, mt: 0.5, mb: 0.5, flexWrap: 'wrap' }}>
+                  <Typography variant="caption" sx={{ color: 'var(--color-text-dim)', width: '100%' }}>Choose target ally:</Typography>
+                  {[0, 1, 2].map(ally => (
+                    <Button key={ally} size="small" variant="outlined" disabled={!team[ally]?.collectionNo}
+                      onClick={() => fireSkill(si, ally)}>
+                      {slotServant(ally)?.name?.split(' ')[0] || `Ally ${ally + 1}`}
+                    </Button>
+                  ))}
+                  <Button size="small" onClick={() => fireSkill(si, null)}>No target</Button>
+                </Box>
+              )}
+
+              {choiceSkill === si && (
+                <Box sx={{ mt: 0.5, mb: 0.5 }}>
+                  <ChoiceSelector
+                    servantIndex={selectedSlot}
+                    skillIndex={si}
+                    addCommand={(cmd) => { addCommand(cmd); setChoiceSkill(null); }}
+                    team={namedTeam}
+                    isDisabled={false}
+                  />
+                </Box>
+              )}
+            </div>
           ))}
-        </div>
-      </div>
+        </Box>
+      )}
+
+      <Divider sx={{ my: 2 }} />
+
+      <Typography variant="subtitle2" gutterBottom>Noble Phantasms</Typography>
+      <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+        {[0, 1, 2].map(slot => (
+          <Button key={slot} variant="outlined" disabled={!team[slot]?.collectionNo} onClick={() => handleNP(slot)}>
+            NP {slot + 1}{slotServant(slot) ? `: ${slotServant(slot).name.split(' ')[0]}` : ''}
+          </Button>
+        ))}
+        <Button variant="contained" color="primary" onClick={handleEndTurn}>End Turn</Button>
+      </Box>
+
+      <Divider sx={{ my: 2 }} />
+
+      <MysticCodeCommand
+        team={team}
+        servants={servants}
+        setTeam={setTeam}
+        updateCommands={updateCommands}
+        selectedMysticCode={selectedMysticCode}
+        setSelectedMysticCode={setSelectedMysticCode}
+        onSwap={(topIndex, bottomIndex) => {
+          if (bottomIndex >= 0 && bottomIndex < 3) setSelectedSlot(bottomIndex);
+          else if (topIndex >= 0 && topIndex < 3) setSelectedSlot(topIndex);
+        }}
+      />
     </div>
   );
 };

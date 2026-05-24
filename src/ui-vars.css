@@ -43,6 +43,11 @@
   --servant-slot-size:   7rem;
   --servant-row-height:  var(--servant-slot-size);
   --servant-gap:         1rem;
+  --servant-thumb:       45px;   /* compact portrait in selection grids */
+
+  /* ── App shell ── */
+  --nav-height:    52px;
+  --team-panel-width: 340px;
 
   /* ── Z-index layers ── */
   --z-sticky:  1000;

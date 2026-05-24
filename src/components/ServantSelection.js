@@ -1,32 +1,37 @@
-import React, { useEffect, useRef } from 'react';
+import React from 'react';
 import { Typography } from '@mui/material';
 import ServantAvatar from './ServantAvatar';
 import './ServantSelection.css';
 
-const ServantSelection = ({ servants, handleServantClick }) => {
-  const viewportRef = useRef(null);
-
-  useEffect(() => {
-    const viewport = viewportRef.current;
-    if (viewport) {
-      const hasScroll = viewport.scrollWidth > viewport.clientWidth;
-      viewport.classList.toggle('has-scroll', hasScroll);
-    }
-  }, [servants]);
+// Renders every servant in a compact left-to-right wrapping grid. Filters do not
+// remove cards — non-matching servants are dimmed (like AppMedia) so the grid
+// stays stable and the full roster is always visible. `matchSet` (collectionNo
+// strings) marks which pass the active filters; null/empty => all match.
+const ServantSelection = ({ servants = [], handleServantClick, matchSet = null, popularity = null, tierOf = null }) => {
+  const isMatch = (servant) => !matchSet || matchSet.has(String(servant.collectionNo));
+  const pickCount = (servant) => (popularity ? (popularity.get(Number(servant.collectionNo)) || 0) : 0);
+  const tier = (servant) => (tierOf ? tierOf(servant.name) : null);
 
   return (
     <div className="servant-selection">
-      <Typography variant="h6" style={{ marginBottom: '1rem' }}>Servant Selection</Typography>
-      <div className="servant-selection-viewport" ref={viewportRef}>
-        <div className="servant-grid">
-          {servants.map((servant, index) => (
+      <Typography variant="h6" sx={{ mb: 1 }}>
+        Servant Selection
+        <Typography component="span" variant="caption" sx={{ ml: 1, color: 'var(--color-text-dim)' }}>
+          ({servants.length})
+        </Typography>
+      </Typography>
+      <div className="servant-grid">
+        {servants.map((servant) => {
+          const dim = !isMatch(servant);
+          return (
             <div
-              key={index}
-              className="servant-grid-item"
+              key={servant.collectionNo}
+              className={`servant-grid-item ${dim ? 'dimmed' : ''}`}
               onClick={() => handleServantClick(servant)}
               tabIndex={0}
               role="button"
               aria-label={`Select servant ${servant.name || 'Unknown'}`}
+              title={servant.name}
               onKeyDown={(e) => {
                 if (e.key === 'Enter' || e.key === ' ') {
                   e.preventDefault();
@@ -34,15 +39,20 @@ const ServantSelection = ({ servants, handleServantClick }) => {
                 }
               }}
             >
-              <ServantAvatar
-                className="servant-avatar"
-                servantFace={servant.face_url}
-                bgType={servant.noblePhantasms?.[0]?.card}
-                tagType={servant.noblePhantasms?.[0]?.effectFlags?.[0]}
-              />
+              <div className="servant-portrait">
+                <ServantAvatar servantFace={servant.face_url} />
+                {tier(servant)
+                  ? <span className="servant-tier-badge" title={`Tier ${tier(servant)}`}>{tier(servant)}</span>
+                  : (pickCount(servant) > 0 && (
+                      <span className="servant-pick-count" title={`Used in ${pickCount(servant)} community run(s)`}>
+                        {pickCount(servant)}
+                      </span>
+                    ))}
+              </div>
+              <div className="servant-name">{servant.name}</div>
             </div>
-          ))}
-        </div>
+          );
+        })}
       </div>
     </div>
   );
