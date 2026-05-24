@@ -1,0 +1,371 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`engine regression (golden snapshots) aoko-transform tokens: "4 #" 1`] = `
+Object {
+  "ok": true,
+  "questCleared": true,
+  "servantsAtWaveEnd": Object {
+    "1": Array [
+      Object {
+        "collectionNo": 4132,
+        "npGauge": 0,
+        "slot": 0,
+      },
+    ],
+  },
+  "totalWaves": 1,
+  "wave": 1,
+  "waveStats": Object {
+    "1": Object {
+      "damageDealt": 9315,
+      "hpRequired": 4500,
+    },
+  },
+}
+`;
+
+exports[`engine regression (golden snapshots) melusine-form-seam tokens: "c 4 #" 1`] = `
+Object {
+  "ok": true,
+  "questCleared": true,
+  "servantsAtWaveEnd": Object {
+    "1": Array [
+      Object {
+        "collectionNo": 888,
+        "npGauge": 18,
+        "slot": 0,
+      },
+    ],
+  },
+  "totalWaves": 1,
+  "wave": 1,
+  "waveStats": Object {
+    "1": Object {
+      "damageDealt": 21735,
+      "hpRequired": 4500,
+    },
+  },
+}
+`;
+
+exports[`engine regression (golden snapshots) melusine-form-seam tokens: "c c 4 #" 1`] = `
+Object {
+  "ok": true,
+  "questCleared": true,
+  "servantsAtWaveEnd": Object {
+    "1": Array [
+      Object {
+        "collectionNo": 888,
+        "npGauge": 18,
+        "slot": 0,
+      },
+    ],
+  },
+  "totalWaves": 1,
+  "wave": 1,
+  "waveStats": Object {
+    "1": Object {
+      "damageDealt": 22822,
+      "hpRequired": 4500,
+    },
+  },
+}
+`;
+
+exports[`engine regression (golden snapshots) normal-farming tokens: "4 #" 1`] = `
+Object {
+  "ok": true,
+  "questCleared": false,
+  "servantsAtWaveEnd": Object {
+    "1": Array [
+      Object {
+        "collectionNo": 1001,
+        "npGauge": 18,
+        "slot": 0,
+      },
+      Object {
+        "collectionNo": 1002,
+        "npGauge": 100,
+        "slot": 1,
+      },
+      Object {
+        "collectionNo": 1003,
+        "npGauge": 100,
+        "slot": 2,
+      },
+    ],
+  },
+  "totalWaves": 3,
+  "wave": 2,
+  "waveStats": Object {
+    "1": Object {
+      "damageDealt": 9315,
+      "hpRequired": 4500,
+    },
+    "2": Object {
+      "damageDealt": 0,
+      "hpRequired": 4500,
+    },
+  },
+}
+`;
+
+exports[`engine regression (golden snapshots) normal-farming tokens: "5 4 #" 1`] = `
+Object {
+  "ok": true,
+  "questCleared": false,
+  "servantsAtWaveEnd": Object {
+    "1": Array [
+      Object {
+        "collectionNo": 1001,
+        "npGauge": 18,
+        "slot": 0,
+      },
+      Object {
+        "collectionNo": 1002,
+        "npGauge": 30,
+        "slot": 1,
+      },
+      Object {
+        "collectionNo": 1003,
+        "npGauge": 130,
+        "slot": 2,
+      },
+    ],
+  },
+  "totalWaves": 3,
+  "wave": 2,
+  "waveStats": Object {
+    "1": Object {
+      "damageDealt": 12110,
+      "hpRequired": 4500,
+    },
+    "2": Object {
+      "damageDealt": 0,
+      "hpRequired": 4500,
+    },
+  },
+}
+`;
+
+exports[`engine regression (golden snapshots) normal-farming tokens: "6" 1`] = `
+Object {
+  "ok": true,
+  "questCleared": false,
+  "servantsAtWaveEnd": Object {},
+  "totalWaves": 3,
+  "wave": 1,
+  "waveStats": Object {
+    "1": Object {
+      "damageDealt": 15525,
+      "hpRequired": 4500,
+    },
+  },
+}
+`;
+
+exports[`engine regression (golden snapshots) normal-farming tokens: "a 4 #" 1`] = `
+Object {
+  "ok": true,
+  "questCleared": false,
+  "servantsAtWaveEnd": Object {
+    "1": Array [
+      Object {
+        "collectionNo": 1001,
+        "npGauge": 18,
+        "slot": 0,
+      },
+      Object {
+        "collectionNo": 1002,
+        "npGauge": 100,
+        "slot": 1,
+      },
+      Object {
+        "collectionNo": 1003,
+        "npGauge": 100,
+        "slot": 2,
+      },
+    ],
+  },
+  "totalWaves": 3,
+  "wave": 2,
+  "waveStats": Object {
+    "1": Object {
+      "damageDealt": 13973,
+      "hpRequired": 4500,
+    },
+    "2": Object {
+      "damageDealt": 0,
+      "hpRequired": 4500,
+    },
+  },
+}
+`;
+
+exports[`engine regression (golden snapshots) normal-farming tokens: "a b1 c" 1`] = `
+Object {
+  "ok": true,
+  "questCleared": false,
+  "servantsAtWaveEnd": Object {},
+  "totalWaves": 3,
+  "wave": 1,
+  "waveStats": Object {
+    "1": Object {
+      "damageDealt": 0,
+      "hpRequired": 4500,
+    },
+  },
+}
+`;
+
+exports[`engine regression (golden snapshots) normal-farming tokens: "d e1 f 4 #" 1`] = `
+Object {
+  "ok": true,
+  "questCleared": false,
+  "servantsAtWaveEnd": Object {
+    "1": Array [
+      Object {
+        "collectionNo": 1001,
+        "npGauge": 21.6,
+        "slot": 0,
+      },
+      Object {
+        "collectionNo": 1002,
+        "npGauge": 100,
+        "slot": 1,
+      },
+      Object {
+        "collectionNo": 1003,
+        "npGauge": 100,
+        "slot": 2,
+      },
+    ],
+  },
+  "totalWaves": 3,
+  "wave": 2,
+  "waveStats": Object {
+    "1": Object {
+      "damageDealt": 13414,
+      "hpRequired": 4500,
+    },
+    "2": Object {
+      "damageDealt": 0,
+      "hpRequired": 4500,
+    },
+  },
+}
+`;
+
+exports[`engine regression (golden snapshots) normal-farming tokens: "j 4 #" 1`] = `
+Object {
+  "ok": true,
+  "questCleared": false,
+  "servantsAtWaveEnd": Object {
+    "1": Array [
+      Object {
+        "collectionNo": 1001,
+        "npGauge": 18,
+        "slot": 0,
+      },
+      Object {
+        "collectionNo": 1002,
+        "npGauge": 100,
+        "slot": 1,
+      },
+      Object {
+        "collectionNo": 1003,
+        "npGauge": 100,
+        "slot": 2,
+      },
+    ],
+  },
+  "totalWaves": 3,
+  "wave": 2,
+  "waveStats": Object {
+    "1": Object {
+      "damageDealt": 11178,
+      "hpRequired": 4500,
+    },
+    "2": Object {
+      "damageDealt": 0,
+      "hpRequired": 4500,
+    },
+  },
+}
+`;
+
+exports[`engine regression (golden snapshots) normal-farming tokens: "k1 4 #" 1`] = `
+Object {
+  "ok": true,
+  "questCleared": false,
+  "servantsAtWaveEnd": Object {
+    "1": Array [
+      Object {
+        "collectionNo": 1001,
+        "npGauge": 18,
+        "slot": 0,
+      },
+      Object {
+        "collectionNo": 1002,
+        "npGauge": 100,
+        "slot": 1,
+      },
+      Object {
+        "collectionNo": 1003,
+        "npGauge": 100,
+        "slot": 2,
+      },
+    ],
+  },
+  "totalWaves": 3,
+  "wave": 2,
+  "waveStats": Object {
+    "1": Object {
+      "damageDealt": 9315,
+      "hpRequired": 4500,
+    },
+    "2": Object {
+      "damageDealt": 0,
+      "hpRequired": 4500,
+    },
+  },
+}
+`;
+
+exports[`engine regression (golden snapshots) normal-farming tokens: "x31 6 #" 1`] = `
+Object {
+  "ok": true,
+  "questCleared": false,
+  "servantsAtWaveEnd": Object {
+    "1": Array [
+      Object {
+        "collectionNo": 1001,
+        "npGauge": 100,
+        "slot": 0,
+      },
+      Object {
+        "collectionNo": 1002,
+        "npGauge": 100,
+        "slot": 1,
+      },
+      Object {
+        "collectionNo": 1004,
+        "npGauge": 18,
+        "slot": 2,
+      },
+    ],
+  },
+  "totalWaves": 3,
+  "wave": 2,
+  "waveStats": Object {
+    "1": Object {
+      "damageDealt": 9315,
+      "hpRequired": 4500,
+    },
+    "2": Object {
+      "damageDealt": 0,
+      "hpRequired": 4500,
+    },
+  },
+}
+`;
