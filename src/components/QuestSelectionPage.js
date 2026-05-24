@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button, Typography, Container } from '@mui/material';
+import { Button, Typography, Box } from '@mui/material';
 import QuestSelection from './QuestSelection';
 import { useNavigate } from 'react-router-dom';
 
@@ -11,7 +11,7 @@ const QuestSelectionPage = ({ selectedQuest, setSelectedQuest }) => {
   };
 
   return (
-    <Container sx={{ py: 3 }}>
+    <Box sx={{ py: 3, width: '100%' }}>
       <Typography variant="h4" sx={{ mb: 2 }}>
         Select Farming Node
       </Typography>
@@ -19,7 +19,7 @@ const QuestSelectionPage = ({ selectedQuest, setSelectedQuest }) => {
       <Button variant="contained" color="primary" onClick={handleNext} sx={{ mt: 3 }}>
         Next
       </Button>
-    </Container>
+    </Box>
   );
 };
 

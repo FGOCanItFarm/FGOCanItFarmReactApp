@@ -104,7 +104,7 @@ const CommandInputPage = ({
   };
 
   return (
-    <Container className="command-input-container">
+    <Container className="command-input-container" disableGutters maxWidth={false}>
       <SourceTargetCommandInput
         team={team}
         servants={servants}

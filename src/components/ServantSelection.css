@@ -7,9 +7,9 @@
 .servant-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(var(--servant-thumb), 1fr));
-  gap: var(--spacing-sm);
-  padding: var(--spacing-sm);
-  max-height: 62vh;
+  gap: 5px;
+  padding: var(--spacing-xs);
+  max-height: 58vh;
   overflow-y: auto;
   align-content: start;
   scrollbar-width: thin;
@@ -76,14 +76,20 @@
 }
 
 .servant-name {
-  margin-top: 3px;
-  width: calc(var(--servant-thumb) + 8px);
-  font-size: 0.62rem;
-  line-height: 1.15;
+  margin-top: 2px;
+  width: calc(var(--servant-thumb) + 6px);
+  font-size: 0.5rem;
+  line-height: 1.1;
   text-align: center;
   color: var(--color-text-dim);
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
+}
+
+.servant-pick-count {
+  font-size: 0.52rem;
+  line-height: 14px;
+  min-width: 14px;
 }

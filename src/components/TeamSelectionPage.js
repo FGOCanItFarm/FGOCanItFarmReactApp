@@ -68,7 +68,12 @@ const TeamSelectionPage = ({ team, setTeam, servants, setFilteredServants, handl
         if (!selectedClass.some(sel => cls === sel || cls.startsWith(sel) || cls.includes(sel))) return false;
       }
       if (selectedNpType.length > 0) {
-        if (!servant.noblePhantasms?.some(np => selectedNpType.includes(np.card?.toLowerCase()))) return false;
+        // NP card type lives on the np_card column (and np_card_options when the
+        // servant's NP card is variable) — the roster has no full NP objects.
+        const cards = (servant.np_card_variable && servant.np_card_options)
+          ? servant.np_card_options.map(c => String(c).toLowerCase())
+          : (servant.np_card ? [String(servant.np_card).toLowerCase()] : []);
+        if (!cards.some(c => selectedNpType.includes(c))) return false;
       }
       if (selectedAttackType.length > 0) {
         if (!servant.noblePhantasms?.some(np => np.effectFlags?.some(flag => selectedAttackType.includes(flag)))) return false;

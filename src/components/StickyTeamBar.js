@@ -103,8 +103,15 @@ const StickyTeamBar = ({
             <>
               <Typography variant="subtitle1" sx={{ fontWeight: 700, lineHeight: 1.2 }}>{servant.name}</Typography>
               <Typography variant="caption" sx={{ color: 'var(--color-text-dim)', display: 'block', mb: 1 }}>
-                {servant.class_name ? servant.class_name[0].toUpperCase() + servant.class_name.slice(1) : (servant.className || '')}
-                {servant.rarity != null ? `  ·  ${servant.rarity}★` : ''}
+                {(() => {
+                  // Mash (collectionNo 1) is a 5★ Paladin once ascended; the base
+                  // Atlas data still lists her as a 4★ Shielder.
+                  const isMash = String(servant.collectionNo) === '1';
+                  const raw = servant.className || servant.class_name || '';
+                  const cls = isMash ? 'Paladin' : (raw ? raw[0].toUpperCase() + raw.slice(1) : '');
+                  const rarity = isMash ? 5 : servant.rarity;
+                  return `${cls}${rarity != null ? `  ·  ${rarity}★` : ''}`;
+                })()}
               </Typography>
             </>
           ) : (
