@@ -4,6 +4,7 @@ import FilterSection from './FilterSection';
 import ServantSelection from './ServantSelection';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../supabaseClient';
+import { tierOf, tierRank } from '../data/servantTiers';
 import '../TeamSelectionPage.css';
 import '../ui-vars.css';
 
@@ -49,13 +50,17 @@ const TeamSelectionPage = ({ team, setTeam, servants, setFilteredServants, handl
     }
     if (sortOrder) {
       base = [...base].sort((a, b) => String(a[sortOrder] ?? '').localeCompare(String(b[sortOrder] ?? '')));
-    } else if (popularity) {
-      // Default: tier-list order by community pick count, ties broken by id.
+    } else {
+      // Default: AppMedia tier order first, then community pick count, then id —
+      // so the strongest / most-used servants float to the top like a tier list.
       base = [...base].sort((a, b) => {
-        const pa = popularity.get(a.collectionNo) || 0;
-        const pb = popularity.get(b.collectionNo) || 0;
+        const ra = tierRank(a.name);
+        const rb = tierRank(b.name);
+        if (ra !== rb) return ra - rb;
+        const pa = (popularity && popularity.get(Number(a.collectionNo))) || 0;
+        const pb = (popularity && popularity.get(Number(b.collectionNo))) || 0;
         if (pb !== pa) return pb - pa;
-        return (a.collectionNo || 0) - (b.collectionNo || 0);
+        return (Number(a.collectionNo) || 0) - (Number(b.collectionNo) || 0);
       });
     }
 
@@ -124,6 +129,7 @@ const TeamSelectionPage = ({ team, setTeam, servants, setFilteredServants, handl
                   servants={displayList}
                   matchSet={matchSet}
                   popularity={popularity}
+                  tierOf={tierOf}
                   handleServantClick={handleServantClick}
                 />
               </div>
