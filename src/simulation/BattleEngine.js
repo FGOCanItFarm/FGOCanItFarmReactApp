@@ -2,9 +2,6 @@ import { Servant }    from './Servant.js';
 import { Quest }      from './Quest.js';
 import { MysticCode } from './MysticCode.js';
 
-// Atlas card ids → engine card-mod keys (real data stores numeric card ids).
-const CARD_ID_TO_NAME = { 1: 'arts', 2: 'buster', 3: 'quick' };
-
 // Injected at the start of every NP that has extra gauge above 100%
 const NP_OC_1_TURN = {
   funcType: 'addStateShort', funcTargetType: 'ptAll',
@@ -279,9 +276,7 @@ export class BattleEngine {
     if (servant.id === 1) {
       const holySwordLoaded = servant.buffs.buffs.some(b => b.buff === '聖剣装填');
       activeNpId = servant.nps.tdTypeChangeNewId(holySwordLoaded);
-      if (activeNpId != null) {
-        npCardType = CARD_ID_TO_NAME[servant.nps.getNpById(activeNpId).card] ?? npCardType;
-      }
+      if (activeNpId != null) npCardType = servant.nps.getNpById(activeNpId).card;
     }
 
     const functions = servant.nps.getNpValues(

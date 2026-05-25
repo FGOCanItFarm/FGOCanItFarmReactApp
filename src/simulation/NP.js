@@ -1,3 +1,9 @@
+// Atlas recently renumbered NP card ids; real data now stores numeric strings
+// ("1"=Arts, "2"=Buster, "3"=Quick). Normalize to the engine's named card keys
+// (already-named values pass through unchanged, e.g. synthetic test fixtures).
+const CARD_ID_TO_NAME = { 1: 'arts', 2: 'buster', 3: 'quick' };
+const normalizeCard = (card) => CARD_ID_TO_NAME[card] ?? card;
+
 export class NP {
   constructor(npsData) {
     this.nps = this.parseNoblePhantasms(npsData);
@@ -8,7 +14,7 @@ export class NP {
     if (!npsData || npsData.length === 0) return [];
     return [...npsData]
       .sort((a, b) => (a.id || 0) - (b.id || 0))
-      .map((np, i) => ({ ...np, newId: i + 1 }));
+      .map((np, i) => ({ ...np, card: normalizeCard(np.card), newId: i + 1 }));
   }
 
   getNpById(newId = null) {

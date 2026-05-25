@@ -441,9 +441,11 @@ border: 1px solid color-mix(in srgb, var(--color-success) 30%, transparent);
 ## Simulation Engine — Rules
 
 `src/simulation/` files (except `RunAdapter.js`) are the core engine. When modifying:
-- Do NOT change logic in `Driver.js`, `BattleEngine.js`, `Servant.js`, `NP.js`, `Skills.js`, `Buffs.js`, `Enemy.js`, `Quest.js`, `Stats.js`, `gameData.js`
+- Do NOT change logic in `Driver.js`, `BattleEngine.js`, `Servant.js`, `NP.js`, `Skills.js`, `Buffs.js`, `Enemy.js`, `Quest.js`, `Stats.js`, `gameData.js` **without owner approval** (FR-4/5/8 are owner-approved engine extensions — see Command Builder Roadmap).
 - `RunAdapter.js` is the integration layer — safe to modify
 - The engine uses camelCase internally (`npGauge`); `RunAdapter` normalises to snake_case (`np_gauge`) before returning to the UI
+- **NP card normalisation:** Atlas renumbered NP card ids; the `data` blob now stores numeric strings (`"1"`=Arts, `"2"`=Buster, `"3"`=Quick) on each `noblePhantasm.card` — NOT the named form the engine's card-mod / `npGain` lookups expect. `NP.parseNoblePhantasms` normalises every `card` to the named key on load (`NP.js`). Synthetic fixtures that already use named cards pass through unchanged. (Before this, every real-data Buster/Quick NP was silently scored as Arts and refunded 0 NP.)
+- **Mash "Holy Sword" transform (FR-5, contained special case — owner-approved):** Mash (`collectionNo 1`) is the one modelled transform servant. `Servant.js` treats her as the upgraded 5★ Paladin (ATK 10835 @ Lv90, `attribute: human`); Atlas still encodes the base 4★ Shielder. `BattleEngine.useNp` resolves her active NP through the `script.tdTypeChangeIDs` group (`NP.tdTypeChangeNewId`): default = Lord Chaldeas (Arts, defensive, id 800107); after firing it loads the `聖剣装填` buff, her active NP becomes the offensive Holy Sword (Buster AoE, id 800108). `BattleEngine.useSkill` models her Holy-Sword S2 ("Purple Bullet…", absent from trimmed data) as a star-fuelled NP charge (assume 50 crit stars × 4% → +200%) plus +100% NP strength (3T), skipping the base-S2 effects while loaded. New transform servants should graduate to the declarative registry (FR-5), not more `id === N` branches.
 
 ## Key Invariants
 
