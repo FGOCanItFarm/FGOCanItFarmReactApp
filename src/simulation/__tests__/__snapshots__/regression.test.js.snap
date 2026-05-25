@@ -332,7 +332,7 @@ Object {
 }
 `;
 
-exports[`engine regression (golden snapshots) normal-farming tokens: "x31 6 #" 1`] = `
+exports[`engine regression (golden snapshots) normal-farming tokens: "x34 6 #" 1`] = `
 Object {
   "ok": true,
   "questCleared": false,
