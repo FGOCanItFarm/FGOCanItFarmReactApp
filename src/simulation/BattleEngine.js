@@ -226,21 +226,27 @@ export class BattleEngine {
   useSkill(servant, skillNum, target = null, choice = null) {
     const num = skillNum + 1; // convert to 1-based
     if (!servant.skills.skillAvailable(num)) return false;
+
+    // Mash Holy Sword S2 ("Purple Bullet…"): while "聖剣装填" is loaded her S2 is a
+    // DIFFERENT skill than Atlas's base S2 (which Atlas does not even expose in
+    // the trimmed data). It converts crit stars into NP charge (stars × 4%,
+    // capped at 50 stars → up to 200%) and grants +100% NP strength for 3 turns.
+    // Stars aren't modeled by the engine; assume a reasonable 50 in hand. The
+    // base-S2 effects are intentionally skipped. (Contained special case — FR-5.)
+    if (servant.id === 1 && num === 2 && servant.buffs.buffs.some(b => b.buff === '聖剣装填')) {
+      servant.skills.setSkillCooldown(num);
+      const assumedStars = 50;
+      servant.stats.setNpgauge(Math.min(assumedStars, 50) * 4); // +(stars × 4%) NP
+      this.applyBuff(servant, { buff_name: 'NP Strength Up', value: 1000, turns: 3, functvals: [], tvals: [] });
+      return true;
+    }
+
     const skill = servant.skills.getSkillByNum(num);
     servant.skills.setSkillCooldown(num);
     // choice is stored for future modal-variable skill handling (Space Ishtar, Emiya)
     this._pendingChoice = choice;
-    const gaugeBefore = servant.npGauge;
     for (const effect of skill.functions) this.applyEffect(effect, servant, target);
     this._pendingChoice = null;
-
-    // Mash Holy Sword: while "聖剣装填" is loaded the in-game skillRankUp turns her
-    // S2 (Obscurant Wall) into a full 100% NP battery. This engine reads only the
-    // base skill (≤30%), so top the grant up to a full 100% (contained — FR-5).
-    if (servant.id === 1 && num === 2 && servant.buffs.buffs.some(b => b.buff === '聖剣装填')) {
-      const granted = servant.npGauge - gaugeBefore;
-      if (granted < 100) servant.stats.setNpgauge(100 - granted);
-    }
     return true;
   }
 
