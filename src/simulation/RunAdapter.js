@@ -109,6 +109,14 @@ export async function runSimulation({ team, commands, selectedQuest, selectedMys
         outcome,
         clear_probability,
         min_multiplier_needed: damage_at_10 > 0 ? hpRequired / damage_at_10 : null,
+        // FR-8: per-enemy granular stats (camelCase engine → snake_case UI)
+        per_enemy: (waveData.enemies || []).map(e => ({
+          index: e.index,
+          name: e.name,
+          max_hp: e.maxHp,
+          damage_taken: e.damageTaken,
+          np_refund: e.npRefund,
+        })),
       };
     }
 

@@ -63,11 +63,22 @@ export class BattleEngine {
   _recordInitialWaveHp() {
     if (!this.waveStats[this.wave]) this.waveStats[this.wave] = { hpRequired: 0, damageDealt: 0 };
     this.waveStats[this.wave].hpRequired = this.enemies.reduce((s, e) => s + e.maxHp, 0);
+    // FR-8 granular logging: per-enemy, index-aligned to the live wave enemies.
+    this.waveStats[this.wave].enemies = this.enemies.map((e, i) => ({
+      index: i, name: e.name, maxHp: e.maxHp, damageTaken: 0, npRefund: 0,
+    }));
   }
 
   recordNpDamage(wave, damage) {
     if (!this.waveStats[wave]) this.waveStats[wave] = { hpRequired: 0, damageDealt: 0 };
     this.waveStats[wave].damageDealt += damage;
+  }
+
+  /** FR-8: per-enemy damage / NP-refund logging, keyed by the enemy's live index. */
+  _recordEnemyStat(enemy, field, amount) {
+    const ws = this.waveStats[this.wave];
+    const idx = this.enemies.indexOf(enemy);
+    if (ws?.enemies && idx >= 0 && ws.enemies[idx]) ws.enemies[idx][field] += amount;
   }
 
   captureServantsAtWaveEnd(wave) {
@@ -369,6 +380,7 @@ export class BattleEngine {
     ) * this.damageMultiplier;
 
     this.recordNpDamage(this.wave, total);
+    this._recordEnemyStat(target, 'damageTaken', total);
     this._distributeHits(servant, target, total, cardType, cardNpValue, cardEffMod);
   }
 
@@ -404,6 +416,7 @@ export class BattleEngine {
     ) * this.damageMultiplier;
 
     this.recordNpDamage(this.wave, total);
+    this._recordEnemyStat(target, 'damageTaken', total);
     this._distributeHits(servant, target, total, cardType, cardNpValue, cardEffMod);
   }
 
@@ -417,7 +430,7 @@ export class BattleEngine {
       cumulative += perHit[i];
       const overkill  = cumulative > target.hp ? 1.5 : 1;
       const npPerHit  = npGain * cardNpValue * (1 + cardEffMod) * target.npPerHitMult * overkill;
-      if (cardType !== 'buster') servant.setNpgauge(npPerHit);
+      if (cardType !== 'buster') { servant.setNpgauge(npPerHit); this._recordEnemyStat(target, 'npRefund', npPerHit); }
       target.setHp(perHit[i]);
     }
   }

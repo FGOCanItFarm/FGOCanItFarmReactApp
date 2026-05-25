@@ -115,4 +115,39 @@ describe('traverse_api_input — real-data engine runs', () => {
     // Arash (16) self-sacrificed and was removed from the party
     expect(engine.servants.map((s) => s.id)).not.toContain(16);
   });
+
+  // FR-8: granular per-enemy / per-wave stats logging (reuses the paladin_mash
+  // full clear so every wave is processed and every enemy is killed).
+  test('granular per-enemy stats are logged (FR-8)', () => {
+    const team = [
+      { collectionNo: 1, attack: 2000, initialCharge: 50, np: 3 },
+      { collectionNo: 16, attack: 2400, initialCharge: 20, np: 5, npUp: 0.80 },
+      { collectionNo: 150 },
+      { collectionNo: 316 },
+      { collectionNo: 314 },
+    ];
+    const commands = [
+      'a', 'b1', 'f', 'g', 'h', 'i1', '4', '5', '#',
+      'x31', 'd', 'e1', 'g1', 'i1', '4', '#',
+      'b', 'f1', 'j', '4', '#',
+    ];
+    const engine = runTokens(team, 210, 94095710, commands);
+    expect(engine.questCleared).toBe(true);
+
+    for (const wave of Object.values(engine.waveStats)) {
+      // Per-enemy array is index-aligned to the wave's enemies.
+      expect(Array.isArray(wave.enemies)).toBe(true);
+      expect(wave.enemies.length).toBeGreaterThan(0);
+
+      // Per-enemy damage sums to the wave aggregate.
+      const sum = wave.enemies.reduce((s, e) => s + e.damageTaken, 0);
+      expect(sum).toBeCloseTo(wave.damageDealt, 3);
+
+      // A full clear means every enemy took at least its max HP (overkill).
+      for (const e of wave.enemies) {
+        expect(e).toMatchObject({ name: expect.any(String), maxHp: expect.any(Number) });
+        expect(e.damageTaken).toBeGreaterThanOrEqual(e.maxHp);
+      }
+    }
+  });
 });

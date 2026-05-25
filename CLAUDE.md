@@ -187,6 +187,10 @@ User clicks Run
         outcome: 'guaranteed' | 'rng' | 'impossible',
         clear_probability: number,
         min_multiplier_needed: number | null,
+        per_enemy: [                          // FR-8 granular stats
+          { index: number, name: string, max_hp: number,
+            damage_taken: number, np_refund: number },
+        ],
       },
     },
   },
@@ -350,11 +354,13 @@ Fixtures:
 ## Command Builder Roadmap
 
 `docs/command-state-machine-spec.md` is the authoritative brief (FR-1…FR-9) for
-the engine-driven command builder. Phase 0 (FR-1 `CommandState.js`, FR-2
-`prepareSimInputs`) is implemented + snapshot-tested. FR-4 (enemy targeting),
-FR-5 (transform/form registry — unblocked by keeping `ascensionAdd`/`svtChange`),
-and FR-8 (granular per-enemy stats) are approved engine extensions; extend the
-regression suite before each.
+the engine-driven command builder. Implemented: Phase 0 (FR-1 `CommandState.js`,
+FR-2 `prepareSimInputs`, snapshot-tested); **FR-8 granular per-enemy stats**
+(`waveStats[wave].enemies[] = {index,name,maxHp,damageTaken,npRefund}`, exposed
+as `stats.waves[w].per_enemy` by RunAdapter); **FR-5 (Mash only)** as a contained
+special case (see Simulation Engine — Rules). Still open: FR-4 (enemy targeting),
+FR-5 general registry, FR-3/6/7 builder UI, FR-9 saved-run format. Extend the
+regression suite before each engine change.
 
 ## Environment Variables
 
