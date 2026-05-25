@@ -10,7 +10,15 @@ export class Buffs {
   processEndTurnSkills() {
     let addMagicBullets = false;
     for (const buff of this.buffs) {
-      if (buff.buff === 'NP Gain Each Turn') this.servant.setNpgauge(buff.value);
+      // Per-turn NP charge (Lord Logres S1, etc.). svals.Value is in 0.01%
+      // units (a 50% battery = 5000), same scale as the gainNp handler — convert
+      // to gauge percent. Applied here (once per turn) NOT in processServantBuffs
+      // (a recompute that runs many times per turn and would compound it).
+      if (
+        buff.buff === 'NP Gain Each Turn' ||
+        buff.buff.includes('Triggers Each Turn (Increase NP)') ||
+        buff.buff.includes('Triggers Each Turn (NP Absorb)')
+      ) this.servant.setNpgauge(buff.value / 100);
       if (buff.buff === 'Delayed Effect (Death)') this.servant.kill = true;
       if (this.servant.name === 'Super Aoko') addMagicBullets = true;
     }
@@ -85,12 +93,10 @@ export class Buffs {
                 s.powerMod[tval] += buff.value || 0;
               }
             }
-            if (
-              buff.buff.includes('Triggers Each Turn (Increase NP)') ||
-              buff.buff.includes('Triggers Each Turn (NP Absorb)')
-            ) {
-              s.npGauge += buff.value;
-            }
+            // NOTE: per-turn NP gain ("Triggers Each Turn …", "NP Gain Each
+            // Turn") is applied once per turn in processEndTurnSkills, NOT here —
+            // processServantBuffs is a derived-stat recompute that runs many
+            // times per turn, so mutating npGauge here would compound it.
         }
       }
     }
@@ -135,5 +141,18 @@ export class Buffs {
 
   clearBuff(name) {
     this.buffs = this.buffs.filter(b => b.buff !== name);
+  }
+
+  // Spend one charge of each count-limited Overcharge Lv. Up buff (the "1 time"
+  // party OC from NPs like Lord Logres). Unlimited buffs (count -1, e.g. the
+  // 1-turn NP-chain OC) are left untouched; buffs whose count hits 0 are removed.
+  consumeOverchargeBuffs() {
+    this.buffs = this.buffs.filter(b => {
+      if ((b.buff === 'Overcharge Lv. Up' || b.buff === 'NP Overcharge Level Up') && b.count > 0) {
+        b.count -= 1;
+        return b.count > 0;
+      }
+      return true;
+    });
   }
 }

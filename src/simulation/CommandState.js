@@ -24,6 +24,8 @@ const NP_SLOTS = { 4: 0, 5: 1, 6: 2 };
 const RE_CHOICE_TARGET = /^([a-i])\(\[Ch(\d+)([A-C])\](\d)\)$/; // a([Ch1A]2)
 const RE_CHOICE = /^([a-i])\[Ch(\d+)([A-C])\]$/;                 // a[Ch1A]
 const RE_SWAP = /^x(\d)(\d)$/;                                   // x12
+const RE_NP_TARGET = /^([456])e(\d+)$/;                          // 4e2 (FR-4)
+const RE_SKILL_ENEMY = /^([a-i])~(\d+)$/;                        // a~2 (FR-4)
 const RE_SKILL_TARGET = /^([a-i])(\d)$/;                          // a1
 const RE_MC_TARGET = /^([jkl])(\d)$/;                             // j1
 
@@ -47,6 +49,13 @@ export function classifyToken(token) {
   }
   if ((m = RE_SWAP.exec(token))) {
     return { kind: 'swap', front: parseInt(m[1], 10), back: parseInt(m[2], 10) };
+  }
+  if ((m = RE_NP_TARGET.exec(token))) {
+    return { kind: 'np', slot: NP_SLOTS[m[1]], enemyTarget: parseInt(m[2], 10) };
+  }
+  if ((m = RE_SKILL_ENEMY.exec(token))) {
+    const idx = SKILL_LETTERS.indexOf(m[1]);
+    return { kind: 'skill', servantIdx: Math.floor(idx / 3), skillIdx: idx % 3, enemyTarget: parseInt(m[2], 10), allySlot: null };
   }
   if ((m = RE_SKILL_TARGET.exec(token)) && SKILL_LETTERS.includes(m[1])) {
     const idx = SKILL_LETTERS.indexOf(m[1]);
@@ -338,6 +347,7 @@ export function humanizeToken(token, engineOrSnapshot) {
   switch (desc.kind) {
     case 'skill': {
       const base = `S${desc.servantIdx + 1} · Skill ${desc.skillIdx + 1}`;
+      if (desc.enemyTarget) return `${base} → enemy ${desc.enemyTarget}`;
       return desc.allySlot ? `${base} → ally ${nameAt(front, desc.allySlot - 1)}` : base;
     }
     case 'choice': {
@@ -352,10 +362,68 @@ export function humanizeToken(token, engineOrSnapshot) {
       return desc.allySlot ? `${base} → ally ${nameAt(front, desc.allySlot - 1)}` : base;
     }
     case 'np':
-      return `S${desc.slot + 1} NP`;
+      return desc.enemyTarget ? `S${desc.slot + 1} NP → enemy ${desc.enemyTarget}` : `S${desc.slot + 1} NP`;
     case 'endTurn':
       return 'End turn';
     default:
       return `Invalid: ${token}`;
   }
 }
+
+// ─── Command builder controller (FR-3 token resolution, FR-6 edit/validate) ──
+
+/**
+ * FR-3: combine a `legalNextTokens` option with the user's picked target into a
+ * concrete token. `self`/`team`/`enemyAll`/`none` fire immediately (base token);
+ * `ally` appends the ally slot (`a` → `a2`); `enemyOne` appends the enemy suffix
+ * (`6` → `6e2` for NPs, `a` → `a~2` for skills).
+ * @param {{token:string, kind:string, targetClass:string}} option
+ * @param {{allySlot?:number, enemyIndex?:number}} target
+ */
+export function resolveToken(option, target = {}) {
+  const { token, kind, targetClass } = option;
+  if (targetClass === 'ally' && target.allySlot != null) {
+    return `${token}${target.allySlot}`;
+  }
+  if (targetClass === 'enemyOne' && target.enemyIndex != null) {
+    return kind === 'np' ? `${token}e${target.enemyIndex}` : `${token}~${target.enemyIndex}`;
+  }
+  return token; // immediate, or target not yet picked
+}
+
+/** True when an option needs a follow-up target pick before it resolves. */
+export function needsTarget(option) {
+  return option.targetClass === 'ally' || option.targetClass === 'enemyOne';
+}
+
+/**
+ * FR-6: forward-only re-validation of an edited token array. Returns the first
+ * token index that makes the run fail (-1 if all valid) and a per-token state so
+ * the UI can mark the failing token and grey everything after it (without
+ * silently dropping). The command array remains the single source of truth.
+ */
+export function validateSequence(simInputs, tokens) {
+  const { ok, failedIndex } = buildEngineAt(simInputs, tokens);
+  return {
+    ok,
+    failedIndex,
+    tokenStates: tokens.map((token, i) => ({
+      token,
+      valid: failedIndex === -1 || i < failedIndex,
+      failed: i === failedIndex,
+    })),
+  };
+}
+
+/**
+ * FR-6: pure edit operations on the command array (the single source of truth).
+ * The UI re-validates with validateSequence after any edit.
+ */
+export const editOps = {
+  append:    (tokens, token)      => [...tokens, token],
+  pop:       (tokens)            => tokens.slice(0, -1),
+  deleteAt:  (tokens, i)         => tokens.filter((_, j) => j !== i),
+  insertAt:  (tokens, i, token)  => [...tokens.slice(0, i), token, ...tokens.slice(i)],
+  replaceAt: (tokens, i, token)  => tokens.map((t, j) => (j === i ? token : t)),
+  clear:     ()                  => [],
+};

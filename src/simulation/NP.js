@@ -1,3 +1,9 @@
+// Atlas recently renumbered NP card ids; real data now stores numeric strings
+// ("1"=Arts, "2"=Buster, "3"=Quick). Normalize to the engine's named card keys
+// (already-named values pass through unchanged, e.g. synthetic test fixtures).
+const CARD_ID_TO_NAME = { 1: 'arts', 2: 'buster', 3: 'quick' };
+const normalizeCard = (card) => CARD_ID_TO_NAME[card] ?? card;
+
 export class NP {
   constructor(npsData) {
     this.nps = this.parseNoblePhantasms(npsData);
@@ -8,7 +14,7 @@ export class NP {
     if (!npsData || npsData.length === 0) return [];
     return [...npsData]
       .sort((a, b) => (a.id || 0) - (b.id || 0))
-      .map((np, i) => ({ ...np, newId: i + 1 }));
+      .map((np, i) => ({ ...np, card: normalizeCard(np.card), newId: i + 1 }));
   }
 
   getNpById(newId = null) {
@@ -17,6 +23,21 @@ export class NP {
     if (!found) throw new Error(`No NP found with newId ${newId}`);
     return found;
   }
+
+  /**
+   * Resolve the newId of an NP-swap (`script.tdTypeChangeIDs`) group member.
+   * Mash's "Lord Chaldeas" (default, Arts) ↔ "Holy Sword" (loaded, Buster) is the
+   * only live case. `loaded` = whether the tdTypeChange state buff is active.
+   * Returns null when the servant has no NP-swap group.
+   */
+  tdTypeChangeNewId(loaded) {
+    const group = this.nps.find(np => np.script?.tdTypeChangeIDs);
+    if (!group) return null;
+    const [defaultId, alternateId] = group.script.tdTypeChangeIDs;
+    const wantId = loaded ? alternateId : defaultId;
+    return this.nps.find(np => np.id === wantId)?.newId ?? null;
+  }
+
 
   static safeSvalAtLevel(func, oc, npLevel) {
     const key = oc > 1 ? `svals${oc}` : 'svals';
@@ -94,7 +115,10 @@ export class NP {
 
   getNpgain(cardType, newId = null) {
     const np = this.getNpById(newId);
-    const arr = np.npGain?.[cardType] || [0];
+    // Atlas renormalised NP gain: the NP-card refund rate is under `npGain.np`
+    // (the per-card keys exist too and are equal). Fall back to the card key for
+    // synthetic fixtures that only define named-card arrays.
+    const arr = np.npGain?.np ?? np.npGain?.[cardType] ?? [0];
     return arr[0] / 100;
   }
 

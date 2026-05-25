@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import {
   Box, Typography, TextField, Select, MenuItem, FormControl, InputLabel,
-  Paper, Chip, IconButton, Tooltip, Collapse, CircularProgress
+  Paper, Chip, IconButton, Tooltip, Collapse, CircularProgress, Button, Alert
 } from '@mui/material';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import CheckIcon from '@mui/icons-material/Check';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import { supabase } from '../supabaseClient';
+import { resimulateSavedRun, reconcileWaveResults } from '../simulation/RunAdapter';
 
 const waveChipColor = (outcome) => {
   if (outcome === 'guaranteed') return 'success';
@@ -23,6 +24,9 @@ const fmtDate = (iso) => {
 const RunCard = ({ run, servantMap }) => {
   const [expanded, setExpanded] = useState(false);
   const [copied, setCopied] = useState(false);
+  // FR-9 verify-by-re-sim state.
+  const [verify, setVerify] = useState({ status: 'idle' }); // idle|running|match|diverged|error
+  const [reportStatus, setReportStatus] = useState(null);   // null|sending|sent|failed
 
   const handleCopy = async (e) => {
     e.stopPropagation();
@@ -34,6 +38,37 @@ const RunCard = ({ run, servantMap }) => {
   };
 
   const waveResults = run.wave_results || {};
+
+  const handleVerify = async (e) => {
+    e.stopPropagation();
+    setVerify({ status: 'running' });
+    setReportStatus(null);
+    const fresh = await resimulateSavedRun(run);
+    if (!fresh?.success) {
+      setVerify({ status: 'error', error: fresh?.error || 'Re-simulation failed.' });
+      return;
+    }
+    const freshWaves = fresh.stats?.waves ?? {};
+    const { diverged, diffs } = reconcileWaveResults(waveResults, freshWaves);
+    setVerify({ status: diverged ? 'diverged' : 'match', fresh: freshWaves, diffs });
+  };
+
+  const handleReport = async (e) => {
+    e.stopPropagation();
+    setReportStatus('sending');
+    const reason = verify.status === 'error' ? 'error' : 'divergence';
+    const { error } = await supabase.rpc('submit_run_report', {
+      p_run_id: run.id ?? null,
+      p_quest_id: run.quest_id ?? null,
+      p_token_string: run.token_string ?? '',
+      p_reason: reason,
+      p_stored_summary: waveResults,
+      p_fresh_summary: verify.fresh ?? null,
+      p_diffs: verify.diffs ?? (verify.error ? { error: verify.error } : null),
+      p_note: null,
+    });
+    setReportStatus(error ? 'failed' : 'sent');
+  };
 
   return (
     <Paper
@@ -180,6 +215,47 @@ const RunCard = ({ run, servantMap }) => {
               </Box>
             ))
           }
+
+          {/* FR-9: re-simulate and reconcile against the stored summary. */}
+          <Box mt={1.5} onClick={(e) => e.stopPropagation()}>
+            <Button
+              size="small" variant="outlined"
+              onClick={handleVerify}
+              disabled={verify.status === 'running'}
+            >
+              {verify.status === 'running' ? 'Re-simulating…' : 'Verify (re-sim)'}
+            </Button>
+
+            {verify.status === 'match' && (
+              <Alert severity="success" sx={{ mt: 1 }}>Re-sim matches the stored result.</Alert>
+            )}
+            {verify.status === 'diverged' && (
+              <Alert severity="warning" sx={{ mt: 1 }}>
+                Re-sim diverges from the stored result (engine may have changed):
+                <Box component="ul" sx={{ m: 0.5, pl: 2 }}>
+                  {Object.entries(verify.diffs).map(([w, d]) => (
+                    <li key={w}>Wave {w} · {d.field}: stored {String(d.stored)} → now {String(d.fresh)}</li>
+                  ))}
+                </Box>
+              </Alert>
+            )}
+            {verify.status === 'error' && (
+              <Alert severity="error" sx={{ mt: 1 }}>Re-sim error: {verify.error}</Alert>
+            )}
+
+            {(verify.status === 'diverged' || verify.status === 'error') && (
+              <Button
+                size="small" color="secondary" sx={{ mt: 1 }}
+                onClick={handleReport}
+                disabled={reportStatus === 'sending' || reportStatus === 'sent'}
+              >
+                {reportStatus === 'sent' ? 'Report submitted ✓'
+                  : reportStatus === 'sending' ? 'Submitting…'
+                  : reportStatus === 'failed' ? 'Retry report'
+                  : 'Report discrepancy'}
+              </Button>
+            )}
+          </Box>
         </Box>
       </Collapse>
     </Paper>

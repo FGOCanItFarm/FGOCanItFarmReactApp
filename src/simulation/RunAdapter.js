@@ -59,7 +59,7 @@ export async function prepareSimInputs({ team, selectedQuest, selectedMysticCode
       busterDamageUp: Number(fx.busterDamageUp ?? 0),
       quickDamageUp:  Number(fx.quickDamageUp  ?? 0),
       artsDamageUp:   Number(fx.artsDamageUp   ?? 0),
-      append5:        !!(fx.append5 ?? fx.append_5 ?? false),
+      append5:        !!(fx.append5 ?? fx.append_5 ?? true),
     };
     return { rawData, opts };
   });
@@ -69,6 +69,69 @@ export async function prepareSimInputs({ team, selectedQuest, selectedMysticCode
     questData: selectedQuest._fullData,
     mcData,
     damageMultiplier: 1.0,
+  };
+}
+
+/**
+ * Pure post-processing: turn a finished engine into the UI/saved-run result
+ * shape (stats.waves with FR-8 per_enemy, outcome, clear probability). Shared by
+ * runSimulation and offline seeding so a re-sim reproduces a stored summary
+ * byte-for-byte.
+ */
+export function summarizeEngine(engine) {
+  const waves = {};
+  for (const [waveKey, waveData] of Object.entries(engine.waveStats)) {
+    const { hpRequired, damageDealt } = waveData;
+    const damage_at_09 = damageDealt * 0.9;
+    const damage_at_10 = damageDealt;
+    const damage_at_11 = damageDealt * 1.1;
+
+    let outcome, clear_probability;
+    if (damage_at_09 >= hpRequired) {
+      outcome = 'guaranteed';
+      clear_probability = 1.0;
+    } else if (damage_at_10 >= hpRequired) {
+      outcome = 'rng';
+      clear_probability = 0.5;
+    } else {
+      outcome = 'impossible';
+      clear_probability = 0.0;
+    }
+
+    waves[waveKey] = {
+      hp_required: hpRequired,
+      damage_at_09,
+      damage_at_10,
+      damage_at_11,
+      outcome,
+      clear_probability,
+      min_multiplier_needed: damage_at_10 > 0 ? hpRequired / damage_at_10 : null,
+      // FR-8: per-enemy granular stats (camelCase engine → snake_case UI)
+      per_enemy: (waveData.enemies || []).map(e => ({
+        index: e.index,
+        name: e.name,
+        max_hp: e.maxHp,
+        damage_taken: e.damageTaken,
+        np_refund: e.npRefund,
+      })),
+    };
+  }
+
+  const waveProbs = Object.values(waves).map(w => w.clear_probability);
+  const overall_clear_probability = waveProbs.length > 0 ? Math.min(...waveProbs) : 0;
+
+  return {
+    success: true,
+    quest_cleared: engine.questCleared,
+    wave_reached: engine.wave,
+    total_waves: engine.totalWaves,
+    servants_at_wave_end: Object.fromEntries(
+      Object.entries(engine.servantsAtWaveEnd).map(([wave, servants]) => [
+        wave,
+        servants.map(({ slot, collectionNo, npGauge }) => ({ slot, collectionNo, np_gauge: npGauge })),
+      ])
+    ),
+    stats: { waves, overall_clear_probability },
   };
 }
 
@@ -82,53 +145,78 @@ export async function runSimulation({ team, commands, selectedQuest, selectedMys
       return { success: false, error: 'Simulation failed: invalid token sequence or skill error.' };
     }
 
-    const waves = {};
-    for (const [waveKey, waveData] of Object.entries(engine.waveStats)) {
-      const { hpRequired, damageDealt } = waveData;
-      const damage_at_09 = damageDealt * 0.9;
-      const damage_at_10 = damageDealt;
-      const damage_at_11 = damageDealt * 1.1;
-
-      let outcome, clear_probability;
-      if (damage_at_09 >= hpRequired) {
-        outcome = 'guaranteed';
-        clear_probability = 1.0;
-      } else if (damage_at_10 >= hpRequired) {
-        outcome = 'rng';
-        clear_probability = 0.5;
-      } else {
-        outcome = 'impossible';
-        clear_probability = 0.0;
-      }
-
-      waves[waveKey] = {
-        hp_required: hpRequired,
-        damage_at_09,
-        damage_at_10,
-        damage_at_11,
-        outcome,
-        clear_probability,
-        min_multiplier_needed: damage_at_10 > 0 ? hpRequired / damage_at_10 : null,
-      };
-    }
-
-    const waveProbs = Object.values(waves).map(w => w.clear_probability);
-    const overall_clear_probability = waveProbs.length > 0 ? Math.min(...waveProbs) : 0;
-
-    return {
-      success: true,
-      quest_cleared: engine.questCleared,
-      wave_reached: engine.wave,
-      total_waves: engine.totalWaves,
-      servants_at_wave_end: Object.fromEntries(
-        Object.entries(engine.servantsAtWaveEnd).map(([wave, servants]) => [
-          wave,
-          servants.map(({ slot, collectionNo, npGauge }) => ({ slot, collectionNo, np_gauge: npGauge })),
-        ])
-      ),
-      stats: { waves, overall_clear_probability },
-    };
+    return summarizeEngine(engine);
   } catch (err) {
     return { success: false, error: err.message };
   }
+}
+
+/**
+ * FR-9: reconcile a stored saved-run summary (saved_runs.wave_results) against a
+ * freshly re-simulated one, to detect engine drift. Compares each wave's outcome
+ * and damage (within a relative tolerance) plus per-enemy damage when both carry
+ * the FR-8 granular `per_enemy` data. Returns the diverging waves/fields so the
+ * UI can surface a discrepancy and offer a bug report.
+ *
+ * @param {object} stored - stats.waves shape persisted at submit time
+ * @param {object} fresh  - stats.waves from a re-run of the same token string
+ * @param {number} tol    - relative damage tolerance (default 1%)
+ */
+export function reconcileWaveResults(stored = {}, fresh = {}, tol = 0.01) {
+  const diffs = {};
+  const near = (a, b) => {
+    const max = Math.max(Math.abs(a), Math.abs(b), 1);
+    return Math.abs(a - b) / max <= tol;
+  };
+  const waveKeys = new Set([...Object.keys(stored), ...Object.keys(fresh)]);
+  for (const w of waveKeys) {
+    const s = stored[w];
+    const f = fresh[w];
+    if (!s || !f) { diffs[w] = { field: 'wave', stored: s ?? null, fresh: f ?? null }; continue; }
+    if (s.outcome !== f.outcome) {
+      diffs[w] = { field: 'outcome', stored: s.outcome, fresh: f.outcome };
+    } else if (!near(Number(s.damage_at_10 ?? 0), Number(f.damage_at_10 ?? 0))) {
+      diffs[w] = { field: 'damage_at_10', stored: s.damage_at_10, fresh: f.damage_at_10 };
+    } else if (Array.isArray(s.per_enemy) && Array.isArray(f.per_enemy)) {
+      for (let i = 0; i < Math.max(s.per_enemy.length, f.per_enemy.length); i++) {
+        const se = s.per_enemy[i];
+        const fe = f.per_enemy[i];
+        if (!se || !fe || !near(Number(se.damage_taken ?? 0), Number(fe.damage_taken ?? 0))) {
+          diffs[w] = { field: `per_enemy[${i}].damage_taken`, stored: se?.damage_taken ?? null, fresh: fe?.damage_taken ?? null };
+          break;
+        }
+      }
+    }
+  }
+  return { diverged: Object.keys(diffs).length > 0, diffs };
+}
+
+/**
+ * FR-9: re-simulate a stored saved-run row (no app state needed) so its summary
+ * can be reconciled against the live engine. Reconstructs team / NP levels /
+ * quest / mystic code from the row, fetches the quest blob, and reuses
+ * runSimulation. Returns the same shape as runSimulation (incl. stats.waves).
+ *
+ * @param {{servant_collection_nos:number[], np_levels:number[], token_string:string,
+ *          quest_id:number, mystic_code_id?:number|null}} run
+ */
+export async function resimulateSavedRun(run) {
+  const colls = run.servant_collection_nos || [];
+  const team = Array.from({ length: 6 }, (_, i) => ({
+    collectionNo: colls[i] != null ? String(colls[i]) : '',
+  }));
+  const servantEffects = Array.from({ length: 6 }, (_, i) => ({
+    np: Number(run.np_levels?.[i] ?? 1),
+  }));
+
+  const { data: qRow, error: qErr } = await supabase
+    .from('quests').select('data').eq('id', run.quest_id).maybeSingle();
+  if (qErr) return { success: false, error: qErr.message };
+  if (!qRow?.data) return { success: false, error: `Quest ${run.quest_id} data not found.` };
+
+  const selectedQuest = { id: run.quest_id, _fullData: qRow.data };
+  const selectedMysticCode = run.mystic_code_id != null ? { id: run.mystic_code_id } : null;
+  const commands = (run.token_string || '').split(/\s+/).filter(Boolean);
+
+  return runSimulation({ team, commands, selectedQuest, selectedMysticCode, servantEffects });
 }

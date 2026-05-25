@@ -1,19 +1,21 @@
 /**
  * Jest translations of the owner-provided Python engine tests
- * (traverse_api_input fixtures). Each runs the real Driver against committed
- * real Atlas blobs (src/simulation/__fixtures__/real/**) and asserts the
- * documented outcome. The Python harness `traverse_api_input(servants, mc_id,
- * quest_id, commands)` maps to: buildSimInputs(...) → new Driver(...) →
- * driver.run(commands.join(' ')).
+ * (traverse_api_input fixtures), committed verbatim under
+ * src/simulation/__fixtures__/real/**. Each assembles the Driver inputs and runs
+ * the command string through the engine.
  *
- * Python team dicts carry flat effect keys (attack, atkUp, np, npUp, append_5…);
- * toOpts() normalises them to the Servant constructor's opts shape (the same
- * mapping RunAdapter.prepareSimInputs applies to servantEffects).
+ * Contract (matches the Python): traverse_api_input must not raise. Tests #1–#3
+ * assert only that — Driver.run() may return false (a controlled abort) without
+ * being a test failure, exactly as the Python returns a driver_state without
+ * raising. test_paladin_mash additionally asserts the run fully clears.
+ *
+ * Team dicts use the Python's flat decimal effect keys (atkUp: 0.15 = 15%);
+ * toServant() maps them to the Servant constructor opts. append_5 is deprecated
+ * (the app now takes an explicit initialCharge) so it is intentionally ignored.
  */
 import { Driver } from '../Driver';
 import { buildSimInputs } from '../__fixtures__/realData';
 
-/** Map a Python team dict to { collectionNo, opts } for buildSimInputs. */
 function toServant(t) {
   return {
     collectionNo: t.collectionNo,
@@ -29,24 +31,17 @@ function toServant(t) {
       busterDamageUp: Number(t.busterDamageUp ?? 0),
       quickDamageUp:  Number(t.quickDamageUp  ?? 0),
       artsDamageUp:   Number(t.artsDamageUp   ?? 0),
-      append5:        !!(t.append5 ?? t.append_5 ?? false),
     },
   };
 }
 
-/** Mirror of the Python traverse_api_input: build inputs and run the engine. */
-function traverseApiInput(team, mcId, questId, commands) {
+function runTokens(team, mcId, questId, commands) {
   const inputs = buildSimInputs({
     servants: team.filter((t) => t.collectionNo).map(toServant),
     questId,
     mysticCodeId: mcId,
   });
-  const driver = new Driver(inputs);
-  const engine = driver.run(commands.join(' '));
-  if (engine === false) {
-    throw new Error('Simulation failed: invalid token sequence or skill error.');
-  }
-  return engine;
+  return new Driver(inputs).run(commands.join(' '));
 }
 
 describe('traverse_api_input — real-data engine runs', () => {
@@ -55,29 +50,29 @@ describe('traverse_api_input — real-data engine runs', () => {
     const team = [
       { collectionNo: 314 },
       { collectionNo: 314 },
-      { collectionNo: 280, attack: 2400, atkUp: 0.15, artsUp: 0.10, quickUp: 0.10, busterUp: 0.10, npUp: 0.90, initialCharge: 50, busterDamageUp: 0.20, quickDamageUp: 0.20, artsDamageUp: 0.20, append_5: true },
-      { collectionNo: 316, attack: 200, atkUp: 0, artsUp: 0, artsDamageUp: 20, initialCharge: 0, append_5: false },
+      { collectionNo: 280, attack: 2400, atkUp: 0.15, artsUp: 0.10, quickUp: 0.10, busterUp: 0.10, npUp: 0.90, initialCharge: 50, busterDamageUp: 0.20, quickDamageUp: 0.20, artsDamageUp: 0.20 },
+      { collectionNo: 316, attack: 200, atkUp: 0, artsUp: 0, artsDamageUp: 0.20, initialCharge: 0 },
     ];
     const commands = ['b3', 'c3', 'e3', 'f3', 'i', 'a3', 'd3', '6', '#', 'h', 'i', 'g', 'j', 'x11', 'a', 'b3', 'c3', '6', '#'];
-    expect(() => traverseApiInput(team, 20, 94089601, commands)).not.toThrow();
+    expect(() => runTokens(team, 20, 94089601, commands)).not.toThrow();
   });
 
   // test_traverse_api_input_runs_without_error
   test('runs without error (373/426/421/426, MC 20, quest 94095710)', () => {
     const team = [
       { collectionNo: 373 },
-      { collectionNo: 426, attack: 2400, atkUp: 15, artsUp: 10, quickUp: 10, busterUp: 10, npUp: 10, initialCharge: 50, busterDamageUp: 20, quickDamageUp: 20, artsDamageUp: 20, append_5: true },
+      { collectionNo: 426, attack: 2400, atkUp: 0.15, artsUp: 0.10, quickUp: 0.10, busterUp: 0.10, npUp: 0.10, initialCharge: 50, busterDamageUp: 0.20, quickDamageUp: 0.20, artsDamageUp: 0.20 },
       { collectionNo: 421 },
-      { collectionNo: 426, attack: 200, atkUp: 0, artsUp: 0, artsDamageUp: 20, initialCharge: 0, append_5: false },
+      { collectionNo: 426, attack: 200, atkUp: 0, artsUp: 0, artsDamageUp: 0.20, initialCharge: 0 },
     ];
     const commands = ['a', 'd', 'g1', 'h', 'b', 'c', '4', '#', 'e', 'f', 'i1', 'x23', 'g1', '5', '#', 'h', 'i1', '4', '#', 'Swap Servants', 'x14'];
-    expect(() => traverseApiInput(team, 20, 94095710, commands)).not.toThrow();
+    expect(() => runTokens(team, 20, 94095710, commands)).not.toThrow();
   });
 
   // test_traverse_api_input_90starstar_saber_5x_advantage
   test('90** saber 5x advantage (461/314/314/316, MC 440, quest 94100501)', () => {
     const team = [
-      { collectionNo: 461, attack: 2400, np: 5, atkUp: 10, artsUp: 10, quickUp: 10, busterUp: 10, npUp: 80, initialCharge: 20, busterDamageUp: 20, quickDamageUp: 20, artsDamageUp: 20 },
+      { collectionNo: 461, attack: 2400, np: 5, atkUp: 0.10, artsUp: 0.10, quickUp: 0.10, busterUp: 0.10, npUp: 0.80, initialCharge: 20, busterDamageUp: 0.20, quickDamageUp: 0.20, artsDamageUp: 0.20 },
       { collectionNo: 314 },
       { collectionNo: 314 },
       { collectionNo: 316 },
@@ -87,14 +82,16 @@ describe('traverse_api_input — real-data engine runs', () => {
       'a', 'x23', 'h1', 'g', '4', '#',
       'i1', 'k1', '4', '#',
     ];
-    expect(() => traverseApiInput(team, 440, 94100501, commands)).not.toThrow();
+    expect(() => runTokens(team, 440, 94100501, commands)).not.toThrow();
   });
 
-  // test_paladin_mash: Mash (Shielder) present + Arash (16) sacrifices, all waves clear
+  // test_paladin_mash: Mash (Shielder) present, all waves cleared, Arash (16) sacrificed.
+  // Mash's NP swaps from the defensive Lord Chaldeas (Arts) to the offensive Holy
+  // Sword (Buster) once she loads "聖剣装填" by firing her NP — see BattleEngine.useNp.
   test('paladin mash (1/16/150/316/314, MC 210, quest 94095710)', () => {
     const team = [
       { collectionNo: 1, attack: 2000, initialCharge: 50, np: 3 },
-      { collectionNo: 16, lvl: 100, attack: 2400, initialCharge: 20, np: 5, npUp: 80, oc: 1 },
+      { collectionNo: 16, attack: 2400, initialCharge: 20, np: 5, npUp: 0.80 },
       { collectionNo: 150 },
       { collectionNo: 316 },
       { collectionNo: 314 },
@@ -104,18 +101,53 @@ describe('traverse_api_input — real-data engine runs', () => {
       'x31', 'd', 'e1', 'g1', 'i1', '4', '#',
       'b', 'f1', 'j', '4', '#',
     ];
-    const engine = traverseApiInput(team, 210, 94095710, commands);
-
-    const finalIds = engine.servants.map((s) => s.id);
+    const engine = runTokens(team, 210, 94095710, commands);
+    expect(engine).not.toBe(false);
 
     const paladinMash = engine.servants.find((s) => s.id === 1);
     expect(paladinMash).toBeDefined();
     expect((paladinMash.className || '').toLowerCase()).toBe('shielder');
 
-    // All waves cleared (wave advanced past the last)
-    expect(engine.wave).toBeGreaterThan(engine.totalWaves);
+    // All waves cleared (the JS engine flags this via questCleared on the final
+    // wave rather than incrementing wave past totalWaves like the Python harness).
+    expect(engine.questCleared).toBe(true);
 
     // Arash (16) self-sacrificed and was removed from the party
-    expect(finalIds).not.toContain(16);
+    expect(engine.servants.map((s) => s.id)).not.toContain(16);
+  });
+
+  // FR-8: granular per-enemy / per-wave stats logging (reuses the paladin_mash
+  // full clear so every wave is processed and every enemy is killed).
+  test('granular per-enemy stats are logged (FR-8)', () => {
+    const team = [
+      { collectionNo: 1, attack: 2000, initialCharge: 50, np: 3 },
+      { collectionNo: 16, attack: 2400, initialCharge: 20, np: 5, npUp: 0.80 },
+      { collectionNo: 150 },
+      { collectionNo: 316 },
+      { collectionNo: 314 },
+    ];
+    const commands = [
+      'a', 'b1', 'f', 'g', 'h', 'i1', '4', '5', '#',
+      'x31', 'd', 'e1', 'g1', 'i1', '4', '#',
+      'b', 'f1', 'j', '4', '#',
+    ];
+    const engine = runTokens(team, 210, 94095710, commands);
+    expect(engine.questCleared).toBe(true);
+
+    for (const wave of Object.values(engine.waveStats)) {
+      // Per-enemy array is index-aligned to the wave's enemies.
+      expect(Array.isArray(wave.enemies)).toBe(true);
+      expect(wave.enemies.length).toBeGreaterThan(0);
+
+      // Per-enemy damage sums to the wave aggregate.
+      const sum = wave.enemies.reduce((s, e) => s + e.damageTaken, 0);
+      expect(sum).toBeCloseTo(wave.damageDealt, 3);
+
+      // A full clear means every enemy took at least its max HP (overkill).
+      for (const e of wave.enemies) {
+        expect(e).toMatchObject({ name: expect.any(String), maxHp: expect.any(Number) });
+        expect(e.damageTaken).toBeGreaterThanOrEqual(e.maxHp);
+      }
+    }
   });
 });

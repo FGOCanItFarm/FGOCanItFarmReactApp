@@ -33,7 +33,7 @@ const SelectedServantDetails = ({ servant, handleEffectChange }) => {
       <FormControlLabel
         control={
           <Checkbox
-            checked={servant.append_5 || false}
+            checked={servant.append_5 ?? servant.append5 ?? true}
             onChange={(e) => handleEffectChange('append5', e.target.checked)}
           />
         }

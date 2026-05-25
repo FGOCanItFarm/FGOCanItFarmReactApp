@@ -3,6 +3,7 @@ import { Button, Typography, Box, Container, Modal, Chip, CircularProgress, Aler
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import '../CommandInputPage.css';
 import SourceTargetCommandInput from './SourceTargetCommandInput';
+import CombatDashboard from './CombatDashboard';
 import SimulationStats from './SimulationStats';
 import { supabase } from '../supabaseClient';
 import { parseServantSkills } from './skillInfo';
@@ -10,6 +11,7 @@ import { parseServantSkills } from './skillInfo';
 const CommandInputPage = ({
   team, servants, setTeam, activeServant, setActiveServant,
   commands, setCommands, selectedQuest, selectedMysticCode, setSelectedMysticCode,
+  servantEffects,
   handleSubmit, openModal, handleOpenModal, handleCloseModal,
   simulationResult, setSimulationResult,
   simulating = false,
@@ -116,6 +118,15 @@ const CommandInputPage = ({
         selectedSlot={activeServant}
         setSelectedSlot={setActiveServant}
         skillInfo={skillInfo}
+      />
+
+      <CombatDashboard
+        team={team}
+        selectedQuest={selectedQuest}
+        selectedMysticCode={selectedMysticCode}
+        servantEffects={servantEffects}
+        commands={commands}
+        setCommands={setCommandsWithHistory}
       />
 
       <Box mt={4}>

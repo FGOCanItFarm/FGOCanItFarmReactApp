@@ -24,7 +24,7 @@ export class Servant {
     busterDamageUp = 0,
     quickDamageUp  = 0,
     artsDamageUp   = 0,
-    append5        = false,
+    append5        = true,
   } = {}) {
     this.id        = rawData.collectionNo;
     this.data      = rawData;
@@ -37,6 +37,16 @@ export class Servant {
     this.cards     = rawData.cards || [];
     this.atkGrowth = rawData.atkGrowth || [];
     this.rarity    = rawData.rarity;
+
+    // Mash Kyrielight (collectionNo 1): Atlas models her base 4★ Shielder, but the
+    // playable unit is the upgraded 5★ "Paladin" — higher ATK and Human attribute.
+    // (NP swap to the offensive Holy Sword is handled in BattleEngine.useNp.)
+    if (this.id === 1) {
+      this.rarity    = 5;
+      this.attribute = 'human';
+      this.atkGrowth = this.atkGrowth.slice();
+      this.atkGrowth[89] = 10835; // 5★ ATK @ Lv90 (Stats reads index 89 for rarity 5)
+    }
 
     this.skills  = new Skills(rawData.skills || [], append5);
     this.nps     = new NP(rawData.noblePhantasms || []);

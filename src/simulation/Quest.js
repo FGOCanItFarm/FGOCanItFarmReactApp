@@ -24,7 +24,15 @@ export class Quest {
           enemy.svt.attribute,
           enemy.state ?? null,
         ];
-        return new Enemy(enemydata);
+        const e = new Enemy(enemydata);
+        // 90** "Anti-<class> Defense Vulnerability" gimmick: per-attacker-class
+        // damage-advantage override (e.g. { saber: 5 } = Saber attackers deal 5×
+        // instead of the normal 2×). Populated by the sync trim from the enemy's
+        // vulnerability buff; absent for ordinary enemies.
+        if (enemy.classAdvantageMod && typeof enemy.classAdvantageMod === 'object') {
+          e.classAdvantageMod = enemy.classAdvantageMod;
+        }
+        return e;
       });
     }
     this.totalWaves = stages.length;

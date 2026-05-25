@@ -187,6 +187,10 @@ User clicks Run
         outcome: 'guaranteed' | 'rng' | 'impossible',
         clear_probability: number,
         min_multiplier_needed: number | null,
+        per_enemy: [                          // FR-8 granular stats
+          { index: number, name: string, max_hp: number,
+            damage_taken: number, np_refund: number },
+        ],
       },
     },
   },
@@ -320,6 +324,19 @@ svt.{className, attribute, traits[].id}}` (+ `enemyHash`/`availableEnemyHashes`)
 ~45× smaller. Runs after `extractEnemyMeta` (which reads full stages for the
 `enemy_*`/`wave_*` columns), so trimming is safe.
 
+> **90** class-vulnerability — `classAdvantageMod` (PARTIALLY WIRED):** the
+> engine reads an optional per-enemy `classAdvantageMod` map
+> (`{ attackerClassName: multiplier }`) that **overrides** the normal
+> class-advantage multiplier — e.g. `{ saber: 5 }` makes Saber attackers deal 5×
+> instead of 2× (the "Anti-Saber Defense Vulnerability" 90** gimmick).
+> `Quest.js` → `Enemy.classAdvantageMod`, applied in
+> `BattleEngine._classMultiplier` (used by both NP-damage paths). **Pending:**
+> `stripQuestData` does NOT yet extract this from the Atlas enemy vulnerability
+> buff (enemy `skills`/buffs are trimmed away), so it only fires where a row
+> carries the field. The fixture `real/quests/94100501.json` is hand-annotated
+> (Great Dragon, Vritra → `{saber:5}`) to exercise the engine; production needs
+> the trim to parse the buff (blocked on the raw Atlas buff shape).
+
 ### Field read-map traps (verified against `src/simulation/*`)
 - Engine-read servant fields: `collectionNo, name, className, classId, gender,
   attribute, rarity, traits[].id, atkGrowth, skills, noblePhantasms, classPassive`.
@@ -350,11 +367,14 @@ Fixtures:
 ## Command Builder Roadmap
 
 `docs/command-state-machine-spec.md` is the authoritative brief (FR-1…FR-9) for
-the engine-driven command builder. Phase 0 (FR-1 `CommandState.js`, FR-2
-`prepareSimInputs`) is implemented + snapshot-tested. FR-4 (enemy targeting),
-FR-5 (transform/form registry — unblocked by keeping `ascensionAdd`/`svtChange`),
-and FR-8 (granular per-enemy stats) are approved engine extensions; extend the
-regression suite before each.
+the engine-driven command builder. Implemented: Phase 0 (FR-1 `CommandState.js`,
+FR-2 `prepareSimInputs`, snapshot-tested); **FR-4 enemy targeting** (`4e2`/`a~2`
+grammar, `useNp(servant, enemyTargetIdx)`, back-compat); **FR-8 granular
+per-enemy stats** (`waveStats[wave].enemies[] = {index,name,maxHp,damageTaken,
+npRefund}`, exposed as `stats.waves[w].per_enemy` by RunAdapter); **FR-5 (Mash
+only)** as a contained special case (see Simulation Engine — Rules). Still open:
+FR-5 general registry, FR-3/6/7 builder UI, FR-9 saved-run format. Extend the
+regression suite before each engine change.
 
 ## Environment Variables
 
@@ -441,14 +461,25 @@ border: 1px solid color-mix(in srgb, var(--color-success) 30%, transparent);
 ## Simulation Engine — Rules
 
 `src/simulation/` files (except `RunAdapter.js`) are the core engine. When modifying:
-- Do NOT change logic in `Driver.js`, `BattleEngine.js`, `Servant.js`, `NP.js`, `Skills.js`, `Buffs.js`, `Enemy.js`, `Quest.js`, `Stats.js`, `gameData.js`
+- Do NOT change logic in `Driver.js`, `BattleEngine.js`, `Servant.js`, `NP.js`, `Skills.js`, `Buffs.js`, `Enemy.js`, `Quest.js`, `Stats.js`, `gameData.js` **without owner approval** (FR-4/5/8 are owner-approved engine extensions — see Command Builder Roadmap).
 - `RunAdapter.js` is the integration layer — safe to modify
 - The engine uses camelCase internally (`npGauge`); `RunAdapter` normalises to snake_case (`np_gauge`) before returning to the UI
+- **Append Skill 5 (cooldown reduction) defaults ON:** the first use of each
+  active skill has its cooldown reduced by 1 turn (`Skills.setSkillCooldown`,
+  clamped at 0). It is enabled by default for every servant (`Servant` opt
+  `append5` defaults `true`; `RunAdapter` treats a missing flag as `true`; the
+  team-bar / detail toggles render checked unless explicitly unticked) because
+  Append 5 is near-universal at the farming endgame and its absence caused
+  legitimate command sequences to abort on a skill that should have been
+  off-cooldown. Untick the per-servant "Append 5" box to disable.
+- **NP card normalisation:** Atlas renumbered NP card ids; the `data` blob now stores numeric strings (`"1"`=Arts, `"2"`=Buster, `"3"`=Quick) on each `noblePhantasm.card` — NOT the named form the engine's card-mod / `npGain` lookups expect. `NP.parseNoblePhantasms` normalises every `card` to the named key on load (`NP.js`). Synthetic fixtures that already use named cards pass through unchanged. (Before this, every real-data Buster/Quick NP was silently scored as Arts.)
+- **NP refund / hit distribution:** the NP-card refund rate lives under `noblePhantasm.npGain.np` (Atlas also exposes equal per-card keys); `NP.getNpgain` reads `npGain.np` (falls back to the card key for synthetic fixtures). Refund + damage spread + per-hit overkill (1.5×) use `noblePhantasm.npDistribution`. `_distributeHits` resolves both against the **fired** NP's `newId`, so an NP swap (Mash's Holy Sword) uses the right NP's gain/distribution, not the default last NP.
+- **Mash "Holy Sword" transform (FR-5, contained special case — owner-approved):** Mash (`collectionNo 1`) is the one modelled transform servant. `Servant.js` treats her as the upgraded 5★ Paladin (ATK 10835 @ Lv90, `attribute: human`); Atlas still encodes the base 4★ Shielder. `BattleEngine.useNp` resolves her active NP through the `script.tdTypeChangeIDs` group (`NP.tdTypeChangeNewId`): default = Lord Chaldeas (Arts, defensive, id 800107); after firing it loads the `聖剣装填` buff, her active NP becomes the offensive Holy Sword (Buster AoE, id 800108). `BattleEngine.useSkill` models her Holy-Sword S2 ("Purple Bullet…", absent from trimmed data) as a star-fuelled NP charge (assume 50 crit stars × 4% → +200%) plus +100% NP strength (3T), skipping the base-S2 effects while loaded. New transform servants should graduate to the declarative registry (FR-5), not more `id === N` branches.
 
 ## Key Invariants
 
 - `selectedQuest._fullData` is populated at quest-selection time by `QuestSelection.js`; `RunAdapter` reads it directly — no re-fetch
 - `team` is always length 6; empty slots have `collectionNo: ''`
 - `servantEffects` is always length 6 (parallel to `team`)
-- Command grammar (see `Driver.js`): `a`–`i` = frontline servant skills (`a/b/c`→servant 1, `d/e/f`→servant 2, `g/h/i`→servant 3); `j`/`k`/`l` = mystic-code skills; `4`/`5`/`6` = fire NP for frontline slot 1/2/3; `a1` = skill targeting ally slot 1–3; `x12` = swap frontline 1 ↔ backline 2; `#` = end turn; `a[Ch1A]` / `a([Ch1A]2)` = choice tokens (parsed but currently inert). NP tokens (`4`/`5`/`6`) are counted for `total_np_cost` in saved runs. Unknown tokens are silently ignored (`Driver.js:110`).
+- Command grammar (see `Driver.js`): `a`–`i` = frontline servant skills (`a/b/c`→servant 1, `d/e/f`→servant 2, `g/h/i`→servant 3); `j`/`k`/`l` = mystic-code skills; `4`/`5`/`6` = fire NP for frontline slot 1/2/3; `a1` = skill targeting ally slot 1–3; `a~2` = skill targeting enemy 2 (1-based, FR-4); `4e2`/`5e2`/`6e2` = fire NP at enemy 2 (1-based, FR-4; bare `4`/`5`/`6` keep the highest-HP default); `x12` = swap frontline 1 ↔ backline 2; `#` = end turn; `a[Ch1A]` / `a([Ch1A]2)` = choice tokens (parsed but currently inert). NP tokens (`4`/`5`/`6`) are counted for `total_np_cost` in saved runs. Unknown tokens are silently ignored (`Driver.js:110`).
 - The `supabase` export from `supabaseClient.js` is always defined (uses placeholder URL if env vars missing); check `supabaseMisconfigured` export if you need to warn the user

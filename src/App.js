@@ -229,6 +229,7 @@ const App = () => {
     const p_token_string = commands.join(' ');
     const p_quest_id = selectedQuest?.id ?? null;
     const p_wave_results = simulationResult?.stats?.waves ?? {};
+    const p_mystic_code_id = selectedMysticCode?.id ?? null;
 
     const { error } = await supabase.rpc('submit_run', {
       p_quest_id,
@@ -237,6 +238,7 @@ const App = () => {
       p_total_np_cost,
       p_token_string,
       p_wave_results,
+      p_mystic_code_id,
     });
 
     if (error) return { success: false, error: error.message };
@@ -250,7 +252,7 @@ const App = () => {
     <Router>
       <CssBaseline />
       <Sidebar team={team} selectedQuest={selectedQuest} />
-      <Container className="app-content" disableGutters maxWidth={false} style={{ marginLeft: 0, marginRight: 'var(--team-panel-width)', marginTop: 'var(--nav-height)', padding: '20px' }}>
+      <Container className="app-content" disableGutters maxWidth={false} style={{ marginLeft: 0, marginRight: 'var(--team-panel-width)', marginTop: 'var(--nav-height)', padding: '20px', maxWidth: 'calc(100vw - var(--team-panel-width))', boxSizing: 'border-box' }}>
         <Routes>
           <Route path="/instructions" element={<Instructions />} />
           <Route path="/team-selection" element={

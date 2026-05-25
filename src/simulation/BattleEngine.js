@@ -63,11 +63,22 @@ export class BattleEngine {
   _recordInitialWaveHp() {
     if (!this.waveStats[this.wave]) this.waveStats[this.wave] = { hpRequired: 0, damageDealt: 0 };
     this.waveStats[this.wave].hpRequired = this.enemies.reduce((s, e) => s + e.maxHp, 0);
+    // FR-8 granular logging: per-enemy, index-aligned to the live wave enemies.
+    this.waveStats[this.wave].enemies = this.enemies.map((e, i) => ({
+      index: i, name: e.name, maxHp: e.maxHp, damageTaken: 0, npRefund: 0,
+    }));
   }
 
   recordNpDamage(wave, damage) {
     if (!this.waveStats[wave]) this.waveStats[wave] = { hpRequired: 0, damageDealt: 0 };
     this.waveStats[wave].damageDealt += damage;
+  }
+
+  /** FR-8: per-enemy damage / NP-refund logging, keyed by the enemy's live index. */
+  _recordEnemyStat(enemy, field, amount) {
+    const ws = this.waveStats[this.wave];
+    const idx = this.enemies.indexOf(enemy);
+    if (ws?.enemies && idx >= 0 && ws.enemies[idx]) ws.enemies[idx][field] += amount;
   }
 
   captureServantsAtWaveEnd(wave) {
@@ -171,6 +182,7 @@ export class BattleEngine {
       tvals,
       value:     svals.Value || 0,
       turns:     svals.Turn  || 0,
+      count:     svals.Count ?? -1,
     };
   }
 
@@ -209,6 +221,7 @@ export class BattleEngine {
       value:     state.value,
       tvals:     (state.tvals || []).map(t => t.id ?? t),
       turns:     state.turns,
+      count:     state.count ?? -1,
     });
   }
 
@@ -223,6 +236,21 @@ export class BattleEngine {
   useSkill(servant, skillNum, target = null, choice = null) {
     const num = skillNum + 1; // convert to 1-based
     if (!servant.skills.skillAvailable(num)) return false;
+
+    // Mash Holy Sword S2 ("Purple Bullet…"): while "聖剣装填" is loaded her S2 is a
+    // DIFFERENT skill than Atlas's base S2 (which Atlas does not even expose in
+    // the trimmed data). It converts crit stars into NP charge (stars × 4%,
+    // capped at 50 stars → up to 200%) and grants +100% NP strength for 3 turns.
+    // Stars aren't modeled by the engine; assume a reasonable 50 in hand. The
+    // base-S2 effects are intentionally skipped. (Contained special case — FR-5.)
+    if (servant.id === 1 && num === 2 && servant.buffs.buffs.some(b => b.buff === '聖剣装填')) {
+      servant.skills.setSkillCooldown(num);
+      const assumedStars = 50;
+      servant.stats.setNpgauge(Math.min(assumedStars, 50) * 4); // +(stars × 4%) NP
+      this.applyBuff(servant, { buff_name: 'NP Strength Up', value: 1000, turns: 3, functvals: [], tvals: [] });
+      return true;
+    }
+
     const skill = servant.skills.getSkillByNum(num);
     servant.skills.setSkillCooldown(num);
     // choice is stored for future modal-variable skill handling (Space Ishtar, Emiya)
@@ -242,7 +270,7 @@ export class BattleEngine {
 
   // ─── NP execution ─────────────────────────────────────────────────────────
 
-  useNp(servant) {
+  useNp(servant, enemyTargetIdx = null) {
     if (servant.stats.getNpgauge() < 99) return false;
 
     // Each 100% above baseline adds one Overcharge Lv. Up to the whole party
@@ -252,32 +280,53 @@ export class BattleEngine {
       servant.buffs.processServantBuffs();
     }
 
+    // Mash NP swap (contained special case — see FR-5): she fires the default
+    // Lord Chaldeas (Arts, id 800107), which loads "聖剣装填" (Holy Sword); once
+    // that buff is active her NP becomes the offensive Holy Sword (Buster, id
+    // 800108). Other servants resolve to their default NP (activeNpId = null).
+    let activeNpId = null;
+    let npCardType = servant.nps.card;
+    if (servant.id === 1) {
+      const holySwordLoaded = servant.buffs.buffs.some(b => b.buff === '聖剣装填');
+      activeNpId = servant.nps.tdTypeChangeNewId(holySwordLoaded);
+      if (activeNpId != null) npCardType = servant.nps.getNpById(activeNpId).card;
+    }
+
+    // Recompute derived stats so OC level reflects all currently-active buffs
+    // (incl. an Overcharge Lv. Up carried from a prior wave) — getNpValues
+    // selects each function's overcharge-scaled svals by this OC level.
+    servant.buffs.processServantBuffs();
     const functions = servant.nps.getNpValues(
-      servant.stats.getNpLevel(), servant.stats.getOcLevel()
+      servant.stats.getNpLevel(), servant.stats.getOcLevel(), activeNpId
     );
+    // Overcharge Lv. Up buffs from a prior NP are "1 time" (Count): they raise
+    // THIS fire's OC, then are spent — consume so they don't stack across waves.
+    servant.buffs.consumeOverchargeBuffs();
     servant.stats.setNpgauge(0);
 
-    // Highest-HP living enemy is the default single-target
-    const mainTarget = this.enemies.reduce(
-      (best, e) => (e.hp > best.hp ? e : best), this.enemies[0]
-    );
+    // FR-4: an explicit, living enemy target wins; otherwise default to the
+    // highest-HP living enemy.
+    const explicit = (enemyTargetIdx != null) ? this.enemies[enemyTargetIdx] : null;
+    const mainTarget = (explicit && explicit.hp > 0)
+      ? explicit
+      : this.enemies.reduce((best, e) => (e.hp > best.hp ? e : best), this.enemies[0]);
 
     for (const func of functions) {
       if (['damageNp', 'damageNpPierce'].includes(func.funcType)) {
         servant.buffs.processServantBuffs();
         if (func.funcTargetType === 'enemyAll') {
-          for (const e of this.enemies) { e.buffs.processEnemyBuffs(); this._applyNpDamage(servant, e); }
+          for (const e of this.enemies) { e.buffs.processEnemyBuffs(); this._applyNpDamage(servant, e, activeNpId, npCardType); }
         } else {
           for (const e of this.enemies) e.buffs.processEnemyBuffs();
-          this._applyNpDamage(servant, mainTarget);
+          this._applyNpDamage(servant, mainTarget, activeNpId, npCardType);
         }
       } else if (['damageNpIndividualSum','damageNpStateIndividualFix','damageNpIndividual'].includes(func.funcType)) {
         servant.buffs.processServantBuffs();
         if (func.funcTargetType === 'enemyAll') {
-          for (const e of this.enemies) { e.buffs.processEnemyBuffs(); this._applyNpOddDamage(servant, e); }
+          for (const e of this.enemies) { e.buffs.processEnemyBuffs(); this._applyNpOddDamage(servant, e, activeNpId, npCardType); }
         } else {
           for (const e of this.enemies) e.buffs.processEnemyBuffs();
-          this._applyNpOddDamage(servant, mainTarget);
+          this._applyNpOddDamage(servant, mainTarget, activeNpId, npCardType);
         }
       } else {
         if (func.funcTargetType === 'enemyAll') this.applyEffect(func, servant);
@@ -325,34 +374,40 @@ export class BattleEngine {
     };
   }
 
-  _applyNpDamage(servant, target) {
-    const cardType = servant.nps.card;
+  // Class-advantage multiplier, honouring a 90** enemy vulnerability override
+  // (e.g. Anti-Saber Defense Vulnerability: Saber attackers deal 5× not 2×).
+  _classMultiplier(servant, target) {
+    const override = target.getClassAdvantageMod?.(servant.className);
+    return override != null ? override : servant.stats.getClassMultiplier(target.getClass());
+  }
+
+  _applyNpDamage(servant, target, newId = null, cardType = servant.nps.card) {
     const { cardDamageValue, cardNpValue, cardEffMod, cardDamageMod, enemyResMod } =
       this._getCardMods(servant, target, cardType);
 
     const [npDamageMultiplier] = servant.nps.getNpDamageValues(
-      servant.stats.getOcLevel(), servant.stats.getNpLevel()
+      servant.stats.getOcLevel(), servant.stats.getNpLevel(), newId
     );
     const total = (
       servant.stats.getBaseAtk() * npDamageMultiplier *
       cardDamageValue * (1 + cardDamageMod - enemyResMod) *
-      servant.stats.getClassMultiplier(target.getClass()) *
+      this._classMultiplier(servant, target) *
       servant.stats.getAttributeModifier(target) * 0.23 *
       (1 + servant.stats.getAtkMod() - target.getDef()) *
       (1 + servant.stats.getNpDamageMod() + servant.stats.getPowerMod(target))
     ) * this.damageMultiplier;
 
     this.recordNpDamage(this.wave, total);
-    this._distributeHits(servant, target, total, cardType, cardNpValue, cardEffMod);
+    this._recordEnemyStat(target, 'damageTaken', total);
+    this._distributeHits(servant, target, total, cardType, cardNpValue, cardEffMod, newId);
   }
 
-  _applyNpOddDamage(servant, target) {
-    const cardType = servant.nps.card;
+  _applyNpOddDamage(servant, target, newId = null, cardType = servant.nps.card) {
     const { cardDamageValue, cardNpValue, cardEffMod, cardDamageMod, enemyResMod } =
       this._getCardMods(servant, target, cardType);
 
     const [npMult, , npCorr, npCorrId, npCorrTarget] = servant.nps.getNpDamageValues(
-      servant.stats.getOcLevel(), servant.stats.getNpLevel()
+      servant.stats.getOcLevel(), servant.stats.getNpLevel(), newId
     );
 
     let seMod = 1;
@@ -371,7 +426,7 @@ export class BattleEngine {
     const total = (
       servant.stats.getBaseAtk() * npMult *
       cardDamageValue * (1 + cardDamageMod - enemyResMod) *
-      servant.stats.getClassMultiplier(target.getClass()) *
+      this._classMultiplier(servant, target) *
       servant.stats.getAttributeModifier(target) * 0.23 *
       (1 + servant.stats.getAtkMod() - target.getDef()) *
       (1 + servant.stats.getNpDamageMod() + servant.stats.getPowerMod(target)) *
@@ -379,20 +434,23 @@ export class BattleEngine {
     ) * this.damageMultiplier;
 
     this.recordNpDamage(this.wave, total);
-    this._distributeHits(servant, target, total, cardType, cardNpValue, cardEffMod);
+    this._recordEnemyStat(target, 'damageTaken', total);
+    this._distributeHits(servant, target, total, cardType, cardNpValue, cardEffMod, newId);
   }
 
   /** Spread total damage across NP hit distribution, apply NP refund per hit. */
-  _distributeHits(servant, target, totalDamage, cardType, cardNpValue, cardEffMod) {
-    const npGain  = servant.stats.getNpgain() * servant.stats.getNpGainMod();
-    const dist    = servant.stats.getNpdist();
+  _distributeHits(servant, target, totalDamage, cardType, cardNpValue, cardEffMod, newId = null) {
+    // Use the FIRED NP's gain + hit distribution (not the default last NP) so an
+    // NP swap (e.g. Mash's Holy Sword) refunds and distributes against the right NP.
+    const npGain  = servant.nps.getNpgain(cardType, newId) * servant.stats.getNpGainMod();
+    const dist    = servant.nps.getNpdist(newId);
     const perHit  = dist.map(v => totalDamage * v / 100);
     let cumulative = 0;
     for (let i = 0; i < dist.length; i++) {
       cumulative += perHit[i];
       const overkill  = cumulative > target.hp ? 1.5 : 1;
       const npPerHit  = npGain * cardNpValue * (1 + cardEffMod) * target.npPerHitMult * overkill;
-      if (cardType !== 'buster') servant.setNpgauge(npPerHit);
+      if (cardType !== 'buster') { servant.setNpgauge(npPerHit); this._recordEnemyStat(target, 'npRefund', npPerHit); }
       target.setHp(perHit[i]);
     }
   }
