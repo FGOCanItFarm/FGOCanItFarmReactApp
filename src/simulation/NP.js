@@ -18,6 +18,21 @@ export class NP {
     return found;
   }
 
+  /**
+   * Resolve the newId of an NP-swap (`script.tdTypeChangeIDs`) group member.
+   * Mash's "Lord Chaldeas" (default, Arts) ↔ "Holy Sword" (loaded, Buster) is the
+   * only live case. `loaded` = whether the tdTypeChange state buff is active.
+   * Returns null when the servant has no NP-swap group.
+   */
+  tdTypeChangeNewId(loaded) {
+    const group = this.nps.find(np => np.script?.tdTypeChangeIDs);
+    if (!group) return null;
+    const [defaultId, alternateId] = group.script.tdTypeChangeIDs;
+    const wantId = loaded ? alternateId : defaultId;
+    return this.nps.find(np => np.id === wantId)?.newId ?? null;
+  }
+
+
   static safeSvalAtLevel(func, oc, npLevel) {
     const key = oc > 1 ? `svals${oc}` : 'svals';
     const svalsList = func[key] || func.svals || [];

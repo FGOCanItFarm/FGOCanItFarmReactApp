@@ -86,11 +86,9 @@ describe('traverse_api_input — real-data engine runs', () => {
   });
 
   // test_paladin_mash: Mash (Shielder) present, all waves cleared, Arash (16) sacrificed.
-  // BLOCKED on FR-5: the engine does not yet implement Mash's "Holy Sword Loaded"
-  // transformation (S2 + NP swap on her first NP). Without it her NP stays the
-  // defensive Lord Camelot (≈0 damage), so she cannot clear wave 2 — the run
-  // aborts at the wave-2 end-turn. Un-skip once the transform registry lands.
-  test.skip('paladin mash (1/16/150/316/314, MC 210, quest 94095710)', () => {
+  // Mash's NP swaps from the defensive Lord Chaldeas (Arts) to the offensive Holy
+  // Sword (Buster) once she loads "聖剣装填" by firing her NP — see BattleEngine.useNp.
+  test('paladin mash (1/16/150/316/314, MC 210, quest 94095710)', () => {
     const team = [
       { collectionNo: 1, attack: 2000, initialCharge: 50, np: 3 },
       { collectionNo: 16, attack: 2400, initialCharge: 20, np: 5, npUp: 0.80 },
@@ -110,8 +108,9 @@ describe('traverse_api_input — real-data engine runs', () => {
     expect(paladinMash).toBeDefined();
     expect((paladinMash.className || '').toLowerCase()).toBe('shielder');
 
-    // All waves cleared
-    expect(engine.wave).toBeGreaterThan(engine.totalWaves);
+    // All waves cleared (the JS engine flags this via questCleared on the final
+    // wave rather than incrementing wave past totalWaves like the Python harness).
+    expect(engine.questCleared).toBe(true);
 
     // Arash (16) self-sacrificed and was removed from the party
     expect(engine.servants.map((s) => s.id)).not.toContain(16);

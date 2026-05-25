@@ -2,6 +2,9 @@ import { Servant }    from './Servant.js';
 import { Quest }      from './Quest.js';
 import { MysticCode } from './MysticCode.js';
 
+// Atlas card ids → engine card-mod keys (real data stores numeric card ids).
+const CARD_ID_TO_NAME = { 1: 'arts', 2: 'buster', 3: 'quick' };
+
 // Injected at the start of every NP that has extra gauge above 100%
 const NP_OC_1_TURN = {
   funcType: 'addStateShort', funcTargetType: 'ptAll',
@@ -227,8 +230,17 @@ export class BattleEngine {
     servant.skills.setSkillCooldown(num);
     // choice is stored for future modal-variable skill handling (Space Ishtar, Emiya)
     this._pendingChoice = choice;
+    const gaugeBefore = servant.npGauge;
     for (const effect of skill.functions) this.applyEffect(effect, servant, target);
     this._pendingChoice = null;
+
+    // Mash Holy Sword: while "聖剣装填" is loaded the in-game skillRankUp turns her
+    // S2 (Obscurant Wall) into a full 100% NP battery. This engine reads only the
+    // base skill (≤30%), so top the grant up to a full 100% (contained — FR-5).
+    if (servant.id === 1 && num === 2 && servant.buffs.buffs.some(b => b.buff === '聖剣装填')) {
+      const granted = servant.npGauge - gaugeBefore;
+      if (granted < 100) servant.stats.setNpgauge(100 - granted);
+    }
     return true;
   }
 
@@ -252,8 +264,22 @@ export class BattleEngine {
       servant.buffs.processServantBuffs();
     }
 
+    // Mash NP swap (contained special case — see FR-5): she fires the default
+    // Lord Chaldeas (Arts, id 800107), which loads "聖剣装填" (Holy Sword); once
+    // that buff is active her NP becomes the offensive Holy Sword (Buster, id
+    // 800108). Other servants resolve to their default NP (activeNpId = null).
+    let activeNpId = null;
+    let npCardType = servant.nps.card;
+    if (servant.id === 1) {
+      const holySwordLoaded = servant.buffs.buffs.some(b => b.buff === '聖剣装填');
+      activeNpId = servant.nps.tdTypeChangeNewId(holySwordLoaded);
+      if (activeNpId != null) {
+        npCardType = CARD_ID_TO_NAME[servant.nps.getNpById(activeNpId).card] ?? npCardType;
+      }
+    }
+
     const functions = servant.nps.getNpValues(
-      servant.stats.getNpLevel(), servant.stats.getOcLevel()
+      servant.stats.getNpLevel(), servant.stats.getOcLevel(), activeNpId
     );
     servant.stats.setNpgauge(0);
 
@@ -266,18 +292,18 @@ export class BattleEngine {
       if (['damageNp', 'damageNpPierce'].includes(func.funcType)) {
         servant.buffs.processServantBuffs();
         if (func.funcTargetType === 'enemyAll') {
-          for (const e of this.enemies) { e.buffs.processEnemyBuffs(); this._applyNpDamage(servant, e); }
+          for (const e of this.enemies) { e.buffs.processEnemyBuffs(); this._applyNpDamage(servant, e, activeNpId, npCardType); }
         } else {
           for (const e of this.enemies) e.buffs.processEnemyBuffs();
-          this._applyNpDamage(servant, mainTarget);
+          this._applyNpDamage(servant, mainTarget, activeNpId, npCardType);
         }
       } else if (['damageNpIndividualSum','damageNpStateIndividualFix','damageNpIndividual'].includes(func.funcType)) {
         servant.buffs.processServantBuffs();
         if (func.funcTargetType === 'enemyAll') {
-          for (const e of this.enemies) { e.buffs.processEnemyBuffs(); this._applyNpOddDamage(servant, e); }
+          for (const e of this.enemies) { e.buffs.processEnemyBuffs(); this._applyNpOddDamage(servant, e, activeNpId, npCardType); }
         } else {
           for (const e of this.enemies) e.buffs.processEnemyBuffs();
-          this._applyNpOddDamage(servant, mainTarget);
+          this._applyNpOddDamage(servant, mainTarget, activeNpId, npCardType);
         }
       } else {
         if (func.funcTargetType === 'enemyAll') this.applyEffect(func, servant);
@@ -325,13 +351,12 @@ export class BattleEngine {
     };
   }
 
-  _applyNpDamage(servant, target) {
-    const cardType = servant.nps.card;
+  _applyNpDamage(servant, target, newId = null, cardType = servant.nps.card) {
     const { cardDamageValue, cardNpValue, cardEffMod, cardDamageMod, enemyResMod } =
       this._getCardMods(servant, target, cardType);
 
     const [npDamageMultiplier] = servant.nps.getNpDamageValues(
-      servant.stats.getOcLevel(), servant.stats.getNpLevel()
+      servant.stats.getOcLevel(), servant.stats.getNpLevel(), newId
     );
     const total = (
       servant.stats.getBaseAtk() * npDamageMultiplier *
@@ -346,13 +371,12 @@ export class BattleEngine {
     this._distributeHits(servant, target, total, cardType, cardNpValue, cardEffMod);
   }
 
-  _applyNpOddDamage(servant, target) {
-    const cardType = servant.nps.card;
+  _applyNpOddDamage(servant, target, newId = null, cardType = servant.nps.card) {
     const { cardDamageValue, cardNpValue, cardEffMod, cardDamageMod, enemyResMod } =
       this._getCardMods(servant, target, cardType);
 
     const [npMult, , npCorr, npCorrId, npCorrTarget] = servant.nps.getNpDamageValues(
-      servant.stats.getOcLevel(), servant.stats.getNpLevel()
+      servant.stats.getOcLevel(), servant.stats.getNpLevel(), newId
     );
 
     let seMod = 1;
