@@ -383,7 +383,7 @@ export class BattleEngine {
 
     this.recordNpDamage(this.wave, total);
     this._recordEnemyStat(target, 'damageTaken', total);
-    this._distributeHits(servant, target, total, cardType, cardNpValue, cardEffMod);
+    this._distributeHits(servant, target, total, cardType, cardNpValue, cardEffMod, newId);
   }
 
   _applyNpOddDamage(servant, target, newId = null, cardType = servant.nps.card) {
@@ -419,13 +419,15 @@ export class BattleEngine {
 
     this.recordNpDamage(this.wave, total);
     this._recordEnemyStat(target, 'damageTaken', total);
-    this._distributeHits(servant, target, total, cardType, cardNpValue, cardEffMod);
+    this._distributeHits(servant, target, total, cardType, cardNpValue, cardEffMod, newId);
   }
 
   /** Spread total damage across NP hit distribution, apply NP refund per hit. */
-  _distributeHits(servant, target, totalDamage, cardType, cardNpValue, cardEffMod) {
-    const npGain  = servant.stats.getNpgain() * servant.stats.getNpGainMod();
-    const dist    = servant.stats.getNpdist();
+  _distributeHits(servant, target, totalDamage, cardType, cardNpValue, cardEffMod, newId = null) {
+    // Use the FIRED NP's gain + hit distribution (not the default last NP) so an
+    // NP swap (e.g. Mash's Holy Sword) refunds and distributes against the right NP.
+    const npGain  = servant.nps.getNpgain(cardType, newId) * servant.stats.getNpGainMod();
+    const dist    = servant.nps.getNpdist(newId);
     const perHit  = dist.map(v => totalDamage * v / 100);
     let cumulative = 0;
     for (let i = 0; i < dist.length; i++) {

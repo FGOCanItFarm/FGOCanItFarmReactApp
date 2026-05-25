@@ -115,7 +115,10 @@ export class NP {
 
   getNpgain(cardType, newId = null) {
     const np = this.getNpById(newId);
-    const arr = np.npGain?.[cardType] || [0];
+    // Atlas renormalised NP gain: the NP-card refund rate is under `npGain.np`
+    // (the per-card keys exist too and are equal). Fall back to the card key for
+    // synthetic fixtures that only define named-card arrays.
+    const arr = np.npGain?.np ?? np.npGain?.[cardType] ?? [0];
     return arr[0] / 100;
   }
 
