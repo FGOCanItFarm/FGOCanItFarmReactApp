@@ -24,6 +24,8 @@ const NP_SLOTS = { 4: 0, 5: 1, 6: 2 };
 const RE_CHOICE_TARGET = /^([a-i])\(\[Ch(\d+)([A-C])\](\d)\)$/; // a([Ch1A]2)
 const RE_CHOICE = /^([a-i])\[Ch(\d+)([A-C])\]$/;                 // a[Ch1A]
 const RE_SWAP = /^x(\d)(\d)$/;                                   // x12
+const RE_NP_TARGET = /^([456])e(\d+)$/;                          // 4e2 (FR-4)
+const RE_SKILL_ENEMY = /^([a-i])~(\d+)$/;                        // a~2 (FR-4)
 const RE_SKILL_TARGET = /^([a-i])(\d)$/;                          // a1
 const RE_MC_TARGET = /^([jkl])(\d)$/;                             // j1
 
@@ -47,6 +49,13 @@ export function classifyToken(token) {
   }
   if ((m = RE_SWAP.exec(token))) {
     return { kind: 'swap', front: parseInt(m[1], 10), back: parseInt(m[2], 10) };
+  }
+  if ((m = RE_NP_TARGET.exec(token))) {
+    return { kind: 'np', slot: NP_SLOTS[m[1]], enemyTarget: parseInt(m[2], 10) };
+  }
+  if ((m = RE_SKILL_ENEMY.exec(token))) {
+    const idx = SKILL_LETTERS.indexOf(m[1]);
+    return { kind: 'skill', servantIdx: Math.floor(idx / 3), skillIdx: idx % 3, enemyTarget: parseInt(m[2], 10), allySlot: null };
   }
   if ((m = RE_SKILL_TARGET.exec(token)) && SKILL_LETTERS.includes(m[1])) {
     const idx = SKILL_LETTERS.indexOf(m[1]);

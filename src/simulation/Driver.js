@@ -13,6 +13,8 @@ const SKILL_MAP = Object.fromEntries(
 const RE_CHOICE_TARGET = /^([a-i])\(\[Ch(\d+)([A-C])\](\d)\)$/;  // a([Ch1A]2)
 const RE_CHOICE        = /^([a-i])\[Ch(\d+)([A-C])\]$/;            // a[Ch1A]
 const RE_SWAP          = /^x(\d)(\d)$/;                             // x12
+const RE_NP_TARGET     = /^([456])e(\d+)$/;                         // 4e2 (NP → enemy 2)
+const RE_SKILL_ENEMY   = /^([a-i])~(\d+)$/;                         // a~2 (skill → enemy 2)
 const RE_SKILL_TARGET  = /^([a-i])(\d)$/;                           // a1
 const RE_MC_TARGET     = /^([jkl])(\d)$/;                           // j1
 
@@ -76,6 +78,14 @@ export class Driver {
       return eng;
     }
 
+    // a~2  — skill with explicit enemy target (FR-4); enemy index is 1-based
+    if ((m = RE_SKILL_ENEMY.exec(token))) {
+      const { servantIdx, skillIdx } = SKILL_MAP[m[1]];
+      const enemy = eng.getEnemies()[parseInt(m[2], 10) - 1];
+      if (!enemy) return false;
+      return eng.useSkill(eng.servants[servantIdx], skillIdx, enemy);
+    }
+
     // a1  — skill with explicit ally target
     if ((m = RE_SKILL_TARGET.exec(token)) && SKILL_LETTERS.includes(m[1])) {
       const { servantIdx, skillIdx } = SKILL_MAP[m[1]];
@@ -98,7 +108,12 @@ export class Driver {
       return eng.useMysticCodeSkill(MC_LETTERS.indexOf(token));
     }
 
-    // 4 / 5 / 6  — fire NP
+    // 4e2  — fire NP at an explicit enemy (FR-4); enemy index is 1-based
+    if ((m = RE_NP_TARGET.exec(token))) {
+      return eng.useNp(eng.servants[NP_SLOTS[m[1]]], parseInt(m[2], 10) - 1);
+    }
+
+    // 4 / 5 / 6  — fire NP (highest-HP enemy default)
     if (token in NP_SLOTS) {
       return eng.useNp(eng.servants[NP_SLOTS[token]]);
     }

@@ -268,7 +268,7 @@ export class BattleEngine {
 
   // ─── NP execution ─────────────────────────────────────────────────────────
 
-  useNp(servant) {
+  useNp(servant, enemyTargetIdx = null) {
     if (servant.stats.getNpgauge() < 99) return false;
 
     // Each 100% above baseline adds one Overcharge Lv. Up to the whole party
@@ -295,10 +295,12 @@ export class BattleEngine {
     );
     servant.stats.setNpgauge(0);
 
-    // Highest-HP living enemy is the default single-target
-    const mainTarget = this.enemies.reduce(
-      (best, e) => (e.hp > best.hp ? e : best), this.enemies[0]
-    );
+    // FR-4: an explicit, living enemy target wins; otherwise default to the
+    // highest-HP living enemy.
+    const explicit = (enemyTargetIdx != null) ? this.enemies[enemyTargetIdx] : null;
+    const mainTarget = (explicit && explicit.hp > 0)
+      ? explicit
+      : this.enemies.reduce((best, e) => (e.hp > best.hp ? e : best), this.enemies[0]);
 
     for (const func of functions) {
       if (['damageNp', 'damageNpPierce'].includes(func.funcType)) {

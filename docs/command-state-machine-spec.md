@@ -174,17 +174,20 @@ command page into a readable combat dashboard.
 - If the owner provides their original target-classification function, adapt it
   here instead of re-deriving.
 
-### FR-4 Enemy targeting (ENGINE EXTENSION — approved)
-- Extend grammar with an explicit enemy target. Proposed, non-colliding syntax:
-  - NP: `4e2` = fire S1 NP at enemy index 2 (1-based). Bare `4` keeps the
-    highest-HP default (back-compat).
-  - Single-target-enemy skill: `a~2` or reuse a distinct delimiter that does not
-    collide with the ally-target `a1` form. **Pick one delimiter and document it.**
-- `BattleEngine.useNp(servant, enemyTarget = null)` and the enemy-skill path must
-  honor an explicit target, falling back to highest-HP when null.
-- The Driver must parse the new suffix and pass the chosen `Enemy`.
-- Back-compat: all existing saved token strings must still parse and behave
-  identically.
+### FR-4 Enemy targeting (ENGINE EXTENSION — approved) — IMPLEMENTED
+- Grammar (chosen delimiters, documented):
+  - NP: `4e2` / `5e2` / `6e2` = fire that slot's NP at enemy index 2 (1-based).
+    Bare `4`/`5`/`6` keep the highest-HP default (back-compat).
+  - Single-target-enemy skill: `a~2` (the `~` delimiter does not collide with the
+    ally-target `a1` form).
+- `BattleEngine.useNp(servant, enemyTargetIdx = null)` honors an explicit, living
+  target and falls back to highest-HP when null or out-of-range. The enemy-skill
+  path routes the chosen `Enemy` through `useSkill`'s target arg (applyEffect's
+  `enemy` funcTargetType). Driver parses the suffixes (`Driver.js`); CommandState
+  classifies them (`enemyTarget`). Verified via the FR-8 per-enemy damage log
+  (`__tests__/enemyTargeting.test.js`).
+- Back-compat: existing saved token strings parse and behave identically
+  (regression snapshots unchanged).
 
 ### FR-5 Transform / form-change system (ENGINE EXTENSION — approved)
 

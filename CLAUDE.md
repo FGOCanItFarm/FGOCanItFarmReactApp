@@ -355,10 +355,11 @@ Fixtures:
 
 `docs/command-state-machine-spec.md` is the authoritative brief (FR-1…FR-9) for
 the engine-driven command builder. Implemented: Phase 0 (FR-1 `CommandState.js`,
-FR-2 `prepareSimInputs`, snapshot-tested); **FR-8 granular per-enemy stats**
-(`waveStats[wave].enemies[] = {index,name,maxHp,damageTaken,npRefund}`, exposed
-as `stats.waves[w].per_enemy` by RunAdapter); **FR-5 (Mash only)** as a contained
-special case (see Simulation Engine — Rules). Still open: FR-4 (enemy targeting),
+FR-2 `prepareSimInputs`, snapshot-tested); **FR-4 enemy targeting** (`4e2`/`a~2`
+grammar, `useNp(servant, enemyTargetIdx)`, back-compat); **FR-8 granular
+per-enemy stats** (`waveStats[wave].enemies[] = {index,name,maxHp,damageTaken,
+npRefund}`, exposed as `stats.waves[w].per_enemy` by RunAdapter); **FR-5 (Mash
+only)** as a contained special case (see Simulation Engine — Rules). Still open:
 FR-5 general registry, FR-3/6/7 builder UI, FR-9 saved-run format. Extend the
 regression suite before each engine change.
 
@@ -458,5 +459,5 @@ border: 1px solid color-mix(in srgb, var(--color-success) 30%, transparent);
 - `selectedQuest._fullData` is populated at quest-selection time by `QuestSelection.js`; `RunAdapter` reads it directly — no re-fetch
 - `team` is always length 6; empty slots have `collectionNo: ''`
 - `servantEffects` is always length 6 (parallel to `team`)
-- Command grammar (see `Driver.js`): `a`–`i` = frontline servant skills (`a/b/c`→servant 1, `d/e/f`→servant 2, `g/h/i`→servant 3); `j`/`k`/`l` = mystic-code skills; `4`/`5`/`6` = fire NP for frontline slot 1/2/3; `a1` = skill targeting ally slot 1–3; `x12` = swap frontline 1 ↔ backline 2; `#` = end turn; `a[Ch1A]` / `a([Ch1A]2)` = choice tokens (parsed but currently inert). NP tokens (`4`/`5`/`6`) are counted for `total_np_cost` in saved runs. Unknown tokens are silently ignored (`Driver.js:110`).
+- Command grammar (see `Driver.js`): `a`–`i` = frontline servant skills (`a/b/c`→servant 1, `d/e/f`→servant 2, `g/h/i`→servant 3); `j`/`k`/`l` = mystic-code skills; `4`/`5`/`6` = fire NP for frontline slot 1/2/3; `a1` = skill targeting ally slot 1–3; `a~2` = skill targeting enemy 2 (1-based, FR-4); `4e2`/`5e2`/`6e2` = fire NP at enemy 2 (1-based, FR-4; bare `4`/`5`/`6` keep the highest-HP default); `x12` = swap frontline 1 ↔ backline 2; `#` = end turn; `a[Ch1A]` / `a([Ch1A]2)` = choice tokens (parsed but currently inert). NP tokens (`4`/`5`/`6`) are counted for `total_np_cost` in saved runs. Unknown tokens are silently ignored (`Driver.js:110`).
 - The `supabase` export from `supabaseClient.js` is always defined (uses placeholder URL if env vars missing); check `supabaseMisconfigured` export if you need to warn the user
