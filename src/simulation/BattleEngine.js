@@ -182,6 +182,7 @@ export class BattleEngine {
       tvals,
       value:     svals.Value || 0,
       turns:     svals.Turn  || 0,
+      count:     svals.Count ?? -1,
     };
   }
 
@@ -220,6 +221,7 @@ export class BattleEngine {
       value:     state.value,
       tvals:     (state.tvals || []).map(t => t.id ?? t),
       turns:     state.turns,
+      count:     state.count ?? -1,
     });
   }
 
@@ -290,9 +292,16 @@ export class BattleEngine {
       if (activeNpId != null) npCardType = servant.nps.getNpById(activeNpId).card;
     }
 
+    // Recompute derived stats so OC level reflects all currently-active buffs
+    // (incl. an Overcharge Lv. Up carried from a prior wave) — getNpValues
+    // selects each function's overcharge-scaled svals by this OC level.
+    servant.buffs.processServantBuffs();
     const functions = servant.nps.getNpValues(
       servant.stats.getNpLevel(), servant.stats.getOcLevel(), activeNpId
     );
+    // Overcharge Lv. Up buffs from a prior NP are "1 time" (Count): they raise
+    // THIS fire's OC, then are spent — consume so they don't stack across waves.
+    servant.buffs.consumeOverchargeBuffs();
     servant.stats.setNpgauge(0);
 
     // FR-4: an explicit, living enemy target wins; otherwise default to the

@@ -142,4 +142,17 @@ export class Buffs {
   clearBuff(name) {
     this.buffs = this.buffs.filter(b => b.buff !== name);
   }
+
+  // Spend one charge of each count-limited Overcharge Lv. Up buff (the "1 time"
+  // party OC from NPs like Lord Logres). Unlimited buffs (count -1, e.g. the
+  // 1-turn NP-chain OC) are left untouched; buffs whose count hits 0 are removed.
+  consumeOverchargeBuffs() {
+    this.buffs = this.buffs.filter(b => {
+      if ((b.buff === 'Overcharge Lv. Up' || b.buff === 'NP Overcharge Level Up') && b.count > 0) {
+        b.count -= 1;
+        return b.count > 0;
+      }
+      return true;
+    });
+  }
 }
