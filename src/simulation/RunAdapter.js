@@ -72,6 +72,69 @@ export async function prepareSimInputs({ team, selectedQuest, selectedMysticCode
   };
 }
 
+/**
+ * Pure post-processing: turn a finished engine into the UI/saved-run result
+ * shape (stats.waves with FR-8 per_enemy, outcome, clear probability). Shared by
+ * runSimulation and offline seeding so a re-sim reproduces a stored summary
+ * byte-for-byte.
+ */
+export function summarizeEngine(engine) {
+  const waves = {};
+  for (const [waveKey, waveData] of Object.entries(engine.waveStats)) {
+    const { hpRequired, damageDealt } = waveData;
+    const damage_at_09 = damageDealt * 0.9;
+    const damage_at_10 = damageDealt;
+    const damage_at_11 = damageDealt * 1.1;
+
+    let outcome, clear_probability;
+    if (damage_at_09 >= hpRequired) {
+      outcome = 'guaranteed';
+      clear_probability = 1.0;
+    } else if (damage_at_10 >= hpRequired) {
+      outcome = 'rng';
+      clear_probability = 0.5;
+    } else {
+      outcome = 'impossible';
+      clear_probability = 0.0;
+    }
+
+    waves[waveKey] = {
+      hp_required: hpRequired,
+      damage_at_09,
+      damage_at_10,
+      damage_at_11,
+      outcome,
+      clear_probability,
+      min_multiplier_needed: damage_at_10 > 0 ? hpRequired / damage_at_10 : null,
+      // FR-8: per-enemy granular stats (camelCase engine → snake_case UI)
+      per_enemy: (waveData.enemies || []).map(e => ({
+        index: e.index,
+        name: e.name,
+        max_hp: e.maxHp,
+        damage_taken: e.damageTaken,
+        np_refund: e.npRefund,
+      })),
+    };
+  }
+
+  const waveProbs = Object.values(waves).map(w => w.clear_probability);
+  const overall_clear_probability = waveProbs.length > 0 ? Math.min(...waveProbs) : 0;
+
+  return {
+    success: true,
+    quest_cleared: engine.questCleared,
+    wave_reached: engine.wave,
+    total_waves: engine.totalWaves,
+    servants_at_wave_end: Object.fromEntries(
+      Object.entries(engine.servantsAtWaveEnd).map(([wave, servants]) => [
+        wave,
+        servants.map(({ slot, collectionNo, npGauge }) => ({ slot, collectionNo, np_gauge: npGauge })),
+      ])
+    ),
+    stats: { waves, overall_clear_probability },
+  };
+}
+
 export async function runSimulation({ team, commands, selectedQuest, selectedMysticCode, servantEffects }) {
   try {
     const simInputs = await prepareSimInputs({ team, selectedQuest, selectedMysticCode, servantEffects });
@@ -82,60 +145,7 @@ export async function runSimulation({ team, commands, selectedQuest, selectedMys
       return { success: false, error: 'Simulation failed: invalid token sequence or skill error.' };
     }
 
-    const waves = {};
-    for (const [waveKey, waveData] of Object.entries(engine.waveStats)) {
-      const { hpRequired, damageDealt } = waveData;
-      const damage_at_09 = damageDealt * 0.9;
-      const damage_at_10 = damageDealt;
-      const damage_at_11 = damageDealt * 1.1;
-
-      let outcome, clear_probability;
-      if (damage_at_09 >= hpRequired) {
-        outcome = 'guaranteed';
-        clear_probability = 1.0;
-      } else if (damage_at_10 >= hpRequired) {
-        outcome = 'rng';
-        clear_probability = 0.5;
-      } else {
-        outcome = 'impossible';
-        clear_probability = 0.0;
-      }
-
-      waves[waveKey] = {
-        hp_required: hpRequired,
-        damage_at_09,
-        damage_at_10,
-        damage_at_11,
-        outcome,
-        clear_probability,
-        min_multiplier_needed: damage_at_10 > 0 ? hpRequired / damage_at_10 : null,
-        // FR-8: per-enemy granular stats (camelCase engine → snake_case UI)
-        per_enemy: (waveData.enemies || []).map(e => ({
-          index: e.index,
-          name: e.name,
-          max_hp: e.maxHp,
-          damage_taken: e.damageTaken,
-          np_refund: e.npRefund,
-        })),
-      };
-    }
-
-    const waveProbs = Object.values(waves).map(w => w.clear_probability);
-    const overall_clear_probability = waveProbs.length > 0 ? Math.min(...waveProbs) : 0;
-
-    return {
-      success: true,
-      quest_cleared: engine.questCleared,
-      wave_reached: engine.wave,
-      total_waves: engine.totalWaves,
-      servants_at_wave_end: Object.fromEntries(
-        Object.entries(engine.servantsAtWaveEnd).map(([wave, servants]) => [
-          wave,
-          servants.map(({ slot, collectionNo, npGauge }) => ({ slot, collectionNo, np_gauge: npGauge })),
-        ])
-      ),
-      stats: { waves, overall_clear_probability },
-    };
+    return summarizeEngine(engine);
   } catch (err) {
     return { success: false, error: err.message };
   }
