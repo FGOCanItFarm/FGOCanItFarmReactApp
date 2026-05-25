@@ -106,7 +106,7 @@ describe('legalNextTokens', () => {
 
   test('swaps appear only when a backline exists', () => {
     const start = legalNextTokens(buildEngineAt(sim, []).engine);
-    expect(opt(start, 'x34')).toBeTruthy(); // 4 servants → front3 ↔ back slot4 (S4) valid
+    expect(opt(start, 'x31')).toBeTruthy(); // 4 servants → front3 ↔ back1 valid
   });
 
   test('skill target classes are derived from funcTargetType', () => {

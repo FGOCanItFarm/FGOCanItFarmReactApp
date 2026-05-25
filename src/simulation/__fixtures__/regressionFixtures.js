@@ -202,7 +202,7 @@ function fixtureNormal() {
       'd e1 f 4 #',     // S2 party/ally skills then S1 NP
       '5 4 #',          // support NP (charge+atk) then S1 AoE NP
       '6',              // ST NP on highest-HP enemy (no end turn — wave not cleared)
-      'x34 6 #',        // swap front 3 (S3) ↔ back S4 (absolute slot 4), then slot-3 NP
+      'x31 6 #',        // swap front 3 (S3) ↔ back 1 (S4), then slot-3 NP
       'j 4 #',          // MC ATK-up-all then NP
       'k1 4 #',         // MC charge ally 1 then NP
       'a b1 c',         // pure skills (no NP/end) — parse + buff coverage

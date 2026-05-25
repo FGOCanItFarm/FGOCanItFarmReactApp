@@ -66,15 +66,13 @@ export class Driver {
       return eng.useSkill(eng.servants[servantIdx], skillIdx, null, choice);
     }
 
-    // x14  — swap two absolute slots (1-3 = frontline, 4-6 = backline; 1-indexed).
-    // Only a frontline↔backline swap is legal (not front-front or back-back).
+    // x12  — swap frontline slot 1 (1-indexed) with backline slot 2 (1-indexed)
     if ((m = RE_SWAP.exec(token))) {
-      const a = parseInt(m[1], 10) - 1;
-      const b = parseInt(m[2], 10) - 1;
-      const inRange = (i) => i >= 0 && i < eng.servants.length;
-      const isFront = (i) => i >= 0 && i <= 2;
-      if (!inRange(a) || !inRange(b) || isFront(a) === isFront(b)) return false;
-      eng.swapServants(a, b);
+      const frontline = parseInt(m[1]) - 1;
+      const backline  = parseInt(m[2]) + 2; // backline slots start at index 3
+      if (frontline < 0 || frontline > 2 || backline < 3 || backline >= eng.servants.length)
+        return false;
+      eng.swapServants(frontline, backline);
       return eng;
     }
 

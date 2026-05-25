@@ -32,7 +32,7 @@ command page into a readable combat dashboard.
 - `executeToken` (`Driver.js:50–111`) matches, in order:
   - `a([Ch1A]2)` choice + ally target — `RE_CHOICE_TARGET` (`:13,:55`)
   - `a[Ch1A]` choice, no target — `RE_CHOICE` (`:14,:63`)
-  - `x14` swap two **absolute** slots (1-3 = frontline, 4-6 = backline; 1-indexed). Only frontline↔backline is legal (`:15,:70`)
+  - `x12` swap frontline 1 ↔ backline 2 (1-indexed; backline index = `+2`) (`:15,:70`)
   - `a1` skill + **ally** target (slot 1–3) (`:16,:80`)
   - `a` skill, no target (`:86`)
   - `j1` / `j` mystic-code skill (±target) (`:17,:92,:97`)

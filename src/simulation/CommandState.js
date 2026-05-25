@@ -253,12 +253,12 @@ export function legalNextTokens(engine) {
     });
   }
 
-  // Swaps (only when a backline exists). Absolute slots: front 1-3 ↔ back 4-6.
+  // Swaps (only when a backline exists). Front 1..3 ↔ each backline slot.
   if (engine.servants.length > 3) {
     for (let f = 1; f <= 3; f++) {
       if (!engine.servants[f - 1]) continue;
       for (let backIdx = 3; backIdx < engine.servants.length; backIdx++) {
-        const b = backIdx + 1; // absolute slot number (index 3/4/5 → slot 4/5/6)
+        const b = backIdx - 2; // back number used by the x token (index = +2)
         options.push({
           token: `x${f}${b}`,
           kind: 'swap', targetClass: 'none', servantSlot: f - 1, skillNum: null,
