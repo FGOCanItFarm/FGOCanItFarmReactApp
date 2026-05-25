@@ -140,3 +140,43 @@ export async function runSimulation({ team, commands, selectedQuest, selectedMys
     return { success: false, error: err.message };
   }
 }
+
+/**
+ * FR-9: reconcile a stored saved-run summary (saved_runs.wave_results) against a
+ * freshly re-simulated one, to detect engine drift. Compares each wave's outcome
+ * and damage (within a relative tolerance) plus per-enemy damage when both carry
+ * the FR-8 granular `per_enemy` data. Returns the diverging waves/fields so the
+ * UI can surface a discrepancy and offer a bug report.
+ *
+ * @param {object} stored - stats.waves shape persisted at submit time
+ * @param {object} fresh  - stats.waves from a re-run of the same token string
+ * @param {number} tol    - relative damage tolerance (default 1%)
+ */
+export function reconcileWaveResults(stored = {}, fresh = {}, tol = 0.01) {
+  const diffs = {};
+  const near = (a, b) => {
+    const max = Math.max(Math.abs(a), Math.abs(b), 1);
+    return Math.abs(a - b) / max <= tol;
+  };
+  const waveKeys = new Set([...Object.keys(stored), ...Object.keys(fresh)]);
+  for (const w of waveKeys) {
+    const s = stored[w];
+    const f = fresh[w];
+    if (!s || !f) { diffs[w] = { field: 'wave', stored: s ?? null, fresh: f ?? null }; continue; }
+    if (s.outcome !== f.outcome) {
+      diffs[w] = { field: 'outcome', stored: s.outcome, fresh: f.outcome };
+    } else if (!near(Number(s.damage_at_10 ?? 0), Number(f.damage_at_10 ?? 0))) {
+      diffs[w] = { field: 'damage_at_10', stored: s.damage_at_10, fresh: f.damage_at_10 };
+    } else if (Array.isArray(s.per_enemy) && Array.isArray(f.per_enemy)) {
+      for (let i = 0; i < Math.max(s.per_enemy.length, f.per_enemy.length); i++) {
+        const se = s.per_enemy[i];
+        const fe = f.per_enemy[i];
+        if (!se || !fe || !near(Number(se.damage_taken ?? 0), Number(fe.damage_taken ?? 0))) {
+          diffs[w] = { field: `per_enemy[${i}].damage_taken`, stored: se?.damage_taken ?? null, fresh: fe?.damage_taken ?? null };
+          break;
+        }
+      }
+    }
+  }
+  return { diverged: Object.keys(diffs).length > 0, diffs };
+}
