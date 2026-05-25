@@ -180,3 +180,33 @@ export function reconcileWaveResults(stored = {}, fresh = {}, tol = 0.01) {
   }
   return { diverged: Object.keys(diffs).length > 0, diffs };
 }
+
+/**
+ * FR-9: re-simulate a stored saved-run row (no app state needed) so its summary
+ * can be reconciled against the live engine. Reconstructs team / NP levels /
+ * quest / mystic code from the row, fetches the quest blob, and reuses
+ * runSimulation. Returns the same shape as runSimulation (incl. stats.waves).
+ *
+ * @param {{servant_collection_nos:number[], np_levels:number[], token_string:string,
+ *          quest_id:number, mystic_code_id?:number|null}} run
+ */
+export async function resimulateSavedRun(run) {
+  const colls = run.servant_collection_nos || [];
+  const team = Array.from({ length: 6 }, (_, i) => ({
+    collectionNo: colls[i] != null ? String(colls[i]) : '',
+  }));
+  const servantEffects = Array.from({ length: 6 }, (_, i) => ({
+    np: Number(run.np_levels?.[i] ?? 1),
+  }));
+
+  const { data: qRow, error: qErr } = await supabase
+    .from('quests').select('data').eq('id', run.quest_id).maybeSingle();
+  if (qErr) return { success: false, error: qErr.message };
+  if (!qRow?.data) return { success: false, error: `Quest ${run.quest_id} data not found.` };
+
+  const selectedQuest = { id: run.quest_id, _fullData: qRow.data };
+  const selectedMysticCode = run.mystic_code_id != null ? { id: run.mystic_code_id } : null;
+  const commands = (run.token_string || '').split(/\s+/).filter(Boolean);
+
+  return runSimulation({ team, commands, selectedQuest, selectedMysticCode, servantEffects });
+}
