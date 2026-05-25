@@ -365,6 +365,13 @@ export class BattleEngine {
     };
   }
 
+  // Class-advantage multiplier, honouring a 90** enemy vulnerability override
+  // (e.g. Anti-Saber Defense Vulnerability: Saber attackers deal 5× not 2×).
+  _classMultiplier(servant, target) {
+    const override = target.getClassAdvantageMod?.(servant.className);
+    return override != null ? override : servant.stats.getClassMultiplier(target.getClass());
+  }
+
   _applyNpDamage(servant, target, newId = null, cardType = servant.nps.card) {
     const { cardDamageValue, cardNpValue, cardEffMod, cardDamageMod, enemyResMod } =
       this._getCardMods(servant, target, cardType);
@@ -375,7 +382,7 @@ export class BattleEngine {
     const total = (
       servant.stats.getBaseAtk() * npDamageMultiplier *
       cardDamageValue * (1 + cardDamageMod - enemyResMod) *
-      servant.stats.getClassMultiplier(target.getClass()) *
+      this._classMultiplier(servant, target) *
       servant.stats.getAttributeModifier(target) * 0.23 *
       (1 + servant.stats.getAtkMod() - target.getDef()) *
       (1 + servant.stats.getNpDamageMod() + servant.stats.getPowerMod(target))
@@ -410,7 +417,7 @@ export class BattleEngine {
     const total = (
       servant.stats.getBaseAtk() * npMult *
       cardDamageValue * (1 + cardDamageMod - enemyResMod) *
-      servant.stats.getClassMultiplier(target.getClass()) *
+      this._classMultiplier(servant, target) *
       servant.stats.getAttributeModifier(target) * 0.23 *
       (1 + servant.stats.getAtkMod() - target.getDef()) *
       (1 + servant.stats.getNpDamageMod() + servant.stats.getPowerMod(target)) *

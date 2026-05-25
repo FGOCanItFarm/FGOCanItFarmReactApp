@@ -16,6 +16,16 @@ export class Enemy {
     this.qResdown  = 0;
     this.buffs     = new Buffs({ enemy: this });
     this.npPerHitMult = this.npGainPerHit();
+    // { attackerClassName: multiplier } override for the 90** class-vulnerability
+    // gimmick; null when the enemy has no such buff (the common case).
+    this.classAdvantageMod = null;
+  }
+
+  // 90** vulnerability: returns the overridden class-advantage multiplier for an
+  // attacker of the given class, or null to fall back to the normal class matrix.
+  getClassAdvantageMod(attackerClass) {
+    const v = this.classAdvantageMod?.[attackerClass];
+    return typeof v === 'number' ? v : null;
   }
 
   getDef()      { return this.defense; }
