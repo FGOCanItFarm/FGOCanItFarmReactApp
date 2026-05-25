@@ -252,7 +252,7 @@ const App = () => {
     <Router>
       <CssBaseline />
       <Sidebar team={team} selectedQuest={selectedQuest} />
-      <Container className="app-content" disableGutters maxWidth={false} style={{ marginLeft: 0, marginRight: 'var(--team-panel-width)', marginTop: 'var(--nav-height)', padding: '20px' }}>
+      <Container className="app-content" disableGutters maxWidth={false} style={{ marginLeft: 0, marginRight: 'var(--team-panel-width)', marginTop: 'var(--nav-height)', padding: '20px', maxWidth: 'calc(100vw - var(--team-panel-width))', boxSizing: 'border-box' }}>
         <Routes>
           <Route path="/instructions" element={<Instructions />} />
           <Route path="/team-selection" element={
