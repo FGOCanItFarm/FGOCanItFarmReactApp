@@ -24,7 +24,7 @@ export class Servant {
     busterDamageUp = 0,
     quickDamageUp  = 0,
     artsDamageUp   = 0,
-    append5        = false,
+    append5        = true,
   } = {}) {
     this.id        = rawData.collectionNo;
     this.data      = rawData;

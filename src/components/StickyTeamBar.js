@@ -65,7 +65,7 @@ const StickyTeamBar = ({
   const num = (v) => (Number.isNaN(Number(v)) ? 0 : Number(v));
 
   const npLevel = effects.np ?? effects.npLevel ?? 1;
-  const append5 = effects.append_5 !== undefined ? !!effects.append_5 : !!effects.append5;
+  const append5 = effects.append_5 ?? effects.append5 ?? true;
   const mode = effects.mode || effects.formMode || 1;
 
   return (

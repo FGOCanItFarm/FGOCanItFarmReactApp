@@ -88,7 +88,7 @@ export class Skills {
 
   setSkillCooldown(skillNum) {
     if (!this.cooldownReductionApplied[skillNum] && this.append5) {
-      this.cooldowns[skillNum] = this.maxCooldowns[skillNum] - 1;
+      this.cooldowns[skillNum] = Math.max(0, this.maxCooldowns[skillNum] - 1);
       this.cooldownReductionApplied[skillNum] = true;
     } else {
       this.cooldowns[skillNum] = this.maxCooldowns[skillNum];

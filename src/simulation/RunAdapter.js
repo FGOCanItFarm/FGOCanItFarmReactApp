@@ -59,7 +59,7 @@ export async function prepareSimInputs({ team, selectedQuest, selectedMysticCode
       busterDamageUp: Number(fx.busterDamageUp ?? 0),
       quickDamageUp:  Number(fx.quickDamageUp  ?? 0),
       artsDamageUp:   Number(fx.artsDamageUp   ?? 0),
-      append5:        !!(fx.append5 ?? fx.append_5 ?? false),
+      append5:        !!(fx.append5 ?? fx.append_5 ?? true),
     };
     return { rawData, opts };
   });
