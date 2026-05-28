@@ -51,10 +51,40 @@ export class NP {
     const group = this.nps.find(np => np.script?.tdTypeChangeIDs);
     if (!group) return null;
     const ids = group.script.tdTypeChangeIDs;
-    const loaded = activeBuffs.some(
+    const swapBuffs = activeBuffs.filter(
       b => typeof b.type === 'string' && b.type.startsWith('tdTypeChange')
     );
-    const wantId = (loaded && ids.length >= 2) ? ids[1] : ids[0];
+
+    // 1. Explicit NP id embedded by selectTreasureDeviceInfo routing
+    //    (BB Dubai S3). The skill knows exactly which group member the option
+    //    maps to, so no card guesswork is needed.
+    for (const b of swapBuffs) {
+      if (b.targetNpId != null) {
+        const explicit = this.nps.find(np => np.id === b.targetNpId);
+        if (explicit) return explicit.newId;
+      }
+    }
+
+    // 2. Card-key fallback (Space Ishtar / Emiya 3-NP groups). The buff type
+    //    suffix names the card the chosen variant fires; pick the group
+    //    member whose card matches.
+    const CARD_BY_TDTYPE = {
+      tdTypeChangeArts:   'arts',
+      tdTypeChangeBuster: 'buster',
+      tdTypeChangeQuick:  'quick',
+    };
+    for (const b of swapBuffs) {
+      const wantCard = CARD_BY_TDTYPE[b.type];
+      if (!wantCard) continue;
+      const member = ids
+        .map(id => this.nps.find(np => np.id === id))
+        .find(np => np && np.card === wantCard);
+      if (member) return member.newId;
+    }
+
+    // 3. Generic 2-NP swap (Mash 1, no per-card selection — any
+    //    `tdTypeChange*` buff flips to the alternate slot).
+    const wantId = (swapBuffs.length > 0 && ids.length >= 2) ? ids[1] : ids[0];
     return this.nps.find(np => np.id === wantId)?.newId ?? null;
   }
 

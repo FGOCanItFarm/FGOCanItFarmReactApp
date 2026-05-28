@@ -187,6 +187,14 @@ export class BattleEngine {
       count:     svals.Count ?? -1,
     };
 
+    // tdTypeChange* (BB Dubai S3, etc.): if the parent skill carried a
+    // `selectTreasureDeviceInfo` entry for the chosen option, embed its NP id
+    // on the buff so NP.tdTypeChangeNewId can resolve to the exact group
+    // member. Without it, the NP-side card-key fallback handles selection.
+    if (typeof buff.type === 'string' && buff.type.startsWith('tdTypeChange') && this._pendingChoiceNpId != null) {
+      state.targetNpId = this._pendingChoiceNpId;
+    }
+
     // overwriteBattleclass (Kazuradrop S3 「月の蛹」): the buff is self-target,
     // but the class to copy comes from the enemy the skill was pinned to.
     // Capture the target enemy's class so processServantBuffs can swap class /
@@ -212,7 +220,8 @@ export class BattleEngine {
 
     let targets = [];
     switch (effect.funcTargetType) {
-      case 'self':      targets = servant ? [servant] : [];           break;
+      case 'self':                          targets = servant ? [servant] : [];           break;
+      case 'commandTypeSelfTreasureDevice': targets = servant ? [servant] : [];           break;
       case 'enemyAll':  targets = this.getEnemies();                  break;
       case 'enemy':     targets = [allyTarget];                       break;
       case 'ptOther':   targets = this.servants.filter(s => s !== servant); break;
@@ -244,6 +253,7 @@ export class BattleEngine {
       targetClassName:  state.targetClassName,
       targetClassId:    state.targetClassId,
       targetClassTrait: state.targetClassTrait,
+      targetNpId:       state.targetNpId,
     });
   }
 
@@ -275,18 +285,57 @@ export class BattleEngine {
 
     const skill = servant.skills.getSkillByNum(num);
     servant.skills.setSkillCooldown(num);
-    // choice is stored for future modal-variable skill handling (Space Ishtar, Emiya)
+    // choice = [choiceCount, optionIdx] from token like [Ch2A] / [Ch3B].
+    // optionIdx is 0-based (A→0, B→1, C→2). Used to route NP-type-chooser
+    // skills (BB Dubai S3, Emiya S3, etc.) — see _resolveChoiceTargetNpId.
     this._pendingChoice = choice;
+    this._pendingChoiceNpId = this._resolveChoiceTargetNpId(skill, choice);
     // If the user pinned the skill to an enemy (e.g. `g~2`), retain it so
     // self-target effects that depend on a target (overwriteBattleclass class
     // copy, etc.) can read it from extractState. ptOne/ally targets are stored
     // here too but cleared after — extractState filters by inclusion in
     // this.enemies.
     this._skillTargetEnemy = (target && this.enemies?.includes(target)) ? target : null;
-    for (const effect of skill.functions) this.applyEffect(effect, servant, target);
+    for (const effect of skill.functions) {
+      if (this._shouldSkipChoiceEffect(skill, effect, choice)) continue;
+      this.applyEffect(effect, servant, target);
+    }
     this._skillTargetEnemy = null;
     this._pendingChoice = null;
+    this._pendingChoiceNpId = null;
     return true;
+  }
+
+  // NP-type-chooser routing (BB Dubai S3 etc.): when a skill has multiple
+  // `tdTypeChange{Arts,Buster,Quick}` (suffixed, non-generic) buff functions —
+  // each representing one of the player-selectable variants — fire only the
+  // one matching `choice[1]` (option idx). The generic `tdTypeChange` buff and
+  // all non-tdTypeChange functions fire unconditionally. With no choice, the
+  // first variant is kept (default to option A) so single-fire scenarios still
+  // behave reasonably.
+  _shouldSkipChoiceEffect(skill, effect, choice) {
+    const buffType = effect.buffs?.[0]?.type;
+    if (typeof buffType !== 'string') return false;
+    if (!buffType.startsWith('tdTypeChange') || buffType === 'tdTypeChange') return false;
+    const variants = (skill.functions || []).filter(f => {
+      const t = f.buffs?.[0]?.type;
+      return typeof t === 'string' && t.startsWith('tdTypeChange') && t !== 'tdTypeChange';
+    });
+    if (variants.length <= 1) return false;
+    const optionIdx = Array.isArray(choice) ? (choice[1] || 0) : 0;
+    return variants.indexOf(effect) !== Math.min(optionIdx, variants.length - 1);
+  }
+
+  // Map the chosen option to an Atlas NP id, when the skill exposes
+  // `selectTreasureDeviceInfo` (BB Dubai). Used by extractState to embed
+  // `targetNpId` on the resulting `tdTypeChange*` buff so the NP resolver can
+  // pick the exact group member regardless of card-type. Returns null for
+  // skills without the metadata (Emiya / Space Ishtar — handled via buff-type
+  // → card-key fallback in NP.tdTypeChangeNewId).
+  _resolveChoiceTargetNpId(skill, choice) {
+    if (!Array.isArray(choice) || !skill?.selectTreasureDeviceInfo) return null;
+    const opt = skill.selectTreasureDeviceInfo[choice[1] || 0];
+    return opt?.id ?? null;
   }
 
   useMysticCodeSkill(skillNum, target = null) {

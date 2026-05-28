@@ -25,6 +25,17 @@ export class Skills {
 
       const parsedSkill = { id: skill.id, name: skill.name, cooldown, functions: [] };
 
+      // NP-type choosers (BB Dubai S3, etc.) carry `script.selectTreasureDeviceInfo`
+      // — an array of per-level option lists. Each entry has `treasureDevices` of
+      // `{ id, type, message }` mapping option-letter (A/B/C) → target NP id.
+      // We keep the first entry (all levels are duplicates in real data).
+      const stdi = skill.script?.selectTreasureDeviceInfo;
+      if (Array.isArray(stdi) && stdi.length > 0 && Array.isArray(stdi[0].treasureDevices)) {
+        parsedSkill.selectTreasureDeviceInfo = stdi[0].treasureDevices.map(
+          td => ({ id: td.id, message: td.message, card: td.type })
+        );
+      }
+
       for (const func of (skill.functions || [])) {
         const sval = Skills.safeSval(func.svals);
         const parsedFunc = {
