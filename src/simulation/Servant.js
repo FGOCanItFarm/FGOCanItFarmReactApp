@@ -113,12 +113,14 @@ export class Servant {
       for (const func of passive.functions) {
         for (const buff of func.buffs) {
           this.applyBuff({
-            buff_name: buff.name || 'Unknown',
-            buff_type: buff.type,
-            value:     func.svals?.Value ?? 0,
-            turns:     -1,
-            functvals: func.functvals || [],
-            tvals:     buff.tvals || [],
+            buff_name:      buff.name || 'Unknown',
+            buff_type:      buff.type,
+            value:          func.svals?.Value ?? 0,
+            turns:          -1,
+            functvals:      func.functvals || [],
+            tvals:          buff.tvals || [],
+            script:         buff.script,
+            originalScript: buff.originalScript,
           });
         }
       }
@@ -127,12 +129,14 @@ export class Servant {
 
   applyBuff(state) {
     this.buffs.addBuff({
-      buff:      state.buff_name,
-      type:      state.buff_type,
-      functvals: state.functvals,
-      value:     state.value,
-      tvals:     (state.tvals || []).map(t => t.id ?? t),
-      turns:     state.turns,
+      buff:           state.buff_name,
+      type:           state.buff_type,
+      functvals:      state.functvals,
+      value:          state.value,
+      tvals:          (state.tvals || []).map(t => t.id ?? t),
+      turns:          state.turns,
+      script:         state.script,
+      originalScript: state.originalScript,
     });
   }
 

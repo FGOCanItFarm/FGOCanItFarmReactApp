@@ -61,7 +61,9 @@ export class Buffs {
 
     for (const buff of this.buffs) {
       const requiredField = buff.script?.INDIVIDUALITIE?.id ?? buff.originalScript?.INDIVIDUALITIE ?? null;
-      if (requiredField === null || s.fields.includes(requiredField)) {
+      if (requiredField === null
+          || s.fields.includes(requiredField)
+          || (s.traits && s.traits.includes(requiredField))) {
         if (buff.buff === 'NP Strength Up' || buff.buff === 'upNpdamage') {
           s.npDamageMod += buff.value / 1000;
         } else if (buff.buff === 'Boost NP Strength Up') {
@@ -74,7 +76,9 @@ export class Buffs {
 
     for (const buff of this.buffs) {
       const requiredField = buff.script?.INDIVIDUALITIE?.id ?? buff.originalScript?.INDIVIDUALITIE ?? null;
-      if (requiredField === null || s.fields.includes(requiredField)) {
+      if (requiredField === null
+          || s.fields.includes(requiredField)
+          || (s.traits && s.traits.includes(requiredField))) {
         switch (buff.buff) {
           case 'ATK Up':                 s.atkMod  += buff.value / 1000; break;
           case 'Buster Up':              s.bUp     += buff.value / 1000; break;
