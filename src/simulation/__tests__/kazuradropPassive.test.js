@@ -84,4 +84,38 @@ describe('Kazuradrop class passive — self-gated by current class', () => {
     expect(kazu.stats.getPowerMod({ traits: [SABER_TRAIT] })).toBeCloseTo(0.75, 5);
     expect(kazu.stats.getPowerMod({ traits: [ALTEREGO_TRAIT] })).toBe(0);
   });
+
+  // Kazuradrop has 13 anti-class rows. Beast has no row (she cannot class-change
+  // to Beast) and Shielder (107) likewise has no row — every other playable
+  // class id should activate cleanly when swapped in via S3.
+  describe.each([
+    ['Saber',      100],
+    ['Lancer',     101],
+    ['Archer',     102],
+    ['Rider',      103],
+    ['Caster',     104],
+    ['Assassin',   105],
+    ['Berserker',  106],
+    ['Ruler',      108],
+    ['Avenger',    110],
+    ['AlterEgo',   109],
+    ['MoonCancer', 115],
+    ['Foreigner',  117],
+    ['Pretender',  120],
+  ])('class-change to %s (trait %i)', (_name, classTrait) => {
+    test('activates only that row; all others remain dormant', () => {
+      const kazu = buildKazuradrop();
+      kazu.traits = kazu.traits.filter((t) => t !== ALTEREGO_TRAIT).concat(classTrait);
+      kazu.buffs.processServantBuffs();
+
+      expect(kazu.powerMod[classTrait]).toBe(750);
+      expect(kazu.stats.getPowerMod({ traits: [classTrait] })).toBeCloseTo(0.75, 5);
+
+      const everyOtherClass = [100, 101, 102, 103, 104, 105, 106, 108, 109, 110, 115, 117, 120]
+        .filter((t) => t !== classTrait);
+      for (const other of everyOtherClass) {
+        expect(kazu.powerMod[other]).toBeUndefined();
+      }
+    });
+  });
 });
