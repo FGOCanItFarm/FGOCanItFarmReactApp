@@ -7,6 +7,7 @@ import CombatDashboard from './CombatDashboard';
 import SimulationStats from './SimulationStats';
 import { supabase } from '../supabaseClient';
 import { parseServantSkills } from './skillInfo';
+import CommandChips from './CommandChips';
 
 const CommandInputPage = ({
   team, servants, setTeam, activeServant, setActiveServant,
@@ -149,6 +150,15 @@ const CommandInputPage = ({
             size="small"
             variant="outlined"
             label={`${commands.length} tokens`}
+          />
+        </Box>
+
+        <Box mb={1}>
+          <CommandChips
+            commands={commands}
+            team={team}
+            servants={servants}
+            setCommands={setCommandsWithHistory}
           />
         </Box>
 

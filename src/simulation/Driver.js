@@ -121,7 +121,10 @@ export class Driver {
     // #  — end turn (advances wave on success)
     if (token === '#') return eng.endTurn();
 
-    // Unknown token — ignore silently
-    return eng;
+    // Unknown token — fail the run (FR-6: silent-drop was hiding bad manual
+    // edits from the builder). For tolerant prefix-validation in the UI, use
+    // CommandState.classifyToken to inspect a token without stepping the
+    // engine.
+    return false;
   }
 }
