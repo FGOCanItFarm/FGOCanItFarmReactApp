@@ -1,6 +1,7 @@
 import { Servant }    from './Servant.js';
 import { Quest }      from './Quest.js';
 import { MysticCode } from './MysticCode.js';
+import { classTraitByName } from './gameData.js';
 
 // Injected at the start of every NP that has extra gauge above 100%
 const NP_OC_1_TURN = {
@@ -175,15 +176,32 @@ export class BattleEngine {
     const buff   = buffs[0] || {};
     const tvals  = buff.tvals || [];
     const hasName = buff.name && buff.name !== 'Unknown';
-    return {
+    const state = {
       type:      'buff',
       buff_name: hasName ? buff.name : (buff.type || 'Unknown'),
+      buff_type: buff.type,
       functvals: hasName ? (effect.functvals || []) : (tvals[0]?.id ?? 'Unknown'),
       tvals,
       value:     svals.Value || 0,
       turns:     svals.Turn  || 0,
       count:     svals.Count ?? -1,
     };
+
+    // overwriteBattleclass (Kazuradrop S3 「月の蛹」): the buff is self-target,
+    // but the class to copy comes from the enemy the skill was pinned to.
+    // Capture the target enemy's class so processServantBuffs can swap class /
+    // class-trait while the buff is active. If no enemy target was provided
+    // (bare `g`/`g1`), fall back to the first surviving enemy (FGO defaults to
+    // the highest-HP / leftmost enemy in practice).
+    if (buff.type === 'overwriteBattleclass') {
+      const enemy = this._skillTargetEnemy ?? this.enemies?.find(e => e.hp > 0) ?? null;
+      if (enemy) {
+        state.targetClassName = enemy.className;
+        state.targetClassId   = enemy.classId;
+        state.targetClassTrait = classTraitByName[enemy.className] ?? null;
+      }
+    }
+    return state;
   }
 
   applyEffect(effect, servant, allyTarget = null) {
@@ -216,12 +234,16 @@ export class BattleEngine {
 
   applyBuff(target, state) {
     target.buffs.addBuff({
-      buff:      state.buff_name,
-      functvals: state.functvals,
-      value:     state.value,
-      tvals:     (state.tvals || []).map(t => t.id ?? t),
-      turns:     state.turns,
-      count:     state.count ?? -1,
+      buff:             state.buff_name,
+      type:             state.buff_type,
+      functvals:        state.functvals,
+      value:            state.value,
+      tvals:            (state.tvals || []).map(t => t.id ?? t),
+      turns:            state.turns,
+      count:            state.count ?? -1,
+      targetClassName:  state.targetClassName,
+      targetClassId:    state.targetClassId,
+      targetClassTrait: state.targetClassTrait,
     });
   }
 
@@ -255,7 +277,14 @@ export class BattleEngine {
     servant.skills.setSkillCooldown(num);
     // choice is stored for future modal-variable skill handling (Space Ishtar, Emiya)
     this._pendingChoice = choice;
+    // If the user pinned the skill to an enemy (e.g. `g~2`), retain it so
+    // self-target effects that depend on a target (overwriteBattleclass class
+    // copy, etc.) can read it from extractState. ptOne/ally targets are stored
+    // here too but cleared after — extractState filters by inclusion in
+    // this.enemies.
+    this._skillTargetEnemy = (target && this.enemies?.includes(target)) ? target : null;
     for (const effect of skill.functions) this.applyEffect(effect, servant, target);
+    this._skillTargetEnemy = null;
     this._pendingChoice = null;
     return true;
   }

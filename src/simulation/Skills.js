@@ -39,10 +39,13 @@ export class Skills {
         for (const buff of (func.buffs || [])) {
           const buffSval = Skills.safeSval(buff.svals);
           parsedFunc.buffs.push({
-            name:  buff.name,
-            tvals: buff.tvals || [],
-            svals: buffSval || null,
-            value: buffSval ? (buffSval.Value ?? 0) : 0,
+            name:           buff.name,
+            type:           buff.type,
+            tvals:          buff.tvals || [],
+            svals:          buffSval || null,
+            value:          buffSval ? (buffSval.Value ?? 0) : 0,
+            script:         buff.script,
+            originalScript: buff.originalScript,
           });
         }
         parsedSkill.functions.push(parsedFunc);

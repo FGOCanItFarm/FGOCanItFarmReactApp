@@ -43,8 +43,35 @@ export class Buffs {
     }
   }
 
+  // Applies any active `overwriteBattleclass` buff (Kazuradrop S3 「月の蛹」, etc.)
+  // by swapping the servant's className/classId/class-trait to the recorded
+  // target class. When no such buff is active (or it has decayed) the baseline
+  // captured at construction is restored. Runs at the top of
+  // processServantBuffs so the downstream powerMod / class-advantage paths see
+  // the effective class. classBaseMultiplier (atk multiplier) is intentionally
+  // NOT recomputed — in FGO class-change does not retroactively rescale ATK.
+  applyBattleClassOverride() {
+    const s = this.servant;
+    if (s._baseClassName == null) return; // pre-init (e.g. fixture stubs)
+    const override = this.buffs.find(b => b.type === 'overwriteBattleclass' && b.targetClassName);
+    if (override) {
+      s.className = override.targetClassName;
+      s.classId   = override.targetClassId ?? s._baseClassId;
+      const swapOut = s._baseClassTrait;
+      const swapIn  = override.targetClassTrait;
+      s.traits = s._baseTraits
+        .filter(t => t !== swapOut)
+        .concat(swapIn != null ? [swapIn] : []);
+    } else {
+      s.className = s._baseClassName;
+      s.classId   = s._baseClassId;
+      s.traits    = [...s._baseTraits];
+    }
+  }
+
   processServantBuffs() {
     const s = this.servant;
+    this.applyBattleClassOverride();
     s.atkMod            = s.userAtkMod;
     s.bUp               = s.userBUp;
     s.aUp               = s.userAUp;

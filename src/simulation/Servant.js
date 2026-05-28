@@ -1,4 +1,4 @@
-import { baseMultipliers } from './gameData.js';
+import { baseMultipliers, classTraitByName } from './gameData.js';
 import { Stats }  from './Stats.js';
 import { Skills } from './Skills.js';
 import { Buffs }  from './Buffs.js';
@@ -84,6 +84,13 @@ export class Servant {
     this.busterCardDamageUp = busterDamageUp;
     this.artsCardDamageUp   = artsDamageUp;
     this.quickCardDamageUp  = quickDamageUp;
+
+    // Baseline class state — captured once so processServantBuffs can revert any
+    // active overwriteBattleclass override (Kazuradrop S3 etc.) when it expires.
+    this._baseClassName  = this.className;
+    this._baseClassId    = this.classId;
+    this._baseClassTrait = classTraitByName[this.className] ?? null;
+    this._baseTraits     = [...this.traits];
 
     this.passives = this.buffs.parsePassive(rawData.classPassive || []);
     this.applyPassiveBuffs();

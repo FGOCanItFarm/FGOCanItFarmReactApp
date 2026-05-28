@@ -24,7 +24,8 @@
  * trait (109 ↔ target class id) and the matching row activates.
  */
 import { Servant } from '../Servant';
-import { loadServant } from '../__fixtures__/realData';
+import { Driver } from '../Driver';
+import { loadServant, buildSimInputs } from '../__fixtures__/realData';
 
 const ALTEREGO_TRAIT = 109;
 const SABER_TRAIT    = 100;
@@ -73,41 +74,79 @@ describe('Kazuradrop class passive — self-gated by current class', () => {
     }
   });
 
-  test('class-change to Saber (swap 109→100) activates the Saber row', () => {
+  // Simulates S3 「月の蛹」: push an overwriteBattleclass buff carrying the new
+  // class so applyBattleClassOverride swaps className / classId / class-trait
+  // at processServantBuffs time. Direct mutation of `traits` no longer works
+  // because the override path now resets traits from _baseTraits each call.
+  function classSwap(servant, className, classId, classTrait) {
+    servant.buffs.addBuff({
+      buff: 'クラス変化',
+      type: 'overwriteBattleclass',
+      targetClassName: className,
+      targetClassId:   classId,
+      targetClassTrait: classTrait,
+      turns: 3,
+      value: 0,
+    });
+  }
+
+  test('class-change to Saber via overwriteBattleclass activates the Saber row', () => {
     const kazu = buildKazuradrop();
-    // Simulate what S3 「月の蛹」 would do: drop the AlterEgo class trait, add Saber.
-    kazu.traits = kazu.traits.filter((t) => t !== ALTEREGO_TRAIT).concat(SABER_TRAIT);
+    classSwap(kazu, 'saber', 1, SABER_TRAIT);
     kazu.buffs.processServantBuffs();
 
+    expect(kazu.className).toBe('saber');
+    expect(kazu.traits).toContain(SABER_TRAIT);
+    expect(kazu.traits).not.toContain(ALTEREGO_TRAIT);
     expect(kazu.powerMod[SABER_TRAIT]).toBe(750);
     expect(kazu.powerMod[ALTEREGO_TRAIT]).toBeUndefined();
     expect(kazu.stats.getPowerMod({ traits: [SABER_TRAIT] })).toBeCloseTo(0.75, 5);
     expect(kazu.stats.getPowerMod({ traits: [ALTEREGO_TRAIT] })).toBe(0);
   });
 
+  test('override decays — class reverts and AlterEgo row reactivates', () => {
+    const kazu = buildKazuradrop();
+    classSwap(kazu, 'saber', 1, SABER_TRAIT);
+    kazu.buffs.processServantBuffs();
+    expect(kazu.className).toBe('saber');
+
+    // Burn the buff's 3 turns to 0; decrementBuffs drops it.
+    kazu.buffs.decrementBuffs();
+    kazu.buffs.decrementBuffs();
+    kazu.buffs.decrementBuffs();
+    kazu.buffs.processServantBuffs();
+
+    expect(kazu.className).toBe('alterEgo');
+    expect(kazu.traits).toContain(ALTEREGO_TRAIT);
+    expect(kazu.traits).not.toContain(SABER_TRAIT);
+    expect(kazu.powerMod[ALTEREGO_TRAIT]).toBe(750);
+    expect(kazu.powerMod[SABER_TRAIT]).toBeUndefined();
+  });
+
   // Kazuradrop has 13 anti-class rows. Beast has no row (she cannot class-change
   // to Beast) and Shielder (107) likewise has no row — every other playable
   // class id should activate cleanly when swapped in via S3.
   describe.each([
-    ['Saber',      100],
-    ['Lancer',     101],
-    ['Archer',     102],
-    ['Rider',      103],
-    ['Caster',     104],
-    ['Assassin',   105],
-    ['Berserker',  106],
-    ['Ruler',      108],
-    ['Avenger',    110],
-    ['AlterEgo',   109],
-    ['MoonCancer', 115],
-    ['Foreigner',  117],
-    ['Pretender',  120],
-  ])('class-change to %s (trait %i)', (_name, classTrait) => {
+    ['saber',      'saber',      1,  100],
+    ['lancer',     'lancer',     2,  101],
+    ['archer',     'archer',     3,  102],
+    ['rider',      'rider',      4,  103],
+    ['caster',     'caster',     5,  104],
+    ['assassin',   'assassin',   6,  105],
+    ['berserker',  'berserker',  7,  106],
+    ['ruler',      'ruler',      9,  108],
+    ['avenger',    'avenger',    11, 110],
+    ['alterEgo',   'alterEgo',   10, 109],
+    ['moonCancer', 'moonCancer', 23, 115],
+    ['foreigner',  'foreigner',  25, 117],
+    ['pretender',  'pretender',  28, 120],
+  ])('class-change to %s', (_label, className, classId, classTrait) => {
     test('activates only that row; all others remain dormant', () => {
       const kazu = buildKazuradrop();
-      kazu.traits = kazu.traits.filter((t) => t !== ALTEREGO_TRAIT).concat(classTrait);
+      classSwap(kazu, className, classId, classTrait);
       kazu.buffs.processServantBuffs();
 
+      expect(kazu.className).toBe(className);
       expect(kazu.powerMod[classTrait]).toBe(750);
       expect(kazu.stats.getPowerMod({ traits: [classTrait] })).toBeCloseTo(0.75, 5);
 
@@ -117,5 +156,48 @@ describe('Kazuradrop class passive — self-gated by current class', () => {
         expect(kazu.powerMod[other]).toBeUndefined();
       }
     });
+  });
+});
+
+// End-to-end via the Driver: Kazuradrop S3 「月の蛹」 (`c~1` — third skill of slot
+// 1, targeting enemy 1) on quest 94089601 whose first wave is all Assassins.
+// The skill includes an `addState/overwriteBattleclass` function on self; the
+// engine reads the pinned enemy's class, attaches it to the buff, and the next
+// processServantBuffs swaps her className/classId/class-trait. Her anti-class
+// passive then routes +75% into powerMod[105] (classAssassin).
+describe('Kazuradrop S3 「月の蛹」 — overwriteBattleclass end-to-end', () => {
+  test('targeting an Assassin enemy makes her an Assassin and arms the Assassin row', () => {
+    const inputs = buildSimInputs({
+      servants: [
+        { collectionNo: 426, opts: { initialCharge: 100 } },
+        { collectionNo: 314 },
+        { collectionNo: 314 },
+      ],
+      questId: 94089601,
+      mysticCodeId: 20,
+    });
+    const driver = new Driver(inputs);
+    const engine = driver.run('c~1');
+    expect(engine).not.toBe(false);
+
+    const kazu = engine.servants[0];
+    expect(kazu.id).toBe(426);
+
+    // After S3 fires, an overwriteBattleclass buff carrying the Assassin enemy's
+    // class is on her active list.
+    const override = kazu.buffs.buffs.find(b => b.type === 'overwriteBattleclass');
+    expect(override).toBeDefined();
+    expect(override.targetClassName).toBe('assassin');
+    expect(override.targetClassTrait).toBe(105);
+
+    // The recompute swaps her effective class to Assassin.
+    kazu.buffs.processServantBuffs();
+    expect(kazu.className).toBe('assassin');
+    expect(kazu.traits).toContain(105);
+    expect(kazu.traits).not.toContain(ALTEREGO_TRAIT);
+
+    // Same-class passive row now powers up vs Assassin targets.
+    expect(kazu.powerMod[105]).toBe(750);
+    expect(kazu.stats.getPowerMod({ traits: [105] })).toBeCloseTo(0.75, 5);
   });
 });
