@@ -33,7 +33,14 @@ export function targetLabel(t) {
   }
 }
 
-// Returns [{ num, name, icon, targetType, label, needsAllyTarget }] for skills 1-3.
+// Returns [{ num, name, icon, targetType, label, needsAllyTarget, isChoice,
+// choiceCount }] for skills 1-3. isChoice is true when the skill is an NP-type
+// chooser — either it carries `script.selectTreasureDeviceInfo` (BB Dubai 421
+// S3, lists each option's target NP) or it has 2+ suffixed
+// `tdTypeChange{Arts,Buster,Quick}` functions (Emiya 11 S3, Space Ishtar 268
+// S2 — choice is by card type). choiceCount is the number of options
+// (2 for BB Dubai/Emiya, 3 for Space Ishtar) so the UI can render the right
+// A/B/C selector.
 export function parseServantSkills(data) {
   const skills = data?.skills || [];
   const byNum = {};
@@ -48,7 +55,7 @@ export function parseServantSkills(data) {
   for (let num = 1; num <= 3; num++) {
     const s = byNum[num];
     if (!s) {
-      result.push({ num, name: `Skill ${num}`, icon: null, targetType: '', label: '', needsAllyTarget: false });
+      result.push({ num, name: `Skill ${num}`, icon: null, targetType: '', label: '', needsAllyTarget: false, isChoice: false, choiceCount: 0 });
       continue;
     }
     const targets = (s.functions || []).map(f => f.funcTargetType).filter(Boolean);
@@ -57,6 +64,16 @@ export function parseServantSkills(data) {
       if (targets.includes(t)) { primary = t; break; }
     }
     if (!primary && targets.length) primary = targets[0];
+
+    const stdi = s.script?.selectTreasureDeviceInfo?.[0]?.treasureDevices;
+    const stdiCount = Array.isArray(stdi) ? stdi.length : 0;
+    const variantCount = (s.functions || []).filter(f => {
+      const t = f.buffs?.[0]?.type;
+      return typeof t === 'string' && t.startsWith('tdTypeChange') && t !== 'tdTypeChange';
+    }).length;
+    const choiceCount = Math.max(stdiCount, variantCount);
+    const isChoice = choiceCount >= 2;
+
     result.push({
       num,
       name: s.name || `Skill ${num}`,
@@ -64,6 +81,8 @@ export function parseServantSkills(data) {
       targetType: primary,
       label: targetLabel(primary),
       needsAllyTarget: targets.some(t => ALLY_TARGET.has(t)),
+      isChoice,
+      choiceCount,
     });
   }
   return result;

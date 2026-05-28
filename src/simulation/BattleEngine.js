@@ -534,6 +534,17 @@ export class BattleEngine {
 }
 
 // ─── Dispatch table for effect funcTypes ──────────────────────────────────────
+// Probabilistic skill effects (`svals.Rate < 1000`) are treated as full
+// uptime: addState / addStateShort / gainNp / shortenSkill all apply
+// unconditionally, ignoring Rate. This matches the player's expected
+// best-case (e.g. Space Ishtar S3 「Multiple Sterling EX」 — Arts/Buster/Quick
+// Up at 80% chance — assumed to always land, so the +20% buff is fully
+// active for the planned 3-turn window). Star-conditional skills follow the
+// same policy: Mash S2 「Purple Bullet」 assumes 50 stars in hand (see
+// useSkill above); future star-based choosers (Kukulkan etc.) should
+// likewise assume max-stars rather than expose a player choice.
+// `instantDeath` is the lone Rate-checked handler because it derives the
+// outcome flag the rest of the engine reads.
 const EFFECT_HANDLERS = {
   addState:      (eng, eff, tgt) => eng.applyBuff(tgt, eng.extractState(eff)),
   addStateShort: (eng, eff, tgt) => eng.applyBuff(tgt, eng.extractState(eff)),
