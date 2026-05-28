@@ -87,7 +87,9 @@ export class Buffs {
           case 'Arts Card Damage Up':    s.artsCardDamageUp   += buff.value / 1000; break;
           case 'Quick Card Damage Up':   s.quickCardDamageUp  += buff.value / 1000; break;
           default:
-            if (buff.buff.includes('STR Up') || buff.buff.includes('Strength Up')) {
+            if (buff.type === 'upDamage'
+                || buff.buff.includes('STR Up')
+                || buff.buff.includes('Strength Up')) {
               for (const tval of (buff.tvals || [])) {
                 if (!(tval in s.powerMod)) s.powerMod[tval] = 0;
                 s.powerMod[tval] += buff.value || 0;

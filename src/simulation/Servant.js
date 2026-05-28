@@ -114,10 +114,11 @@ export class Servant {
         for (const buff of func.buffs) {
           this.applyBuff({
             buff_name: buff.name || 'Unknown',
+            buff_type: buff.type,
             value:     func.svals?.Value ?? 0,
             turns:     -1,
             functvals: func.functvals || [],
-            tvals:     [],
+            tvals:     buff.tvals || [],
           });
         }
       }
@@ -127,6 +128,7 @@ export class Servant {
   applyBuff(state) {
     this.buffs.addBuff({
       buff:      state.buff_name,
+      type:      state.buff_type,
       functvals: state.functvals,
       value:     state.value,
       tvals:     (state.tvals || []).map(t => t.id ?? t),
