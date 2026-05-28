@@ -265,7 +265,7 @@ export class BattleEngine {
     // capped at 50 stars → up to 200%) and grants +100% NP strength for 3 turns.
     // Stars aren't modeled by the engine; assume a reasonable 50 in hand. The
     // base-S2 effects are intentionally skipped. (Contained special case — FR-5.)
-    if (servant.id === 1 && num === 2 && servant.buffs.buffs.some(b => b.buff === '聖剣装填')) {
+    if (servant.id === 1 && num === 2 && servant.buffs.buffs.some(b => typeof b.type === 'string' && b.type.startsWith('tdTypeChange'))) {
       servant.skills.setSkillCooldown(num);
       const assumedStars = 50;
       servant.stats.setNpgauge(Math.min(assumedStars, 50) * 4); // +(stars × 4%) NP
@@ -309,17 +309,16 @@ export class BattleEngine {
       servant.buffs.processServantBuffs();
     }
 
-    // Mash NP swap (contained special case — see FR-5): she fires the default
-    // Lord Chaldeas (Arts, id 800107), which loads "聖剣装填" (Holy Sword); once
-    // that buff is active her NP becomes the offensive Holy Sword (Buster, id
-    // 800108). Other servants resolve to their default NP (activeNpId = null).
-    let activeNpId = null;
-    let npCardType = servant.nps.card;
-    if (servant.id === 1) {
-      const holySwordLoaded = servant.buffs.buffs.some(b => b.buff === '聖剣装填');
-      activeNpId = servant.nps.tdTypeChangeNewId(holySwordLoaded);
-      if (activeNpId != null) npCardType = servant.nps.getNpById(activeNpId).card;
-    }
+    // NP swap (FR-5): any servant whose NPs declare `script.tdTypeChangeIDs`
+    // resolves to the alternate NP when any `tdTypeChange*` state buff is
+    // active. Covers Mash (default Lord Chaldeas → 「聖剣装填」 arms Holy Sword)
+    // and any future 2-NP swap servants out of the box. Servants without an
+    // NP-swap group resolve to null (their default NP). 3-NP groups (Emiya,
+    // Space Ishtar) need choice-token plumbing — tracked under FR-3.
+    let activeNpId = servant.nps.tdTypeChangeNewId(servant.buffs.buffs);
+    let npCardType = (activeNpId != null)
+      ? servant.nps.getNpById(activeNpId).card
+      : servant.nps.card;
 
     // Recompute derived stats so OC level reflects all currently-active buffs
     // (incl. an Overcharge Lv. Up carried from a prior wave) — getNpValues

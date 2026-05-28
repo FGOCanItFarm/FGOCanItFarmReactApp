@@ -26,15 +26,35 @@ export class NP {
 
   /**
    * Resolve the newId of an NP-swap (`script.tdTypeChangeIDs`) group member.
-   * Mash's "Lord Chaldeas" (default, Arts) ↔ "Holy Sword" (loaded, Buster) is the
-   * only live case. `loaded` = whether the tdTypeChange state buff is active.
+   *
+   * Atlas encodes NP transforms as a multi-NP group where each member's
+   * `script.tdTypeChangeIDs` lists the full set, and the active member is
+   * selected by a `tdTypeChange*` state buff (tdTypeChange, tdTypeChangeArts,
+   * tdTypeChangeBuster, tdTypeChangeQuick). Examples covered today:
+   *
+   *   - Mash 1: [800107 Lord Chaldeas/Arts, 800108 聖剣 Holy Sword/Buster].
+   *     Her default NP fires a `tdTypeChangeBuster` buff (「聖剣装填」), arming
+   *     the alternate for subsequent NP fires.
+   *   - BB Dubai 421: [2300601 C.C.C., 2300698 G.G.G.]. Her S3 applies one of
+   *     three `tdTypeChange*` buffs — choice-driven (deferred; see FR-3).
+   *   - Emiya 11, Space Ishtar 268: 2- and 3-card swap groups, also
+   *     choice-driven via skill.
+   *
+   * For 2-NP groups this picks ids[1] when ANY `tdTypeChange*` buff is on the
+   * active list, ids[0] otherwise (covers Mash). For 3-NP groups the right
+   * slot depends on which specific buff variant is active; that map lands
+   * with the choice plumbing.
+   *
    * Returns null when the servant has no NP-swap group.
    */
-  tdTypeChangeNewId(loaded) {
+  tdTypeChangeNewId(activeBuffs = []) {
     const group = this.nps.find(np => np.script?.tdTypeChangeIDs);
     if (!group) return null;
-    const [defaultId, alternateId] = group.script.tdTypeChangeIDs;
-    const wantId = loaded ? alternateId : defaultId;
+    const ids = group.script.tdTypeChangeIDs;
+    const loaded = activeBuffs.some(
+      b => typeof b.type === 'string' && b.type.startsWith('tdTypeChange')
+    );
+    const wantId = (loaded && ids.length >= 2) ? ids[1] : ids[0];
     return this.nps.find(np => np.id === wantId)?.newId ?? null;
   }
 
@@ -62,12 +82,15 @@ export class NP {
       const buffs = (func.buffs || []).map(buff => {
         const bSvals = buff.svals || [];
         return {
-          name: buff.name,
-          functvals: buff.functvals || '',
-          tvals: buff.tvals || [],
-          svals: bSvals.length > 9 ? bSvals[9] : null,
-          value: bSvals.length > 9 ? (bSvals[9]?.Value ?? 0) : 0,
-          turns: bSvals.length > 9 ? (bSvals[9]?.Turn  ?? 0) : 0,
+          name:           buff.name,
+          type:           buff.type,
+          functvals:      buff.functvals || '',
+          tvals:          buff.tvals || [],
+          svals:          bSvals.length > 9 ? bSvals[9] : null,
+          value:          bSvals.length > 9 ? (bSvals[9]?.Value ?? 0) : 0,
+          turns:          bSvals.length > 9 ? (bSvals[9]?.Turn  ?? 0) : 0,
+          script:         buff.script,
+          originalScript: buff.originalScript,
         };
       });
       return {
