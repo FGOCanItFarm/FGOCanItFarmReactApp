@@ -2,12 +2,19 @@
  * Renders the current command sequence as deletable chips (FR-6).
  *
  * Each token becomes one MUI Chip labelled by `humanizeToken`; clicking the
- * chip's ✕ removes that token from the command list. Tokens that fail the
- * cheap syntactic check (`classifyToken` returns null) render with an
- * "invalid" tint — typically the result of a manual paste/edit, so the user
- * sees what's wrong instead of silently losing it. Engine-level legality
- * (skill cooldown, NP gauge insufficient) lives in a follow-up that wires
- * `buildEngineAt`'s `failedIndex` into the same row.
+ * chip's ✕ removes that token from the command list.
+ *
+ * Three chip states:
+ *   - "invalid"      — token fails the cheap syntactic check
+ *                      (`classifyToken` returns null). Red tint; typical of a
+ *                      manual paste typo.
+ *   - "failed"       — token at index === failedIndex (the first engine-level
+ *                      refusal: skill on cooldown, NP gauge insufficient,
+ *                      target out of range). Red tint, same as invalid.
+ *   - "invalidated"  — index > failedIndex. Greyed out: these tokens still
+ *                      exist in the list (per spec they're NOT silently
+ *                      dropped) but they would never execute on the current
+ *                      engine state until the failing token is fixed.
  *
  * Props:
  *   - commands: string[]
@@ -15,6 +22,8 @@
  *     ally targets to readable names.
  *   - servants: Servant[] (the roster from props) — for collectionNo → name lookup.
  *   - setCommands: (next: string[]) => void
+ *   - failedIndex: number (default -1) — index of the first token rejected by
+ *     a real engine replay (`buildEngineAt`), or -1 when every token applies.
  */
 import React, { useMemo } from 'react';
 import { Box, Chip, Typography } from '@mui/material';
@@ -31,7 +40,20 @@ function buildSnapshot(team, servants) {
   return { front };
 }
 
-const CommandChips = ({ commands = [], team = [], servants = [], setCommands = () => {} }) => {
+const ERROR_SX = {
+  borderColor: 'var(--color-error)',
+  color: 'var(--color-error)',
+  backgroundColor: 'color-mix(in srgb, var(--color-error) 8%, transparent)',
+};
+
+const INVALIDATED_SX = {
+  borderColor: 'var(--color-text-dim)',
+  color: 'var(--color-text-dim)',
+  opacity: 0.55,
+  textDecoration: 'line-through',
+};
+
+const CommandChips = ({ commands = [], team = [], servants = [], setCommands = () => {}, failedIndex = -1 }) => {
   const snapshot = useMemo(() => buildSnapshot(team, servants), [team, servants]);
 
   if (commands.length === 0) {
@@ -47,8 +69,15 @@ const CommandChips = ({ commands = [], team = [], servants = [], setCommands = (
   return (
     <Box display="flex" flexWrap="wrap" gap={0.5} role="list" aria-label="Command sequence">
       {commands.map((token, i) => {
-        const invalid = classifyToken(token) === null && token !== '#';
-        const label = invalid ? `Invalid: ${token}` : humanizeToken(token, snapshot);
+        const syntactic = classifyToken(token) === null && token !== '#';
+        const failedHere = failedIndex === i;
+        const invalidated = failedIndex >= 0 && i > failedIndex;
+        const errored = syntactic || failedHere;
+        const label = syntactic ? `Invalid: ${token}` : humanizeToken(token, snapshot);
+        const sx = errored ? ERROR_SX : invalidated ? INVALIDATED_SX : undefined;
+        const title = failedHere ? 'Engine refused this token (cooldown / NP gauge / target?). Fix or delete it.'
+          : invalidated ? 'Will not run until the earlier failing token is fixed.'
+          : undefined;
         return (
           <Chip
             key={`${i}-${token}`}
@@ -56,13 +85,10 @@ const CommandChips = ({ commands = [], team = [], servants = [], setCommands = (
             size="small"
             label={`${i + 1}. ${label}`}
             onDelete={() => deleteAt(i)}
-            sx={invalid ? {
-              borderColor: 'var(--color-error)',
-              color: 'var(--color-error)',
-              backgroundColor: 'color-mix(in srgb, var(--color-error) 8%, transparent)',
-            } : undefined}
+            sx={sx}
             variant="outlined"
-            aria-label={`Token ${i + 1}: ${label}`}
+            title={title}
+            aria-label={`Token ${i + 1}: ${label}${errored ? ' — failed' : invalidated ? ' — invalidated' : ''}`}
           />
         );
       })}

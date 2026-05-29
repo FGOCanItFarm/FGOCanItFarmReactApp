@@ -55,4 +55,38 @@ describe('CommandChips', () => {
     await user.click(deleteButtons[1]);
     expect(setCommands).toHaveBeenCalledWith(['a', 'c']);
   });
+
+  test('failedIndex marks the failing token "failed" and subsequent tokens "invalidated"', () => {
+    render(
+      <CommandChips
+        commands={['a', 'b', 'c', '4']}
+        team={team}
+        servants={servants}
+        failedIndex={1}
+      />,
+    );
+    const items = screen.getAllByRole('listitem');
+    // Index 0 is fine.
+    expect(items[0].getAttribute('aria-label')).not.toMatch(/failed|invalidated/);
+    // Index 1 is the failure.
+    expect(items[1].getAttribute('aria-label')).toMatch(/failed/);
+    // Indices 2 & 3 are invalidated (after the failure).
+    expect(items[2].getAttribute('aria-label')).toMatch(/invalidated/);
+    expect(items[3].getAttribute('aria-label')).toMatch(/invalidated/);
+  });
+
+  test('failedIndex = -1 leaves every chip in the normal state', () => {
+    render(
+      <CommandChips
+        commands={['a', 'b', 'c']}
+        team={team}
+        servants={servants}
+        failedIndex={-1}
+      />,
+    );
+    const items = screen.getAllByRole('listitem');
+    for (const it of items) {
+      expect(it.getAttribute('aria-label')).not.toMatch(/failed|invalidated/);
+    }
+  });
 });
