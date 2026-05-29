@@ -40,6 +40,11 @@ const MATRIX = [
   [61,   'Elisabeth Halloween NP1',       '4',    94100501, { np: 1 }],
   [57,   'Cu Chulainn (Caster) NP3',      '4',    94089601, { np: 3 }],
 
+  // ── previously-zero-damage NP funcTypes (FR-5 backlog) ───────────────────────
+  [257,  'Bartholomew Roberts NP1 (damageNpRare)',                '4', 94089601, { np: 1 }],
+  [417,  'Ereshkigal NP1 (damageNpBattlePointPhase)',             '4', 94089601, { np: 1 }],
+  [423,  'MHXX Alter NP1 (damageNpAndOrCheckIndividuality)',      '4', 94089601, { np: 1 }],
+
   // ── Mash Holy Sword chain ────────────────────────────────────────────────────
   [1,    'Mash: NP→S2→NP (Holy Sword)',   '4 b 4', 94089601, { np: 1, initialCharge: 100 }],
 

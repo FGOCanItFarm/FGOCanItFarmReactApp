@@ -149,6 +149,21 @@ export class NP {
         const sval = NP.safeSvalAtLevel(func, oc, npLevel);
         return [(sval.Value ?? 0) / 1000, null, null, null, null];
       }
+      // Conditional-bonus damage NPs that share the plain Value/1000 baseline.
+      // Each adds a situational Correction the engine intentionally omits, so we
+      // bill only the floor (same precedent as damageNpHpratioLow). Without this
+      // branch the funcType misses both dispatch lists in BattleEngine.useNp and
+      // the NP silently deals ZERO damage. Owner-approved baseline approximation:
+      //   - damageNpRare (Bartholomew Roberts 257): +Correction vs enemy rarity.
+      //   - damageNpBattlePointPhase (Ereshkigal 417): scales with accrued battle
+      //     points; we bill the phase-0 baseline (no points → no bonus).
+      //   - damageNpAndOrCheckIndividuality (MHXX Alter 423): +Correction only when
+      //     the enemy carries ALL of AndCheckIndividualityList; omitted (under-bill).
+      if (['damageNpRare', 'damageNpBattlePointPhase', 'damageNpAndOrCheckIndividuality']
+          .includes(func.funcType)) {
+        const sval = NP.safeSvalAtLevel(func, oc, npLevel);
+        return [(sval.Value ?? 0) / 1000, null, null, null, null];
+      }
       if (['damageNpIndividual', 'damageNpStateIndividualFix'].includes(func.funcType)) {
         const sval = NP.safeSvalAtLevel(func, 1, npLevel);
         return [

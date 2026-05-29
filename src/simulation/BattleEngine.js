@@ -386,7 +386,9 @@ export class BattleEngine {
       : this.enemies.reduce((best, e) => (e.hp > best.hp ? e : best), this.enemies[0]);
 
     for (const func of functions) {
-      if (['damageNp', 'damageNpPierce', 'damageNpHpratioLow'].includes(func.funcType)) {
+      if (['damageNp', 'damageNpPierce', 'damageNpHpratioLow',
+           'damageNpRare', 'damageNpBattlePointPhase', 'damageNpAndOrCheckIndividuality']
+          .includes(func.funcType)) {
         servant.buffs.processServantBuffs();
         if (func.funcTargetType === 'enemyAll') {
           for (const e of this.enemies) { e.buffs.processEnemyBuffs(); this._applyNpDamage(servant, e, activeNpId, npCardType); }
