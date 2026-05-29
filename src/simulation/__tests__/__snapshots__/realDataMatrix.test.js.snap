@@ -100,6 +100,16 @@ Object {
 }
 `;
 
+exports[`cn=257 — Bartholomew Roberts NP1 (damageNpRare) wave damage snapshot 1`] = `
+Object {
+  "1": Object {
+    "cleared": false,
+    "damageDealt": 10473,
+    "hpRequired": 340551,
+  },
+}
+`;
+
 exports[`cn=268 — Space Ishtar NP1 (default) wave damage snapshot 1`] = `
 Object {
   "1": Object {
@@ -112,12 +122,32 @@ Object {
 
 exports[`cn=300 — Arash w1 die-sub wave damage snapshot 1`] = `null`;
 
+exports[`cn=417 — Ereshkigal NP1 (damageNpBattlePointPhase) wave damage snapshot 1`] = `
+Object {
+  "1": Object {
+    "cleared": false,
+    "damageDealt": 40686,
+    "hpRequired": 340551,
+  },
+}
+`;
+
 exports[`cn=421 — BB Dubai NP1 (default) wave damage snapshot 1`] = `
 Object {
   "1": Object {
     "cleared": false,
     "damageDealt": 43892,
     "hpRequired": 251609,
+  },
+}
+`;
+
+exports[`cn=423 — MHXX Alter NP1 (damageNpAndOrCheckIndividuality) wave damage snapshot 1`] = `
+Object {
+  "1": Object {
+    "cleared": false,
+    "damageDealt": 25592,
+    "hpRequired": 340551,
   },
 }
 `;

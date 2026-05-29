@@ -278,6 +278,35 @@ Shapes with an active handler in `BattleEngine.EFFECT_HANDLERS`, `useNp`, `useSk
 Shapes that **could affect damage / NP gauge / cooldowns** but have no handler today.
 Sorted by occurrence count. **This is the FR-5 backlog.**
 
+### Newly handled (zero-damage NP fix)
+
+These three damage funcTypes were silent no-ops (NP dealt **0 damage**); now
+billed at the plain `Value/1000` baseline alongside `damageNpHpratioLow`
+(`NP.getNpDamageValues` + `BattleEngine.useNp` dispatch). Situational Correction
+bonuses are intentionally omitted (conservative under-bill, like the HP-ratio
+approximation). No longer in the backlog:
+
+| funcType | servant | note |
+|---|---|---|
+| `damageNpRare` | Bartholomew Roberts (257) | +Correction vs enemy rarity 1/2 — omitted |
+| `damageNpBattlePointPhase` | Ereshkigal (417) | scales with accrued battle points — phase-0 baseline |
+| `damageNpAndOrCheckIndividuality` | MHXX Alter (423) | +Correction if enemy has ALL of [108,1000] — omitted |
+
+### Intentional no-ops (not worth handling for a farming-clear sim)
+
+These remain unhandled **by design** — they cannot change whether a team
+full-clears a wave (the team one-shots each wave before enemies act). Do not
+re-litigate without a concrete farming scenario that needs them:
+
+- `pierceDefence` / **Ignore DEF** — `Enemy.defense` is never positive in this
+  sim (starts 0, only DEF Down makes it negative), so ignoring it is a literal
+  no-op.
+- `delayNpturn`, enemy `subState`, `absorbNpturn` — enemy NP timing / enemy
+  buff stripping; irrelevant when enemies die before acting (and enemy buffs are
+  trimmed from quest data anyway).
+- Defensive servant buffs — **Debuff Resist Up**, **Buff Removal Resist Up**,
+  **Damage Cut**, **Death Resist Up**, **Guts** — survivability only.
+
 ### Unhandled funcType (no entry in EFFECT_HANDLERS)
 
 These funcTypes are completely absent from the dispatch table — every occurrence
