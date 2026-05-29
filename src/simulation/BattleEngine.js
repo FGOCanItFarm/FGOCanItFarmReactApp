@@ -117,6 +117,11 @@ export class BattleEngine {
 
   getEnemies() { return this.enemies; }
 
+  /** Highest-HP living enemy (default target for single-enemy NPs/skills). */
+  _highestHpEnemy() {
+    return this.enemies.reduce((best, e) => (e.hp > 0 && (!best || e.hp > best.hp) ? e : best), null);
+  }
+
   swapServants(frontlineIdx, backlineIdx) {
     [this.servants[frontlineIdx], this.servants[backlineIdx]] =
       [this.servants[backlineIdx], this.servants[frontlineIdx]];
@@ -243,7 +248,16 @@ export class BattleEngine {
       case 'self':                          targets = servant ? [servant] : [];           break;
       case 'commandTypeSelfTreasureDevice': targets = servant ? [servant] : [];           break;
       case 'enemyAll':  targets = this.getEnemies();                  break;
-      case 'enemy':     targets = [allyTarget];                       break;
+      case 'enemy': {
+        // Single-target enemy effect (DEF Down, etc.). Use the explicitly
+        // pinned enemy (`f~2`) if any; otherwise default to the highest-HP
+        // living enemy — matching bare-NP targeting — instead of mis-applying
+        // to the casting servant (the old allyTarget=self fallback).
+        const pinned = (allyTarget && this.enemies.includes(allyTarget) && allyTarget.hp > 0) ? allyTarget : null;
+        const tgt = pinned || this._highestHpEnemy();
+        targets = tgt ? [tgt] : [];
+        break;
+      }
       case 'ptOther':   targets = this.servants.filter(s => s !== servant); break;
       case 'ptAll':     targets = this.servants;                      break;
       case 'ptOne':     targets = [allyTarget];                       break;
