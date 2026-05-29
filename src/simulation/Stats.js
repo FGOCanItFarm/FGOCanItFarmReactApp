@@ -16,7 +16,11 @@ export class Stats {
   }
 
   getBaseAtk() {
-    return (this.servant.ceAttack + 1000 + this.getAtkAtLevel()) * this.getClassBaseMultiplier();
+    // `ceAttack` is the user-supplied flat ATK bonus (CE + Fou + anything else).
+    // The engine no longer assumes a hardcoded +1000 ("bronze Fou") — that
+    // inflated every servant's damage and isn't universal (users run 0, 1000,
+    // 1580, …). Users add their own bonus via the attack field.
+    return (this.servant.ceAttack + this.getAtkAtLevel()) * this.getClassBaseMultiplier();
   }
 
   getAtkAtLevel(level = 0) {

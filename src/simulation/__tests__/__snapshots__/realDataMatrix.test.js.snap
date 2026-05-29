@@ -4,7 +4,7 @@ exports[`cn=1 — Mash: NP→S2→NP (Holy Sword) wave damage snapshot 1`] = `
 Object {
   "1": Object {
     "cleared": false,
-    "damageDealt": 199050,
+    "damageDealt": 182231,
     "hpRequired": 340551,
   },
 }
@@ -14,7 +14,7 @@ exports[`cn=57 — Cu Chulainn (Caster) NP3 wave damage snapshot 1`] = `
 Object {
   "1": Object {
     "cleared": false,
-    "damageDealt": 74243,
+    "damageDealt": 63453,
     "hpRequired": 340551,
   },
 }
@@ -24,7 +24,7 @@ exports[`cn=61 — Elisabeth Halloween NP1 wave damage snapshot 1`] = `
 Object {
   "1": Object {
     "cleared": false,
-    "damageDealt": 32246,
+    "damageDealt": 28893,
     "hpRequired": 251609,
   },
 }
@@ -34,7 +34,7 @@ exports[`cn=66 — Anne B&M NP1 wave damage snapshot 1`] = `
 Object {
   "1": Object {
     "cleared": false,
-    "damageDealt": 14763,
+    "damageDealt": 13291,
     "hpRequired": 340551,
   },
 }
@@ -44,7 +44,7 @@ exports[`cn=101 — Rama (Saber) NP1 wave damage snapshot 1`] = `
 Object {
   "1": Object {
     "cleared": false,
-    "damageDealt": 27961,
+    "damageDealt": 25477,
     "hpRequired": 340551,
   },
 }
@@ -54,7 +54,7 @@ exports[`cn=108 — Altria (Lancer) NP1 wave damage snapshot 1`] = `
 Object {
   "1": Object {
     "cleared": false,
-    "damageDealt": 32399,
+    "damageDealt": 29915,
     "hpRequired": 181138,
   },
 }
@@ -64,7 +64,7 @@ exports[`cn=161 — Hijikata NP1 (damageNpHpRatio) wave damage snapshot 1`] = `
 Object {
   "1": Object {
     "cleared": false,
-    "damageDealt": 62588,
+    "damageDealt": 57806,
     "hpRequired": 340551,
   },
 }
@@ -74,7 +74,7 @@ exports[`cn=167 — Kiara NP1 (classRelation) wave damage snapshot 1`] = `
 Object {
   "1": Object {
     "cleared": false,
-    "damageDealt": 26223,
+    "damageDealt": 24153,
     "hpRequired": 251609,
   },
 }
@@ -84,7 +84,7 @@ exports[`cn=239 — Kama NP1 (classRelation) wave damage snapshot 1`] = `
 Object {
   "1": Object {
     "cleared": false,
-    "damageDealt": 41087,
+    "damageDealt": 37987,
     "hpRequired": 340551,
   },
 }
@@ -94,7 +94,7 @@ exports[`cn=248 — Aśvatthāman NP5 wave damage snapshot 1`] = `
 Object {
   "1": Object {
     "cleared": false,
-    "damageDealt": 35891,
+    "damageDealt": 32794,
     "hpRequired": 340551,
   },
 }
@@ -114,7 +114,7 @@ exports[`cn=268 — Space Ishtar NP1 (default) wave damage snapshot 1`] = `
 Object {
   "1": Object {
     "cleared": false,
-    "damageDealt": 58220,
+    "damageDealt": 54122,
     "hpRequired": 251609,
   },
 }
@@ -136,7 +136,7 @@ exports[`cn=421 — BB Dubai NP1 (default) wave damage snapshot 1`] = `
 Object {
   "1": Object {
     "cleared": false,
-    "damageDealt": 43892,
+    "damageDealt": 40477,
     "hpRequired": 251609,
   },
 }
@@ -156,7 +156,7 @@ exports[`cn=426 — Kazuradrop: S3~enemy1 then NP wave damage snapshot 1`] = `
 Object {
   "1": Object {
     "cleared": false,
-    "damageDealt": 90895,
+    "damageDealt": 83457,
     "hpRequired": 340551,
   },
 }

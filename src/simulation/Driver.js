@@ -18,6 +18,21 @@ const RE_SKILL_ENEMY   = /^([a-i])~(\d+)$/;                         // a~2 (skil
 const RE_SKILL_TARGET  = /^([a-i])(\d)$/;                           // a1
 const RE_MC_TARGET     = /^([jkl])(\d)$/;                           // j1
 
+/**
+ * Canonical swap-token builder — the single source of truth for the `x<f><b>`
+ * grammar so the UI never hand-rolls (and mis-numbers) it again.
+ *
+ * The token is `x<frontSlot><backSlot>`, BOTH 1-based slots (1-3). The Driver
+ * parses it as frontline index = frontSlot-1 and backline index = backSlot+2.
+ * Callers hold 0-based TEAM indices (frontline 0-2, backline 3-5), so:
+ *   frontSlot = frontTeamIdx + 1   (0->1, 1->2, 2->3)
+ *   backSlot  = backTeamIdx  - 2   (3->1, 4->2, 5->3)
+ * e.g. swap front-1 <-> back-1  ->  "x11"  (NOT "x14").
+ */
+export function swapToken(frontTeamIdx, backTeamIdx) {
+  return `x${frontTeamIdx + 1}${backTeamIdx - 2}`;
+}
+
 export class Driver {
   /**
    * @param {object} config  - same shape passed to BattleEngine constructor

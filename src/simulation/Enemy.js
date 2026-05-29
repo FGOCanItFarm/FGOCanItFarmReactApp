@@ -1,4 +1,5 @@
 import { Buffs } from './Buffs.js';
+import { classTraitByName } from './gameData.js';
 
 export class Enemy {
   constructor(enemydata) {
@@ -7,7 +8,13 @@ export class Enemy {
     this.hp        = enemydata[1];
     this.deathRate = enemydata[2];
     this.className = enemydata[3];
-    this.traits    = enemydata[4];
+    this.traits    = Array.isArray(enemydata[4]) ? [...enemydata[4]] : [];
+    // Ensure the enemy carries its class individuality trait. Raw quest data
+    // includes it inconsistently, but class-conditional damage passives —
+    // "STR Up vs. <class>" and same-class specials (Kazuradrop's 75% vs own
+    // class after a class-change) — key on it, so inject it when missing.
+    const classTrait = classTraitByName[this.className];
+    if (classTrait != null && !this.traits.includes(classTrait)) this.traits.push(classTrait);
     this.attribute = enemydata[5];
     this.state     = enemydata[6];
     this.defense   = 0;

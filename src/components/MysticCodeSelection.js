@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Grid, Typography, Box, Button, Select, MenuItem } from '@mui/material';
+import { swapToken } from '../simulation/Driver';
 
 const mysticCodes = [
   { id: 410, name: 'Winter Casual' },
@@ -80,7 +81,7 @@ const MysticCodeSelection = ({ team, setTeam, updateCommands, selectedMysticCode
               <Button
                 variant="contained"
                 color="primary"
-                onClick={() => { handleSwap(); addCommand(`x${selectedTop}${selectedBottom}`); }}
+                onClick={() => { handleSwap(); addCommand(swapToken(selectedTop, selectedBottom)); }}
                 disabled={selectedTop === null || selectedBottom === null || !team[selectedTop] || !team[selectedBottom]}
               >
                 Swap

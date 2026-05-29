@@ -1,6 +1,13 @@
 import { supabase } from '../supabaseClient';
 import { Driver } from './Driver';
 
+// FGO damage rolls uniformly in [0.9, 1.1]. The forward simulation advances
+// waves on the MAX (1.1) roll — a wave counts as clearable if its best roll
+// kills — and the per-wave statistics then report how likely that is (the
+// minimum roll needed + probability). See summarizeEngine.
+const MIN_ROLL = 0.9;
+const MAX_ROLL = 1.1;
+
 /**
  * Build the BattleEngine inputs from app state (FR-2): fetch servant `data`,
  * mystic-code `data`, normalise servantEffects, and read the pre-loaded
@@ -68,7 +75,9 @@ export async function prepareSimInputs({ team, selectedQuest, selectedMysticCode
     servantDataList,
     questData: selectedQuest._fullData,
     mcData,
-    damageMultiplier: 1.0,
+    // Advance waves on the best-case roll (see MAX_ROLL): a wave is treated as
+    // clearable when its 1.1 roll kills; summarizeEngine reports the odds.
+    damageMultiplier: MAX_ROLL,
   };
 }
 
@@ -79,24 +88,49 @@ export async function prepareSimInputs({ team, selectedQuest, selectedMysticCode
  * byte-for-byte.
  */
 export function summarizeEngine(engine) {
+  // The engine advanced waves on the roll it ran at (MAX_ROLL = 1.1 for the
+  // app); damageDealt is at that roll. Recover the 1.0 baseline and report the
+  // full [0.9, 1.0, 1.1] band from it so the labels are correct regardless.
+  const roll = engine.damageMultiplier || 1.0;
   const waves = {};
   for (const [waveKey, waveData] of Object.entries(engine.waveStats)) {
     const { hpRequired, damageDealt } = waveData;
-    const damage_at_09 = damageDealt * 0.9;
-    const damage_at_10 = damageDealt;
-    const damage_at_11 = damageDealt * 1.1;
+    const baseline = damageDealt / roll;          // wave total at the 1.0 roll
+    const damage_at_09 = baseline * MIN_ROLL;
+    const damage_at_10 = baseline;
+    const damage_at_11 = baseline * MAX_ROLL;
 
+    // A wave clears only when EVERY enemy individually dies — for an AoE NP the
+    // toughest enemy sets the bar, NOT the total (total >= total HP can be true
+    // while the biggest enemy survives). The roll a wave needs is therefore the
+    // worst per-enemy roll: max over enemies of maxHp / (its baseline damage).
+    // (Fall back to total-vs-total only if per-enemy stats are absent.)
+    const enemies = waveData.enemies || [];
+    let min_multiplier_needed;
+    if (enemies.length) {
+      min_multiplier_needed = 0;
+      for (const e of enemies) {
+        const eBaseline = (e.damageTaken || 0) / roll;
+        const need = eBaseline > 0 ? e.maxHp / eBaseline : Infinity;
+        if (need > min_multiplier_needed) min_multiplier_needed = need;
+      }
+    } else {
+      min_multiplier_needed = baseline > 0 ? hpRequired / baseline : Infinity;
+    }
+
+    // Odds of rolling at least the needed multiplier (rolls ~uniform on [0.9,1.1]).
     let outcome, clear_probability;
-    if (damage_at_09 >= hpRequired) {
+    if (min_multiplier_needed <= MIN_ROLL) {
       outcome = 'guaranteed';
       clear_probability = 1.0;
-    } else if (damage_at_10 >= hpRequired) {
+    } else if (min_multiplier_needed <= MAX_ROLL) {
       outcome = 'rng';
-      clear_probability = 0.5;
+      clear_probability = (MAX_ROLL - min_multiplier_needed) / (MAX_ROLL - MIN_ROLL);
     } else {
       outcome = 'impossible';
       clear_probability = 0.0;
     }
+    if (!isFinite(min_multiplier_needed)) min_multiplier_needed = null;
 
     waves[waveKey] = {
       hp_required: hpRequired,
@@ -105,7 +139,7 @@ export function summarizeEngine(engine) {
       damage_at_11,
       outcome,
       clear_probability,
-      min_multiplier_needed: damage_at_10 > 0 ? hpRequired / damage_at_10 : null,
+      min_multiplier_needed,
       // FR-8: per-enemy granular stats (camelCase engine → snake_case UI)
       per_enemy: (waveData.enemies || []).map(e => ({
         index: e.index,
@@ -117,8 +151,11 @@ export function summarizeEngine(engine) {
     };
   }
 
+  // Whole-run success = every wave clears, and each wave's roll is independent,
+  // so multiply the per-wave odds (a single rng wave at 30% caps the run at 30%;
+  // two such waves ~9%). All-guaranteed runs stay at 1.0.
   const waveProbs = Object.values(waves).map(w => w.clear_probability);
-  const overall_clear_probability = waveProbs.length > 0 ? Math.min(...waveProbs) : 0;
+  const overall_clear_probability = waveProbs.length > 0 ? waveProbs.reduce((a, b) => a * b, 1) : 0;
 
   return {
     success: true,
@@ -132,6 +169,10 @@ export function summarizeEngine(engine) {
       ])
     ),
     stats: { waves, overall_clear_probability },
+    // Verbose runtime trace (wave rosters + per-NP damage breakdowns). Display /
+    // debugging only — deliberately OUTSIDE stats.waves so submit_run never
+    // persists it. Absent on engines built before the trace existed.
+    debug: engine.trace ?? [],
   };
 }
 
@@ -205,8 +246,13 @@ export async function resimulateSavedRun(run) {
   const team = Array.from({ length: 6 }, (_, i) => ({
     collectionNo: colls[i] != null ? String(colls[i]) : '',
   }));
+  // FR-11: restore the persisted per-servant effect inputs (attack / charge /
+  // buffs) so the NPs charge and the token string reproduces. Falls back to
+  // np_levels only for legacy rows submitted before servant_effects existed.
+  const effects = Array.isArray(run.servant_effects) ? run.servant_effects : [];
   const servantEffects = Array.from({ length: 6 }, (_, i) => ({
-    np: Number(run.np_levels?.[i] ?? 1),
+    ...(effects[i] || {}),
+    np: Number(effects[i]?.np ?? run.np_levels?.[i] ?? 1),
   }));
 
   const { data: qRow, error: qErr } = await supabase

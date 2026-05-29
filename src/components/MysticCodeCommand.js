@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Box, Button, Select, MenuItem, Typography } from '@mui/material';
+import { swapToken } from '../simulation/Driver';
 
 const mysticCodes = [
   { id: 410, name: 'Winter Casual' },
@@ -70,9 +71,8 @@ const MysticCodeCommand = ({ team = [], servants = [], setTeam = () => {}, updat
             onClick={() => {
               if (selectedTop !== null && selectedBottom !== null) {
                 swapServants(selectedTop, selectedBottom);
-                // emit a compact swap token: x<topIndex+1><bottomIndex+1>
-                const cmd = `x${selectedTop + 1}${selectedBottom + 1}`;
-                addCommand(cmd);
+                // Canonical x<frontSlot><backSlot> token (see Driver.swapToken).
+                addCommand(swapToken(selectedTop, selectedBottom));
                 setSelectedTop(null);
                 setSelectedBottom(null);
               }

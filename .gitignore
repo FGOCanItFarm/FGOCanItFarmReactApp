@@ -6,6 +6,9 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 .env
+.dev.env
+.dev.vars
+.dev
 .DS_Store
 .vscode/
 coverage/
@@ -55,3 +58,6 @@ env
 # Generated locally from Supabase; commit deliberately if you want them shared.
 /src/simulation/__fixtures__/real/realFixtures.generated.json
 /scripts/fixtures.manifest.json
+
+# Owner-provided annotated Python API tests (local reference only, not shared).
+/pythonTests/

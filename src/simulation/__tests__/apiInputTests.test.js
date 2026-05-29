@@ -57,15 +57,17 @@ describe('traverse_api_input — real-data engine runs', () => {
     expect(() => runTokens(team, 20, 94089601, commands)).not.toThrow();
   });
 
-  // test_traverse_api_input_runs_without_error
+  // test_traverse_api_input_runs_without_error — matches the annotated
+  // TraverseApiInput_1 scenario. Human tokens translated to engine grammar:
+  //   "swap frontline_1 backline_1" -> x11 ;  "i choice 2" -> i[Ch2B] (BB Dubai S3 support).
   test('runs without error (373/426/421/426, MC 20, quest 94095710)', () => {
     const team = [
-      { collectionNo: 373 },
-      { collectionNo: 426, attack: 2400, atkUp: 0.15, artsUp: 0.10, quickUp: 0.10, busterUp: 0.10, npUp: 0.10, initialCharge: 50, busterDamageUp: 0.20, quickDamageUp: 0.20, artsDamageUp: 0.20 },
-      { collectionNo: 421 },
-      { collectionNo: 426, attack: 200, atkUp: 0, artsUp: 0, artsDamageUp: 0.20, initialCharge: 0 },
+      { collectionNo: 373, initialCharge: 50 },
+      { collectionNo: 426, attack: 2400, artsUp: 0.10, quickUp: 0.06, busterUp: 0.10, npUp: 0.10, initialCharge: 50, busterDamageUp: 0.20, quickDamageUp: 0.20, artsDamageUp: 0.20 },
+      { collectionNo: 421, np: 3, initialCharge: 50 },
+      { collectionNo: 426, attack: 200, artsDamageUp: 0.20 },
     ];
-    const commands = ['a', 'd', 'g1', 'h', 'b', 'c', '4', '#', 'e', 'f', 'i1', 'x23', 'g1', '5', '#', 'h', 'i1', '4', '#', 'Swap Servants', 'x14'];
+    const commands = ['a', 'd', 'g', 'h', 'b1', 'c', '4', '#', 'x11', 'i[Ch2B]', 'a', 'b', 'c', '6', '4', '#', 'f', 'e', '5', '#'];
     expect(() => runTokens(team, 20, 94095710, commands)).not.toThrow();
   });
 
@@ -79,7 +81,7 @@ describe('traverse_api_input — real-data engine runs', () => {
     ];
     const commands = [
       'a', 'b', 'c', 'd1', 'e1', 'f1', 'g1', 'b', 'h1', 'i1', '4', '#',
-      'a', 'x23', 'h1', 'g', '4', '#',
+      'a', 'x31', 'h1', 'g', '4', '#',   // x31: front-3 <-> back-1 (annotated "x23" is out of range)
       'i1', 'k1', '4', '#',
     ];
     expect(() => runTokens(team, 440, 94100501, commands)).not.toThrow();

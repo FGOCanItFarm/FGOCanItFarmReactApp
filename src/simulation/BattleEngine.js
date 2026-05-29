@@ -13,6 +13,9 @@ const NP_OC_1_TURN = {
   buffs: [{ name: 'Overcharge Lv. Up', functvals: '', tvals: [], svals: null, value: 0, turns: 1 }],
 };
 
+// Round to 3 decimals for the (display-only) verbose damage trace.
+const round3 = (n) => Math.round((n + Number.EPSILON) * 1000) / 1000;
+
 export class BattleEngine {
   /**
    * @param {Array<{rawData: object, opts: object}>} servantDataList
@@ -38,6 +41,10 @@ export class BattleEngine {
     this.waveStats   = {};
     this.questCleared       = false;
     this.servantsAtWaveEnd  = {};
+    // Runtime-only verbose trace (wave rosters + per-NP damage breakdowns).
+    // NEVER persisted — summarizeEngine exposes it as result.debug, outside the
+    // stats.waves blob that submit_run stores. Regenerated on every run.
+    this.trace = [];
 
     this._recordInitialWaveHp();
     this._syncFields();
@@ -70,6 +77,15 @@ export class BattleEngine {
     this.waveStats[this.wave].enemies = this.enemies.map((e, i) => ({
       index: i, name: e.name, maxHp: e.maxHp, damageTaken: 0, npRefund: 0,
     }));
+    // Verbose trace: full enemy roster incl. class / attribute / traits (these
+    // stay out of the persisted per_enemy stats).
+    this.trace.push({
+      type: 'wave', wave: this.wave,
+      enemies: this.enemies.map((e, i) => ({
+        index: i, name: e.name, className: e.getClass?.() ?? e.className,
+        attribute: e.attribute, maxHp: e.maxHp, traits: [...(e.traits || [])],
+      })),
+    });
   }
 
   recordNpDamage(wave, damage) {
@@ -100,6 +116,11 @@ export class BattleEngine {
   }
 
   getEnemies() { return this.enemies; }
+
+  /** Highest-HP living enemy (default target for single-enemy NPs/skills). */
+  _highestHpEnemy() {
+    return this.enemies.reduce((best, e) => (e.hp > 0 && (!best || e.hp > best.hp) ? e : best), null);
+  }
 
   swapServants(frontlineIdx, backlineIdx) {
     [this.servants[frontlineIdx], this.servants[backlineIdx]] =
@@ -150,7 +171,27 @@ export class BattleEngine {
       return true;
     }
     this.getNextWave();
+    this._processTurnStartRegen();
     return true;
+  }
+
+  // Kazuradrop "Buff Regeneration" (selfturnstartFunction「ピクシー・フィンガー」):
+  // her S1 plants a self-buff that, at the start of each of the next `count`
+  // turns, re-applies her S1 enemy Quick Card Resist Down (50%) to the live
+  // wave. Modeled here as a contained per-turn re-application (the referenced
+  // sub-skill id isn't resolvable from trimmed data). Runs after the wave
+  // advances so it lands on the new enemies.
+  _processTurnStartRegen() {
+    for (const s of this.servants.slice(0, 3)) {
+      const regen = s.buffs?.buffs.find(
+        b => b.buff === 'ピクシー・フィンガー' && (typeof b.count !== 'number' || b.count > 0)
+      );
+      if (!regen) continue;
+      for (const e of this.enemies) {
+        if (e.hp > 0) e.addBuff({ buff: 'Quick Card Resist Down', functvals: [], value: 500, tvals: [], turns: 1 });
+      }
+      if (typeof regen.count === 'number') regen.count -= 1;
+    }
   }
 
   _decrementBuffs() {
@@ -227,7 +268,16 @@ export class BattleEngine {
       case 'self':                          targets = servant ? [servant] : [];           break;
       case 'commandTypeSelfTreasureDevice': targets = servant ? [servant] : [];           break;
       case 'enemyAll':  targets = this.getEnemies();                  break;
-      case 'enemy':     targets = [allyTarget];                       break;
+      case 'enemy': {
+        // Single-target enemy effect (DEF Down, etc.). Use the explicitly
+        // pinned enemy (`f~2`) if any; otherwise default to the highest-HP
+        // living enemy — matching bare-NP targeting — instead of mis-applying
+        // to the casting servant (the old allyTarget=self fallback).
+        const pinned = (allyTarget && this.enemies.includes(allyTarget) && allyTarget.hp > 0) ? allyTarget : null;
+        const tgt = pinned || this._highestHpEnemy();
+        targets = tgt ? [tgt] : [];
+        break;
+      }
       case 'ptOther':   targets = this.servants.filter(s => s !== servant); break;
       case 'ptAll':     targets = this.servants;                      break;
       case 'ptOne':     targets = [allyTarget];                       break;
@@ -483,6 +533,16 @@ export class BattleEngine {
     this.recordNpDamage(this.wave, total);
     this._recordEnemyStat(target, 'damageTaken', total);
     this._distributeHits(servant, target, total, cardType, cardNpValue, cardEffMod, newId, dist);
+    this._traceNp(servant, target, cardType, total, dist, {
+      baseAtk: Math.round(servant.stats.getBaseAtk()), npMult: npDamageMultiplier,
+      card: cardDamageValue, cardMod: round3(cardDamageMod - enemyResMod),
+      classAdv: this._classMultiplier(servant, target),
+      attribute: servant.stats.getAttributeModifier(target),
+      atkMod: round3(servant.stats.getAtkMod()), npDmgMod: round3(servant.stats.getNpDamageMod()),
+      powerMod: round3(servant.stats.getPowerMod(target)),
+      superEffective: 1, flatDamage: servant.flatDamageMod ?? 0,
+      rollMultiplier: this.damageMultiplier,
+    });
   }
 
   _applyNpOddDamage(servant, target, newId = null, cardType = servant.nps.card) {
@@ -494,8 +554,9 @@ export class BattleEngine {
     );
 
     let seMod = 1;
-    let isSe = (npCorrTarget && target.traits.includes(npCorrTarget)) ? 1 : 0;
     if (npCorrId) {
+      // damageNpIndividualSum (+ Super Aoko bullets): bonus scales with the
+      // count of matching TargetList traits / magic bullets.
       const ids = Array.isArray(npCorrId) ? npCorrId : [npCorrId];
       if (npCorrTarget === 1) {
         for (const id of ids) seMod += npCorr * target.traits.filter(t => t === id).length;
@@ -503,8 +564,16 @@ export class BattleEngine {
         const bullets = Math.min(10, servant.buffs.buffs.filter(b => b.buff === 'Magic Bullet').length);
         seMod += bullets * npCorr;
       }
+    } else if (npCorrTarget && npCorr > 1 && target.traits.includes(npCorrTarget)) {
+      // damageNpIndividual / damageNpStateIndividualFix: flat super-effective
+      // multiplier (Correction/1000, e.g. 1500 -> x1.5) when the target carries
+      // the single Target trait. This bonus was previously READ but never
+      // applied — seMod only grew inside `if (npCorrId)`, which is null for the
+      // single-trait form — so SE NPs (Kukulkan vs Earth trait 201, etc.)
+      // silently dealt base damage with no super-effective bonus.
+      seMod = npCorr;
     }
-    if (seMod > 1) isSe = 1;
+    const isSe = seMod > 1 ? 1 : 0;
 
     const dist = servant.nps.getNpdist(newId);
     const formula = (
@@ -521,6 +590,30 @@ export class BattleEngine {
     this.recordNpDamage(this.wave, total);
     this._recordEnemyStat(target, 'damageTaken', total);
     this._distributeHits(servant, target, total, cardType, cardNpValue, cardEffMod, newId, dist);
+    this._traceNp(servant, target, cardType, total, dist, {
+      baseAtk: Math.round(servant.stats.getBaseAtk()), npMult,
+      card: cardDamageValue, cardMod: round3(cardDamageMod - enemyResMod),
+      classAdv: this._classMultiplier(servant, target),
+      attribute: servant.stats.getAttributeModifier(target),
+      atkMod: round3(servant.stats.getAtkMod()), npDmgMod: round3(servant.stats.getNpDamageMod()),
+      powerMod: round3(servant.stats.getPowerMod(target)),
+      superEffective: isSe ? round3(seMod) : 1, flatDamage: servant.flatDamageMod ?? 0,
+      rollMultiplier: this.damageMultiplier,
+    });
+  }
+
+  /** Push one verbose per-NP damage-breakdown entry onto the runtime trace. */
+  _traceNp(servant, target, cardType, total, dist, breakdown) {
+    this.trace.push({
+      type: 'np', wave: this.wave,
+      servant: { collectionNo: servant.id, name: servant.name, className: servant.className },
+      card: cardType,
+      target: { index: this.enemies.indexOf(target), name: target.name, traits: [...(target.traits || [])] },
+      total: Math.round(total),
+      perHit: (dist || []).map(v => Math.round(total * v / 100)),
+      breakdown,
+      activeBuffs: servant.buffs.buffs.map(b => ({ name: b.buff, value: b.value, turns: b.turns })),
+    });
   }
 
   /** Spread total damage across NP hit distribution, apply NP refund per hit. */
