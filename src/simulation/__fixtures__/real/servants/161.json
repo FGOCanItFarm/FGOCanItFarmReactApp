@@ -1,0 +1,3400 @@
+{
+  "id": 702500,
+  "cost": 16,
+  "flag": "normal",
+  "name": "Hijikata Toshizo",
+  "ruby": "ヒジカタトシゾウ",
+  "type": "normal",
+  "cards": [
+    "3",
+    "3",
+    "1",
+    "2",
+    "2"
+  ],
+  "flags": [],
+  "hpMax": 12028,
+  "lvMax": 90,
+  "atkMax": 12089,
+  "gender": "male",
+  "hpBase": 1764,
+  "rarity": 5,
+  "script": {},
+  "skills": [
+    {
+      "id": 343450,
+      "num": 1,
+      "icon": "https://static.atlasacademy.io/JP/SkillIcons/skill_00306.png",
+      "name": "Demon of the Battlefield B",
+      "ruby": "いくさばのおに",
+      "type": "active",
+      "svtId": 702500,
+      "condLv": 0,
+      "detail": "味方全体のBusterカード性能をアップ(3ターン)＆スター発生率をアップ(3ターン)",
+      "script": {},
+      "coolDown": [
+        5
+      ],
+      "priority": 1,
+      "skillAdd": [],
+      "functions": [
+        {
+          "buffs": [
+            {
+              "id": 102,
+              "icon": "https://static.atlasacademy.io/JP/BuffIcons/bufficon_314.png",
+              "name": "Buster Up",
+              "type": "upCommandall",
+              "vals": [
+                {
+                  "id": 3004,
+                  "name": "buffPositiveEffect"
+                },
+                {
+                  "id": 3006,
+                  "name": "buffIncreaseDamage"
+                },
+                {
+                  "id": 3093,
+                  "name": "busterBuff"
+                }
+              ],
+              "tvals": [
+                {
+                  "id": 5000,
+                  "name": "canBeInBattle"
+                },
+                {
+                  "id": 4002,
+                  "name": "cardBuster"
+                }
+              ],
+              "detail": "Busterカードの性能をアップ",
+              "script": {
+                "ProgressSelfTurn": 1
+              },
+              "maxRate": 5000,
+              "ckOpIndv": [],
+              "buffGroup": 0,
+              "ckSelfIndv": [
+                {
+                  "id": 4002,
+                  "name": "cardBuster"
+                }
+              ],
+              "originalName": "Busterアップ",
+              "originalScript": {
+                "ProgressSelfTurn": 1
+              }
+            }
+          ],
+          "svals": [
+            {
+              "Rate": 1000,
+              "Turn": 3,
+              "Count": -1,
+              "Value": 200
+            }
+          ],
+          "funcId": 125,
+          "script": {},
+          "funcType": "addStateShort",
+          "funcGroup": [],
+          "functvals": [],
+          "funcPopupIcon": "https://static.atlasacademy.io/JP/BuffIcons/bufficon_314.png",
+          "funcPopupText": "バスターアップ",
+          "funcTargetTeam": "playerAndEnemy",
+          "funcTargetType": "ptAll",
+          "funcquestTvals": [],
+          "overWriteTvalsList": []
+        },
+        {
+          "buffs": [
+            {
+              "id": 117,
+              "icon": "https://static.atlasacademy.io/JP/BuffIcons/bufficon_321.png",
+              "name": "C. Star Drop Rate Up",
+              "type": "upCriticalpoint",
+              "vals": [
+                {
+                  "id": 3004,
+                  "name": "buffPositiveEffect"
+                },
+                {
+                  "id": 3083,
+                  "name": "unknown"
+                }
+              ],
+              "tvals": [],
+              "detail": "スター発生率をアップ",
+              "script": {
+                "ProgressSelfTurn": 1
+              },
+              "maxRate": 5000,
+              "ckOpIndv": [],
+              "buffGroup": 0,
+              "ckSelfIndv": [],
+              "originalName": "スター発生アップ",
+              "originalScript": {
+                "ProgressSelfTurn": 1
+              }
+            }
+          ],
+          "svals": [
+            {
+              "Rate": 1000,
+              "Turn": 3,
+              "Count": -1,
+              "Value": 200
+            }
+          ],
+          "funcId": 302,
+          "script": {},
+          "funcType": "addState",
+          "funcGroup": [],
+          "functvals": [],
+          "funcPopupIcon": "https://static.atlasacademy.io/JP/BuffIcons/bufficon_321.png",
+          "funcPopupText": "スター発生アップ",
+          "funcTargetTeam": "player",
+          "funcTargetType": "ptAll",
+          "funcquestTvals": [],
+          "overWriteTvalsList": []
+        },
+        {
+          "buffs": [
+            {
+              "id": 144,
+              "icon": "https://static.atlasacademy.io/JP/BuffIcons/bufficon_327.png",
+              "name": "Critical Hit Rate Up",
+              "type": "upCriticalrate",
+              "vals": [
+                {
+                  "id": 3004,
+                  "name": "buffPositiveEffect"
+                },
+                {
+                  "id": 3006,
+                  "name": "buffIncreaseDamage"
+                },
+                {
+                  "id": 3032,
+                  "name": "buffCritRateUp"
+                }
+              ],
+              "tvals": [],
+              "detail": "クリティカルの発生率をアップ",
+              "script": {
+                "ProgressSelfTurn": 1
+              },
+              "maxRate": 5000,
+              "ckOpIndv": [],
+              "buffGroup": 0,
+              "ckSelfIndv": [],
+              "originalName": "クリティカル発生アップ",
+              "originalScript": {
+                "ProgressSelfTurn": 1
+              }
+            }
+          ],
+          "svals": [
+            {
+              "Rate": 1000,
+              "Turn": 3,
+              "Count": -1,
+              "Value": 50
+            }
+          ],
+          "funcId": 221,
+          "script": {},
+          "funcType": "addStateShort",
+          "funcGroup": [],
+          "functvals": [],
+          "funcPopupIcon": "https://static.atlasacademy.io/JP/BuffIcons/bufficon_327.png",
+          "funcPopupText": "クリティカル発生アップ",
+          "funcTargetTeam": "enemy",
+          "funcTargetType": "ptAll",
+          "funcquestTvals": [],
+          "overWriteTvalsList": []
+        }
+      ],
+      "skillSvts": [
+        {
+          "num": 1,
+          "flag": 0,
+          "svtId": 702500,
+          "condLv": 0,
+          "script": {},
+          "eventId": 0,
+          "priority": 1,
+          "condQuestId": 0,
+          "condLimitCount": 0,
+          "condQuestPhase": 0,
+          "strengthStatus": 0,
+          "releaseConditions": []
+        },
+        {
+          "num": 1,
+          "flag": 0,
+          "svtId": 9938980,
+          "condLv": 0,
+          "script": {},
+          "eventId": 0,
+          "priority": 1,
+          "condQuestId": 0,
+          "condLimitCount": 0,
+          "condQuestPhase": 0,
+          "strengthStatus": 0,
+          "releaseConditions": []
+        },
+        {
+          "num": 1,
+          "flag": 0,
+          "svtId": 9947300,
+          "condLv": 0,
+          "script": {},
+          "eventId": 0,
+          "priority": 1,
+          "condQuestId": 0,
+          "condLimitCount": 0,
+          "condQuestPhase": 0,
+          "strengthStatus": 0,
+          "releaseConditions": []
+        }
+      ],
+      "condQuestId": 0,
+      "extraPassive": [],
+      "originalName": "戦場の鬼 B",
+      "condLimitCount": 0,
+      "condQuestPhase": 0,
+      "strengthStatus": 0,
+      "actIndividuality": [],
+      "unmodifiedDetail": "味方全体のBusterカード性能をアップ[{0}](3ターン)＆スター発生率をアップ[{0}](3ターン)"
+    },
+    {
+      "id": 12350,
+      "num": 2,
+      "icon": "https://static.atlasacademy.io/JP/SkillIcons/skill_00608.png",
+      "name": "Disengage C",
+      "ruby": "しきりなおし",
+      "type": "active",
+      "svtId": 702500,
+      "condLv": 0,
+      "detail": "自身の弱体状態を解除＆HPを回復",
+      "script": {},
+      "coolDown": [
+        5
+      ],
+      "priority": 1,
+      "skillAdd": [],
+      "functions": [
+        {
+          "buffs": [],
+          "svals": [
+            {
+              "Rate": 1000
+            }
+          ],
+          "funcId": 434,
+          "script": {},
+          "funcType": "subState",
+          "funcGroup": [],
+          "functvals": [],
+          "traitVals": [
+            {
+              "id": 3005,
+              "name": "buffNegativeEffect"
+            }
+          ],
+          "funcPopupText": "弱体解除",
+          "funcTargetTeam": "playerAndEnemy",
+          "funcTargetType": "self",
+          "funcquestTvals": [],
+          "overWriteTvalsList": []
+        },
+        {
+          "buffs": [],
+          "svals": [
+            {
+              "Rate": 1000,
+              "Value": 1500
+            }
+          ],
+          "funcId": 439,
+          "script": {
+            "funcIndividuality": [
+              {
+                "id": 2984,
+                "name": "unknown"
+              }
+            ]
+          },
+          "funcType": "gainHp",
+          "funcGroup": [],
+          "functvals": [],
+          "funcPopupText": "",
+          "funcTargetTeam": "playerAndEnemy",
+          "funcTargetType": "self",
+          "funcquestTvals": [],
+          "overWriteTvalsList": []
+        }
+      ],
+      "skillSvts": [
+        {
+          "num": 3,
+          "flag": 0,
+          "svtId": 300100,
+          "condLv": 0,
+          "script": {},
+          "eventId": 0,
+          "priority": 1,
+          "condQuestId": 0,
+          "condLimitCount": 3,
+          "condQuestPhase": 0,
+          "strengthStatus": 0,
+          "releaseConditions": []
+        },
+        {
+          "num": 3,
+          "flag": 0,
+          "svtId": 502100,
+          "condLv": 0,
+          "script": {
+            "strengthStatusReleaseId": 40060301
+          },
+          "eventId": 0,
+          "priority": 1,
+          "condQuestId": 0,
+          "condLimitCount": 3,
+          "condQuestPhase": 0,
+          "strengthStatus": 1,
+          "releaseConditions": []
+        },
+        {
+          "num": 2,
+          "flag": 0,
+          "svtId": 702500,
+          "condLv": 0,
+          "script": {},
+          "eventId": 0,
+          "priority": 1,
+          "condQuestId": 0,
+          "condLimitCount": 1,
+          "condQuestPhase": 0,
+          "strengthStatus": 1,
+          "releaseConditions": []
+        },
+        {
+          "num": 2,
+          "flag": 0,
+          "svtId": 9938980,
+          "condLv": 0,
+          "script": {},
+          "eventId": 0,
+          "priority": 1,
+          "condQuestId": 0,
+          "condLimitCount": 1,
+          "condQuestPhase": 0,
+          "strengthStatus": 0,
+          "releaseConditions": []
+        },
+        {
+          "num": 2,
+          "flag": 0,
+          "svtId": 9947300,
+          "condLv": 0,
+          "script": {},
+          "eventId": 0,
+          "priority": 1,
+          "condQuestId": 0,
+          "condLimitCount": 1,
+          "condQuestPhase": 0,
+          "strengthStatus": 1,
+          "releaseConditions": []
+        }
+      ],
+      "condQuestId": 0,
+      "extraPassive": [],
+      "originalName": "仕切り直し C",
+      "condLimitCount": 1,
+      "condQuestPhase": 0,
+      "strengthStatus": 1,
+      "actIndividuality": [],
+      "unmodifiedDetail": "自身の弱体状態を解除＆HPを回復[{0}]"
+    },
+    {
+      "id": 344650,
+      "num": 3,
+      "icon": "https://static.atlasacademy.io/JP/SkillIcons/skill_00311.png",
+      "name": "Laws of the Shinsengumi EX",
+      "ruby": "きょくちゅうはっと",
+      "type": "active",
+      "svtId": 702500,
+      "condLv": 0,
+      "detail": "自身のスター集中度をアップ(3ターン)＆HPが少ないほどクリティカル威力がアップする状態を付与(3ターン)＆HPを減少【デメリット】",
+      "script": {},
+      "coolDown": [
+        5
+      ],
+      "priority": 1,
+      "skillAdd": [],
+      "functions": [
+        {
+          "buffs": [
+            {
+              "id": 115,
+              "icon": "https://static.atlasacademy.io/JP/BuffIcons/bufficon_325.png",
+              "name": "C. Star Gather Up",
+              "type": "upStarweight",
+              "vals": [
+                {
+                  "id": 3004,
+                  "name": "buffPositiveEffect"
+                }
+              ],
+              "tvals": [],
+              "detail": "スターの集まりやすさをアップ",
+              "script": {},
+              "maxRate": 500000,
+              "ckOpIndv": [],
+              "buffGroup": 0,
+              "ckSelfIndv": [],
+              "originalName": "スター集中アップ",
+              "originalScript": {}
+            }
+          ],
+          "svals": [
+            {
+              "Rate": 1000,
+              "Turn": 3,
+              "Count": -1,
+              "Value": 40000
+            }
+          ],
+          "funcId": 366,
+          "script": {},
+          "funcType": "addStateShort",
+          "funcGroup": [],
+          "functvals": [],
+          "funcPopupIcon": "https://static.atlasacademy.io/JP/BuffIcons/bufficon_325.png",
+          "funcPopupText": "スター集中アップ",
+          "funcTargetTeam": "player",
+          "funcTargetType": "self",
+          "funcquestTvals": [],
+          "overWriteTvalsList": []
+        },
+        {
+          "buffs": [
+            {
+              "id": 144,
+              "icon": "https://static.atlasacademy.io/JP/BuffIcons/bufficon_327.png",
+              "name": "Critical Hit Rate Up",
+              "type": "upCriticalrate",
+              "vals": [
+                {
+                  "id": 3004,
+                  "name": "buffPositiveEffect"
+                },
+                {
+                  "id": 3006,
+                  "name": "buffIncreaseDamage"
+                },
+                {
+                  "id": 3032,
+                  "name": "buffCritRateUp"
+                }
+              ],
+              "tvals": [],
+              "detail": "クリティカルの発生率をアップ",
+              "script": {
+                "ProgressSelfTurn": 1
+              },
+              "maxRate": 5000,
+              "ckOpIndv": [],
+              "buffGroup": 0,
+              "ckSelfIndv": [],
+              "originalName": "クリティカル発生アップ",
+              "originalScript": {
+                "ProgressSelfTurn": 1
+              }
+            }
+          ],
+          "svals": [
+            {
+              "Rate": 1000,
+              "Turn": 3,
+              "Count": -1,
+              "Value": 100
+            }
+          ],
+          "funcId": 216,
+          "script": {},
+          "funcType": "addStateShort",
+          "funcGroup": [],
+          "functvals": [],
+          "funcPopupIcon": "https://static.atlasacademy.io/JP/BuffIcons/bufficon_327.png",
+          "funcPopupText": "クリティカル発生アップ",
+          "funcTargetTeam": "enemy",
+          "funcTargetType": "self",
+          "funcquestTvals": [],
+          "overWriteTvalsList": []
+        },
+        {
+          "buffs": [
+            {
+              "id": 142,
+              "icon": "https://static.atlasacademy.io/JP/BuffIcons/bufficon_324.png",
+              "name": "Critical Strength Up",
+              "type": "upCriticaldamage",
+              "vals": [
+                {
+                  "id": 3004,
+                  "name": "buffPositiveEffect"
+                },
+                {
+                  "id": 3006,
+                  "name": "buffIncreaseDamage"
+                },
+                {
+                  "id": 3031,
+                  "name": "buffCritDamageUp"
+                }
+              ],
+              "tvals": [],
+              "detail": "クリティカル時のダメージをアップ",
+              "script": {},
+              "maxRate": 5000,
+              "ckOpIndv": [],
+              "buffGroup": 0,
+              "ckSelfIndv": [],
+              "originalName": "クリティカル威力アップ",
+              "originalScript": {}
+            }
+          ],
+          "svals": [
+            {
+              "Rate": 1000,
+              "Turn": 3,
+              "Count": -1,
+              "Value": 200,
+              "RatioHPLow": 800
+            }
+          ],
+          "funcId": 201,
+          "script": {},
+          "funcType": "addStateShort",
+          "funcGroup": [],
+          "functvals": [],
+          "funcPopupIcon": "https://static.atlasacademy.io/JP/BuffIcons/bufficon_324.png",
+          "funcPopupText": "クリティカル威力アップ",
+          "funcTargetTeam": "playerAndEnemy",
+          "funcTargetType": "self",
+          "funcquestTvals": [],
+          "overWriteTvalsList": []
+        },
+        {
+          "buffs": [],
+          "svals": [
+            {
+              "Rate": 5000,
+              "Value": 1000
+            }
+          ],
+          "funcId": 21449,
+          "script": {
+            "funcIndividuality": [
+              {
+                "id": 3098,
+                "name": "demeritFunction"
+              }
+            ]
+          },
+          "funcType": "lossHpSafe",
+          "funcGroup": [],
+          "functvals": [],
+          "funcPopupText": "HP減少",
+          "funcTargetTeam": "playerAndEnemy",
+          "funcTargetType": "self",
+          "funcquestTvals": [],
+          "overWriteTvalsList": []
+        }
+      ],
+      "skillSvts": [
+        {
+          "num": 3,
+          "flag": 0,
+          "svtId": 702500,
+          "condLv": 0,
+          "script": {},
+          "eventId": 0,
+          "priority": 1,
+          "condQuestId": 0,
+          "condLimitCount": 3,
+          "condQuestPhase": 0,
+          "strengthStatus": 1,
+          "releaseConditions": []
+        },
+        {
+          "num": 3,
+          "flag": 0,
+          "svtId": 9938980,
+          "condLv": 0,
+          "script": {},
+          "eventId": 0,
+          "priority": 1,
+          "condQuestId": 0,
+          "condLimitCount": 3,
+          "condQuestPhase": 0,
+          "strengthStatus": 0,
+          "releaseConditions": []
+        },
+        {
+          "num": 3,
+          "flag": 0,
+          "svtId": 9947300,
+          "condLv": 0,
+          "script": {},
+          "eventId": 0,
+          "priority": 1,
+          "condQuestId": 0,
+          "condLimitCount": 3,
+          "condQuestPhase": 0,
+          "strengthStatus": 1,
+          "releaseConditions": []
+        }
+      ],
+      "condQuestId": 0,
+      "extraPassive": [],
+      "originalName": "局中法度 EX",
+      "condLimitCount": 3,
+      "condQuestPhase": 0,
+      "strengthStatus": 1,
+      "actIndividuality": [],
+      "unmodifiedDetail": "自身のスター集中度をアップ[{0}](3ターン)＆HPが少ないほどクリティカル威力がアップする状態を付与(3ターン)＆HPを減少【デメリット】"
+    },
+    {
+      "id": 789451,
+      "num": 2,
+      "icon": "https://static.atlasacademy.io/JP/SkillIcons/skill_00404.png",
+      "name": "Harsh Road To Travel B+",
+      "ruby": "せいれつたるみちゆき",
+      "type": "active",
+      "svtId": 702500,
+      "condLv": 0,
+      "detail": "自身の弱体状態を解除＆HPを回復＆ガッツ状態を付与(1回・3ターン・他のガッツ状態と重複可能)▲",
+      "script": {},
+      "coolDown": [
+        5
+      ],
+      "priority": 2,
+      "skillAdd": [],
+      "functions": [
+        {
+          "buffs": [],
+          "svals": [
+            {
+              "Rate": 1000
+            }
+          ],
+          "funcId": 434,
+          "script": {},
+          "funcType": "subState",
+          "funcGroup": [],
+          "functvals": [],
+          "traitVals": [
+            {
+              "id": 3005,
+              "name": "buffNegativeEffect"
+            }
+          ],
+          "funcPopupText": "弱体解除",
+          "funcTargetTeam": "playerAndEnemy",
+          "funcTargetType": "self",
+          "funcquestTvals": [],
+          "overWriteTvalsList": []
+        },
+        {
+          "buffs": [],
+          "svals": [
+            {
+              "Rate": 1000,
+              "Value": 1500
+            }
+          ],
+          "funcId": 439,
+          "script": {
+            "funcIndividuality": [
+              {
+                "id": 2984,
+                "name": "unknown"
+              }
+            ]
+          },
+          "funcType": "gainHp",
+          "funcGroup": [],
+          "functvals": [],
+          "funcPopupText": "",
+          "funcTargetTeam": "playerAndEnemy",
+          "funcTargetType": "self",
+          "funcquestTvals": [],
+          "overWriteTvalsList": []
+        },
+        {
+          "buffs": [
+            {
+              "id": 3002,
+              "icon": "https://static.atlasacademy.io/JP/BuffIcons/bufficon_304.png",
+              "name": "Guts",
+              "type": "guts",
+              "vals": [
+                {
+                  "id": 3004,
+                  "name": "buffPositiveEffect"
+                },
+                {
+                  "id": 3024,
+                  "name": "buffGuts"
+                }
+              ],
+              "tvals": [],
+              "detail": "HPが0になった時、HPを回復して耐える(他のガッツ状態と重複可能)",
+              "script": {
+                "checkIndvType": 2,
+                "INDIVIDUALITIE": {
+                  "id": 3086,
+                  "name": "gutsBlock",
+                  "negative": true
+                }
+              },
+              "maxRate": 0,
+              "ckOpIndv": [
+                {
+                  "id": 3139,
+                  "name": "unknown",
+                  "negative": true
+                }
+              ],
+              "buffGroup": 0,
+              "ckSelfIndv": [],
+              "originalName": "ガッツ",
+              "originalScript": {
+                "checkIndvType": 2,
+                "INDIVIDUALITIE": -3086
+              }
+            }
+          ],
+          "svals": [
+            {
+              "Rate": 1000,
+              "Turn": 3,
+              "Count": 1,
+              "Value": 1
+            }
+          ],
+          "funcId": 5835,
+          "script": {},
+          "funcType": "addState",
+          "funcGroup": [],
+          "functvals": [],
+          "funcPopupIcon": "https://static.atlasacademy.io/JP/BuffIcons/bufficon_304.png",
+          "funcPopupText": "ガッツ",
+          "funcTargetTeam": "playerAndEnemy",
+          "funcTargetType": "self",
+          "funcquestTvals": [],
+          "overWriteTvalsList": []
+        }
+      ],
+      "skillSvts": [
+        {
+          "num": 2,
+          "flag": 0,
+          "svtId": 702500,
+          "condLv": 0,
+          "script": {},
+          "eventId": 0,
+          "priority": 2,
+          "condQuestId": 94053191,
+          "condLimitCount": 1,
+          "condQuestPhase": 3,
+          "strengthStatus": 99,
+          "releaseConditions": []
+        },
+        {
+          "num": 2,
+          "flag": 0,
+          "svtId": 9947300,
+          "condLv": 0,
+          "script": {},
+          "eventId": 0,
+          "priority": 2,
+          "condQuestId": 0,
+          "condLimitCount": 1,
+          "condQuestPhase": 0,
+          "strengthStatus": 99,
+          "releaseConditions": []
+        }
+      ],
+      "condQuestId": 94053191,
+      "extraPassive": [],
+      "originalName": "凄烈たる道行き B+",
+      "condLimitCount": 1,
+      "condQuestPhase": 3,
+      "strengthStatus": 99,
+      "actIndividuality": [],
+      "unmodifiedDetail": "自身の弱体状態を解除＆HPを回復[{0}]＆ガッツ状態を付与(1回・3ターン・他のガッツ状態と重複可能)[g][o]▲[/o][/g]"
+    },
+    {
+      "id": 344655,
+      "num": 3,
+      "icon": "https://static.atlasacademy.io/JP/SkillIcons/skill_00311.png",
+      "name": "Laws of the Shinsengumi EX",
+      "ruby": "きょくちゅうはっと",
+      "type": "active",
+      "svtId": 702500,
+      "condLv": 0,
+      "detail": "自身のスター集中度をアップ(3ターン)＆HPが少ないほどクリティカル威力がアップする状態を付与(3ターン)＆NPを増やす▲＆HPを減少【デメリット】",
+      "script": {},
+      "coolDown": [
+        5
+      ],
+      "priority": 2,
+      "skillAdd": [],
+      "functions": [
+        {
+          "buffs": [
+            {
+              "id": 115,
+              "icon": "https://static.atlasacademy.io/JP/BuffIcons/bufficon_325.png",
+              "name": "C. Star Gather Up",
+              "type": "upStarweight",
+              "vals": [
+                {
+                  "id": 3004,
+                  "name": "buffPositiveEffect"
+                }
+              ],
+              "tvals": [],
+              "detail": "スターの集まりやすさをアップ",
+              "script": {},
+              "maxRate": 500000,
+              "ckOpIndv": [],
+              "buffGroup": 0,
+              "ckSelfIndv": [],
+              "originalName": "スター集中アップ",
+              "originalScript": {}
+            }
+          ],
+          "svals": [
+            {
+              "Rate": 1000,
+              "Turn": 3,
+              "Count": -1,
+              "Value": 40000
+            }
+          ],
+          "funcId": 366,
+          "script": {},
+          "funcType": "addStateShort",
+          "funcGroup": [],
+          "functvals": [],
+          "funcPopupIcon": "https://static.atlasacademy.io/JP/BuffIcons/bufficon_325.png",
+          "funcPopupText": "スター集中アップ",
+          "funcTargetTeam": "player",
+          "funcTargetType": "self",
+          "funcquestTvals": [],
+          "overWriteTvalsList": []
+        },
+        {
+          "buffs": [
+            {
+              "id": 144,
+              "icon": "https://static.atlasacademy.io/JP/BuffIcons/bufficon_327.png",
+              "name": "Critical Hit Rate Up",
+              "type": "upCriticalrate",
+              "vals": [
+                {
+                  "id": 3004,
+                  "name": "buffPositiveEffect"
+                },
+                {
+                  "id": 3006,
+                  "name": "buffIncreaseDamage"
+                },
+                {
+                  "id": 3032,
+                  "name": "buffCritRateUp"
+                }
+              ],
+              "tvals": [],
+              "detail": "クリティカルの発生率をアップ",
+              "script": {
+                "ProgressSelfTurn": 1
+              },
+              "maxRate": 5000,
+              "ckOpIndv": [],
+              "buffGroup": 0,
+              "ckSelfIndv": [],
+              "originalName": "クリティカル発生アップ",
+              "originalScript": {
+                "ProgressSelfTurn": 1
+              }
+            }
+          ],
+          "svals": [
+            {
+              "Rate": 1000,
+              "Turn": 3,
+              "Count": -1,
+              "Value": 100
+            }
+          ],
+          "funcId": 216,
+          "script": {},
+          "funcType": "addStateShort",
+          "funcGroup": [],
+          "functvals": [],
+          "funcPopupIcon": "https://static.atlasacademy.io/JP/BuffIcons/bufficon_327.png",
+          "funcPopupText": "クリティカル発生アップ",
+          "funcTargetTeam": "enemy",
+          "funcTargetType": "self",
+          "funcquestTvals": [],
+          "overWriteTvalsList": []
+        },
+        {
+          "buffs": [
+            {
+              "id": 142,
+              "icon": "https://static.atlasacademy.io/JP/BuffIcons/bufficon_324.png",
+              "name": "Critical Strength Up",
+              "type": "upCriticaldamage",
+              "vals": [
+                {
+                  "id": 3004,
+                  "name": "buffPositiveEffect"
+                },
+                {
+                  "id": 3006,
+                  "name": "buffIncreaseDamage"
+                },
+                {
+                  "id": 3031,
+                  "name": "buffCritDamageUp"
+                }
+              ],
+              "tvals": [],
+              "detail": "クリティカル時のダメージをアップ",
+              "script": {},
+              "maxRate": 5000,
+              "ckOpIndv": [],
+              "buffGroup": 0,
+              "ckSelfIndv": [],
+              "originalName": "クリティカル威力アップ",
+              "originalScript": {}
+            }
+          ],
+          "svals": [
+            {
+              "Rate": 1000,
+              "Turn": 3,
+              "Count": -1,
+              "Value": 200,
+              "RatioHPLow": 800
+            }
+          ],
+          "funcId": 201,
+          "script": {},
+          "funcType": "addStateShort",
+          "funcGroup": [],
+          "functvals": [],
+          "funcPopupIcon": "https://static.atlasacademy.io/JP/BuffIcons/bufficon_324.png",
+          "funcPopupText": "クリティカル威力アップ",
+          "funcTargetTeam": "playerAndEnemy",
+          "funcTargetType": "self",
+          "funcquestTvals": [],
+          "overWriteTvalsList": []
+        },
+        {
+          "buffs": [],
+          "svals": [
+            {
+              "Rate": 1000,
+              "Value": 3000
+            }
+          ],
+          "funcId": 460,
+          "script": {},
+          "funcType": "gainNp",
+          "funcGroup": [],
+          "functvals": [],
+          "funcPopupText": "NP増加",
+          "funcTargetTeam": "player",
+          "funcTargetType": "self",
+          "funcquestTvals": [],
+          "overWriteTvalsList": []
+        },
+        {
+          "buffs": [],
+          "svals": [
+            {
+              "Rate": 1000,
+              "Value": 1
+            }
+          ],
+          "funcId": 470,
+          "script": {},
+          "funcType": "hastenNpturn",
+          "funcGroup": [],
+          "functvals": [],
+          "funcPopupText": "チャージ増加",
+          "funcTargetTeam": "enemy",
+          "funcTargetType": "self",
+          "funcquestTvals": [],
+          "overWriteTvalsList": []
+        },
+        {
+          "buffs": [],
+          "svals": [
+            {
+              "Rate": 5000,
+              "Value": 1000
+            }
+          ],
+          "funcId": 21449,
+          "script": {
+            "funcIndividuality": [
+              {
+                "id": 3098,
+                "name": "demeritFunction"
+              }
+            ]
+          },
+          "funcType": "lossHpSafe",
+          "funcGroup": [],
+          "functvals": [],
+          "funcPopupText": "HP減少",
+          "funcTargetTeam": "playerAndEnemy",
+          "funcTargetType": "self",
+          "funcquestTvals": [],
+          "overWriteTvalsList": []
+        }
+      ],
+      "skillSvts": [
+        {
+          "num": 3,
+          "flag": 0,
+          "svtId": 702500,
+          "condLv": 0,
+          "script": {},
+          "eventId": 0,
+          "priority": 2,
+          "condQuestId": 94090450,
+          "condLimitCount": 3,
+          "condQuestPhase": 3,
+          "strengthStatus": 99,
+          "releaseConditions": []
+        },
+        {
+          "num": 3,
+          "flag": 0,
+          "svtId": 9947300,
+          "condLv": 0,
+          "script": {},
+          "eventId": 0,
+          "priority": 2,
+          "condQuestId": 0,
+          "condLimitCount": 3,
+          "condQuestPhase": 0,
+          "strengthStatus": 99,
+          "releaseConditions": []
+        }
+      ],
+      "condQuestId": 94090450,
+      "extraPassive": [],
+      "originalName": "局中法度 EX",
+      "condLimitCount": 3,
+      "condQuestPhase": 3,
+      "strengthStatus": 99,
+      "actIndividuality": [],
+      "unmodifiedDetail": "自身のスター集中度をアップ[{0}](3ターン)＆HPが少ないほどクリティカル威力がアップする状態を付与(3ターン)＆NPを増やす[{0}][g][o]▲[/o][/g]＆HPを減少【デメリット】"
+    }
+  ],
+  "traits": [
+    {
+      "id": 1,
+      "name": "genderMale"
+    },
+    {
+      "id": 106,
+      "name": "classBerserker"
+    },
+    {
+      "id": 202,
+      "name": "attributeHuman"
+    },
+    {
+      "id": 300,
+      "name": "alignmentLawful"
+    },
+    {
+      "id": 304,
+      "name": "alignmentEvil"
+    },
+    {
+      "id": 405,
+      "name": "fiveStarServant"
+    },
+    {
+      "id": 1000,
+      "name": "servant"
+    },
+    {
+      "id": 2001,
+      "name": "humanoid"
+    },
+    {
+      "id": 2008,
+      "name": "weakToEnumaElish"
+    },
+    {
+      "id": 2631,
+      "name": "hominidaeServant"
+    },
+    {
+      "id": 2780,
+      "name": "hasCostume"
+    },
+    {
+      "id": 2839,
+      "name": "shinsengumiServant"
+    },
+    {
+      "id": 2858,
+      "name": "standardClassServant"
+    },
+    {
+      "id": 5000,
+      "name": "canBeInBattle"
+    },
+    {
+      "id": 10009,
+      "name": "unknown"
+    },
+    {
+      "id": 702500,
+      "name": "unknown"
+    }
+  ],
+  "atkBase": 1868,
+  "classId": 7,
+  "starGen": 49,
+  "hpGrowth": [
+    1764,
+    1876,
+    1989,
+    2102,
+    2215,
+    2338,
+    2451,
+    2564,
+    2677,
+    2800,
+    2913,
+    3026,
+    3139,
+    3262,
+    3375,
+    3488,
+    3601,
+    3724,
+    3837,
+    3950,
+    4063,
+    4176,
+    4299,
+    4412,
+    4525,
+    4637,
+    4761,
+    4873,
+    4986,
+    5099,
+    5222,
+    5335,
+    5448,
+    5561,
+    5684,
+    5797,
+    5910,
+    6023,
+    6136,
+    6259,
+    6372,
+    6485,
+    6598,
+    6721,
+    6834,
+    6947,
+    7060,
+    7183,
+    7296,
+    7409,
+    7522,
+    7645,
+    7758,
+    7871,
+    7983,
+    8096,
+    8220,
+    8332,
+    8445,
+    8558,
+    8681,
+    8794,
+    8907,
+    9020,
+    9143,
+    9256,
+    9369,
+    9482,
+    9605,
+    9718,
+    9831,
+    9944,
+    10057,
+    10180,
+    10293,
+    10406,
+    10519,
+    10642,
+    10755,
+    10868,
+    10981,
+    11104,
+    11217,
+    11330,
+    11442,
+    11566,
+    11679,
+    11791,
+    11904,
+    12028,
+    12140,
+    12253,
+    12366,
+    12479,
+    12602,
+    12715,
+    12828,
+    12941,
+    13064,
+    13177,
+    13290,
+    13403,
+    13526,
+    13639,
+    13752,
+    13865,
+    13988,
+    14101,
+    14214,
+    14327,
+    14440,
+    14563,
+    14676,
+    14789,
+    14901,
+    15025,
+    15137,
+    15250,
+    15363,
+    15486
+  ],
+  "traitAdd": [
+    {
+      "idx": 8006901,
+      "trait": [
+        {
+          "id": 2069,
+          "name": "unknown"
+        },
+        {
+          "id": 2070,
+          "name": "unknown"
+        },
+        {
+          "id": 2072,
+          "name": "unknown"
+        }
+      ],
+      "condId": 0,
+      "condNum": 0,
+      "endedAt": 1577890800,
+      "eventId": 80069,
+      "condType": "none",
+      "startedAt": 1420124400,
+      "limitCount": -1
+    },
+    {
+      "idx": 8027301,
+      "trait": [
+        {
+          "id": 2601,
+          "name": "unknown"
+        },
+        {
+          "id": 2602,
+          "name": "unknown"
+        },
+        {
+          "id": 2603,
+          "name": "unknown"
+        }
+      ],
+      "condId": 0,
+      "condNum": 0,
+      "endedAt": 1581479999,
+      "eventId": 80273,
+      "condType": "none",
+      "startedAt": 1579683600,
+      "limitCount": -1
+    },
+    {
+      "idx": 8031801,
+      "trait": [
+        {
+          "id": 2770,
+          "name": "unknown"
+        },
+        {
+          "id": 2771,
+          "name": "unknown"
+        },
+        {
+          "id": 2772,
+          "name": "unknown"
+        }
+      ],
+      "condId": 0,
+      "condNum": 0,
+      "endedAt": 1617767999,
+      "eventId": 80318,
+      "condType": "none",
+      "startedAt": 1616576400,
+      "limitCount": -1
+    },
+    {
+      "idx": 8043201,
+      "trait": [
+        {
+          "id": 2865,
+          "name": "unknown"
+        },
+        {
+          "id": 2866,
+          "name": "unknown"
+        },
+        {
+          "id": 2867,
+          "name": "unknown"
+        },
+        {
+          "id": 2869,
+          "name": "unknown"
+        },
+        {
+          "id": 2870,
+          "name": "unknown"
+        }
+      ],
+      "condId": 0,
+      "condNum": 0,
+      "endedAt": 1690343999,
+      "eventId": 80432,
+      "condType": "none",
+      "startedAt": 1688554800,
+      "limitCount": -1
+    }
+  ],
+  "atkGrowth": [
+    1868,
+    1980,
+    2092,
+    2205,
+    2317,
+    2440,
+    2552,
+    2665,
+    2777,
+    2900,
+    3012,
+    3125,
+    3237,
+    3360,
+    3472,
+    3585,
+    3697,
+    3820,
+    3932,
+    4045,
+    4157,
+    4269,
+    4392,
+    4505,
+    4617,
+    4729,
+    4852,
+    4964,
+    5077,
+    5189,
+    5312,
+    5424,
+    5537,
+    5649,
+    5772,
+    5884,
+    5997,
+    6109,
+    6222,
+    6344,
+    6457,
+    6569,
+    6682,
+    6804,
+    6917,
+    7029,
+    7142,
+    7264,
+    7377,
+    7489,
+    7601,
+    7724,
+    7837,
+    7949,
+    8061,
+    8174,
+    8297,
+    8409,
+    8521,
+    8634,
+    8756,
+    8869,
+    8981,
+    9094,
+    9216,
+    9329,
+    9441,
+    9554,
+    9676,
+    9789,
+    9901,
+    10014,
+    10126,
+    10249,
+    10361,
+    10474,
+    10586,
+    10709,
+    10821,
+    10934,
+    11046,
+    11169,
+    11281,
+    11393,
+    11506,
+    11629,
+    11741,
+    11853,
+    11966,
+    12089,
+    12201,
+    12313,
+    12426,
+    12538,
+    12661,
+    12773,
+    12886,
+    12998,
+    13121,
+    13233,
+    13346,
+    13458,
+    13581,
+    13693,
+    13806,
+    13918,
+    14041,
+    14153,
+    14266,
+    14378,
+    14490,
+    14613,
+    14726,
+    14838,
+    14950,
+    15073,
+    15185,
+    15298,
+    15410,
+    15533
+  ],
+  "attribute": "human",
+  "className": "berserker",
+  "svtChange": [],
+  "battleName": "Hijikata Toshizo",
+  "overwrites": [],
+  "starAbsorb": 9,
+  "cardDetails": {
+    "1": {
+      "attackType": "one",
+      "hitsDistribution": [
+        33,
+        67
+      ],
+      "attackIndividuality": [
+        {
+          "id": 3000,
+          "name": "attackPhysical"
+        }
+      ]
+    },
+    "2": {
+      "attackType": "one",
+      "hitsDistribution": [
+        33,
+        67
+      ],
+      "attackIndividuality": [
+        {
+          "id": 3000,
+          "name": "attackPhysical"
+        }
+      ]
+    },
+    "3": {
+      "attackType": "one",
+      "hitsDistribution": [
+        16,
+        33,
+        51
+      ],
+      "attackIndividuality": [
+        {
+          "id": 3000,
+          "name": "attackPhysical"
+        }
+      ]
+    },
+    "4": {
+      "attackType": "one",
+      "hitsDistribution": [
+        12,
+        25,
+        63
+      ],
+      "attackIndividuality": [
+        {
+          "id": 3000,
+          "name": "attackPhysical"
+        }
+      ]
+    }
+  },
+  "extraAssets": {
+    "faces": {
+      "costume": {
+        "702530": "https://static.atlasacademy.io/JP/Faces/f_7025300.png"
+      },
+      "ascension": {
+        "1": "https://static.atlasacademy.io/JP/Faces/f_7025000.png",
+        "2": "https://static.atlasacademy.io/JP/Faces/f_7025001.png",
+        "3": "https://static.atlasacademy.io/JP/Faces/f_7025002.png",
+        "4": "https://static.atlasacademy.io/JP/Faces/f_7025003.png"
+      }
+    }
+  },
+  "ascensionAdd": {
+    "lvMax": {
+      "costume": {},
+      "ascension": {
+        "0": 50,
+        "1": 60,
+        "2": 70,
+        "3": 80,
+        "4": 90
+      }
+    },
+    "rarity": {
+      "costume": {},
+      "ascension": {
+        "0": 5,
+        "1": 5,
+        "2": 5,
+        "3": 5,
+        "4": 5
+      }
+    },
+    "attribute": {
+      "costume": {},
+      "ascension": {}
+    },
+    "faceChange": {
+      "costume": {},
+      "ascension": {}
+    },
+    "voicePrefix": {
+      "costume": {
+        "702530": 11
+      },
+      "ascension": {
+        "0": 0,
+        "1": 0,
+        "2": 0,
+        "3": 0,
+        "4": 0
+      }
+    },
+    "individuality": {
+      "costume": {
+        "702530": []
+      },
+      "ascension": {
+        "0": [],
+        "1": [],
+        "2": [],
+        "3": [],
+        "4": []
+      }
+    },
+    "overwriteCost": {
+      "costume": {},
+      "ascension": {}
+    },
+    "overwriteHpMax": {
+      "costume": {},
+      "ascension": {}
+    },
+    "overWriteTDName": {
+      "costume": {},
+      "ascension": {}
+    },
+    "overWriteTDRank": {
+      "costume": {},
+      "ascension": {}
+    },
+    "overWriteTDRuby": {
+      "costume": {},
+      "ascension": {}
+    },
+    "overwriteAtkMax": {
+      "costume": {},
+      "ascension": {}
+    },
+    "overwriteHpBase": {
+      "costume": {},
+      "ascension": {}
+    },
+    "overwriteRarity": {
+      "costume": {},
+      "ascension": {}
+    },
+    "charaGraphChange": {
+      "costume": {},
+      "ascension": {}
+    },
+    "overwriteAtkBase": {
+      "costume": {},
+      "ascension": {}
+    },
+    "overwriteExpType": {
+      "costume": {},
+      "ascension": {}
+    },
+    "overWriteTDFileName": {
+      "costume": {},
+      "ascension": {}
+    },
+    "overWriteTDTypeText": {
+      "costume": {},
+      "ascension": {}
+    },
+    "overWriteServantName": {
+      "costume": {},
+      "ascension": {}
+    },
+    "overwriteClassPassive": {
+      "costume": {},
+      "ascension": {}
+    },
+    "faceChangeCommonRelease": {
+      "costume": {},
+      "ascension": {}
+    },
+    "originalOverWriteTDName": {
+      "costume": {},
+      "ascension": {}
+    },
+    "overWriteServantBattleName": {
+      "costume": {},
+      "ascension": {}
+    },
+    "originalOverWriteServantName": {
+      "costume": {},
+      "ascension": {}
+    },
+    "charaGraphChangeCommonRelease": {
+      "costume": {},
+      "ascension": {}
+    },
+    "originalOverWriteServantBattleName": {
+      "costume": {},
+      "ascension": {}
+    }
+  },
+  "battlePoints": [],
+  "classPassive": [
+    {
+      "id": 54251,
+      "num": 0,
+      "icon": "https://static.atlasacademy.io/JP/SkillIcons/skill_00106.png",
+      "name": "Madness Enhancement D+",
+      "ruby": "きょうか",
+      "type": "passive",
+      "svtId": 0,
+      "condLv": 0,
+      "detail": "自身のBusterカードの性能を少しアップ",
+      "script": {},
+      "coolDown": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "priority": 0,
+      "skillAdd": [],
+      "functions": [
+        {
+          "buffs": [
+            {
+              "id": 102,
+              "icon": "https://static.atlasacademy.io/JP/BuffIcons/bufficon_314.png",
+              "name": "Buster Up",
+              "type": "upCommandall",
+              "vals": [
+                {
+                  "id": 3004,
+                  "name": "buffPositiveEffect"
+                },
+                {
+                  "id": 3006,
+                  "name": "buffIncreaseDamage"
+                },
+                {
+                  "id": 3093,
+                  "name": "busterBuff"
+                }
+              ],
+              "tvals": [
+                {
+                  "id": 5000,
+                  "name": "canBeInBattle"
+                },
+                {
+                  "id": 4002,
+                  "name": "cardBuster"
+                }
+              ],
+              "detail": "Busterカードの性能をアップ",
+              "script": {
+                "ProgressSelfTurn": 1
+              },
+              "maxRate": 5000,
+              "ckOpIndv": [],
+              "buffGroup": 0,
+              "ckSelfIndv": [
+                {
+                  "id": 4002,
+                  "name": "cardBuster"
+                }
+              ],
+              "originalName": "Busterアップ",
+              "originalScript": {
+                "ProgressSelfTurn": 1
+              }
+            }
+          ],
+          "svals": [
+            {
+              "Rate": 1000,
+              "Turn": -1,
+              "Count": -1,
+              "Value": 50
+            },
+            {
+              "Rate": 1000,
+              "Turn": -1,
+              "Count": -1,
+              "Value": 50
+            },
+            {
+              "Rate": 1000,
+              "Turn": -1,
+              "Count": -1,
+              "Value": 50
+            },
+            {
+              "Rate": 1000,
+              "Turn": -1,
+              "Count": -1,
+              "Value": 50
+            },
+            {
+              "Rate": 1000,
+              "Turn": -1,
+              "Count": -1,
+              "Value": 50
+            },
+            {
+              "Rate": 1000,
+              "Turn": -1,
+              "Count": -1,
+              "Value": 50
+            },
+            {
+              "Rate": 1000,
+              "Turn": -1,
+              "Count": -1,
+              "Value": 50
+            },
+            {
+              "Rate": 1000,
+              "Turn": -1,
+              "Count": -1,
+              "Value": 50
+            },
+            {
+              "Rate": 1000,
+              "Turn": -1,
+              "Count": -1,
+              "Value": 50
+            },
+            {
+              "Rate": 1000,
+              "Turn": -1,
+              "Count": -1,
+              "Value": 50
+            }
+          ],
+          "funcId": 118,
+          "script": {},
+          "funcType": "addStateShort",
+          "funcGroup": [],
+          "functvals": [],
+          "funcPopupIcon": "https://static.atlasacademy.io/JP/BuffIcons/bufficon_314.png",
+          "funcPopupText": "バスターアップ",
+          "funcTargetTeam": "playerAndEnemy",
+          "funcTargetType": "self",
+          "funcquestTvals": [],
+          "overWriteTvalsList": []
+        }
+      ],
+      "skillSvts": [],
+      "condQuestId": 0,
+      "extraPassive": [],
+      "originalName": "狂化 D+",
+      "condLimitCount": 0,
+      "condQuestPhase": 0,
+      "strengthStatus": 0,
+      "actIndividuality": [],
+      "unmodifiedDetail": "自身のBusterカードの性能を少しアップ"
+    }
+  ],
+  "collectionNo": 161,
+  "originalName": "土方歳三",
+  "appendPassive": [
+    {
+      "num": 100,
+      "skill": {
+        "id": 3001000,
+        "num": 0,
+        "icon": "https://static.atlasacademy.io/JP/SkillIcons/skill_00301.png",
+        "name": "Extra Attack Boost",
+        "ruby": "",
+        "type": "passive",
+        "svtId": 0,
+        "condLv": 0,
+        "detail": "自身のExtra Attackカードの性能を{{1:Value:m}}%アップする",
+        "script": {},
+        "coolDown": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "priority": 0,
+        "skillAdd": [],
+        "functions": [
+          {
+            "buffs": [
+              {
+                "id": 30001,
+                "icon": "https://static.atlasacademy.io/JP/BuffIcons/bufficon_302.png",
+                "name": "Extra Attack Up",
+                "type": "upCommandall",
+                "vals": [
+                  {
+                    "id": 3004,
+                    "name": "buffPositiveEffect"
+                  },
+                  {
+                    "id": 3006,
+                    "name": "buffIncreaseDamage"
+                  }
+                ],
+                "tvals": [
+                  {
+                    "id": 5000,
+                    "name": "canBeInBattle"
+                  },
+                  {
+                    "id": 4004,
+                    "name": "cardExtra"
+                  }
+                ],
+                "detail": "Extra Attackカードの性能をアップ",
+                "script": {},
+                "maxRate": 5000,
+                "ckOpIndv": [],
+                "buffGroup": 0,
+                "ckSelfIndv": [
+                  {
+                    "id": 4004,
+                    "name": "cardExtra"
+                  }
+                ],
+                "originalName": "Extra Attackアップ",
+                "originalScript": {}
+              }
+            ],
+            "svals": [
+              {
+                "Rate": 1000,
+                "Turn": -1,
+                "Count": -1,
+                "Value": 300,
+                "ShowState": -1
+              },
+              {
+                "Rate": 1000,
+                "Turn": -1,
+                "Count": -1,
+                "Value": 320,
+                "ShowState": -1
+              },
+              {
+                "Rate": 1000,
+                "Turn": -1,
+                "Count": -1,
+                "Value": 340,
+                "ShowState": -1
+              },
+              {
+                "Rate": 1000,
+                "Turn": -1,
+                "Count": -1,
+                "Value": 360,
+                "ShowState": -1
+              },
+              {
+                "Rate": 1000,
+                "Turn": -1,
+                "Count": -1,
+                "Value": 380,
+                "ShowState": -1
+              },
+              {
+                "Rate": 1000,
+                "Turn": -1,
+                "Count": -1,
+                "Value": 400,
+                "ShowState": -1
+              },
+              {
+                "Rate": 1000,
+                "Turn": -1,
+                "Count": -1,
+                "Value": 420,
+                "ShowState": -1
+              },
+              {
+                "Rate": 1000,
+                "Turn": -1,
+                "Count": -1,
+                "Value": 440,
+                "ShowState": -1
+              },
+              {
+                "Rate": 1000,
+                "Turn": -1,
+                "Count": -1,
+                "Value": 460,
+                "ShowState": -1
+              },
+              {
+                "Rate": 1000,
+                "Turn": -1,
+                "Count": -1,
+                "Value": 500,
+                "ShowState": -1
+              }
+            ],
+            "funcId": 30003,
+            "script": {},
+            "funcType": "addStateShort",
+            "funcGroup": [],
+            "functvals": [],
+            "funcPopupIcon": "https://static.atlasacademy.io/JP/BuffIcons/bufficon_302.png",
+            "funcPopupText": "Extra Attackアップ",
+            "funcTargetTeam": "playerAndEnemy",
+            "funcTargetType": "self",
+            "funcquestTvals": [],
+            "overWriteTvalsList": []
+          }
+        ],
+        "skillSvts": [],
+        "condQuestId": 0,
+        "extraPassive": [],
+        "originalName": "追撃技巧向上",
+        "condLimitCount": 0,
+        "condQuestPhase": 0,
+        "strengthStatus": 0,
+        "actIndividuality": [],
+        "unmodifiedDetail": "自身のExtra Attackカードの性能を{{1:Value:m}}%アップする[{0}]"
+      },
+      "priority": 1,
+      "unlockMaterials": [
+        {
+          "item": {
+            "id": 70250001,
+            "icon": "https://static.atlasacademy.io/JP/Coins/702500.png",
+            "name": "Servant Coin",
+            "type": "svtCoin",
+            "uses": [],
+            "value": 702500,
+            "detail": "【サーヴァント強化素材】\nサーヴァントの霊基のカケラ。",
+            "script": {},
+            "endedAt": 1910876400,
+            "eventId": 0,
+            "priority": 57,
+            "startedAt": 946652400,
+            "background": "silver",
+            "itemSelects": [],
+            "dropPriority": 1003,
+            "eventGroupId": 0,
+            "originalName": "サーヴァントコイン",
+            "individuality": []
+          },
+          "amount": 120
+        }
+      ]
+    },
+    {
+      "num": 101,
+      "skill": {
+        "id": 3002000,
+        "num": 0,
+        "icon": "https://static.atlasacademy.io/JP/SkillIcons/skill_00601.png",
+        "name": "Load Magical Energy",
+        "ruby": "",
+        "type": "passive",
+        "svtId": 0,
+        "condLv": 0,
+        "detail": "自身のNPを{{1:Value:y}}%チャージした状態でバトルを開始する",
+        "script": {},
+        "coolDown": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "priority": 0,
+        "skillAdd": [],
+        "functions": [
+          {
+            "buffs": [],
+            "svals": [
+              {
+                "Rate": 1000,
+                "Value": 1000,
+                "ShowState": -1
+              },
+              {
+                "Rate": 1000,
+                "Value": 1100,
+                "ShowState": -1
+              },
+              {
+                "Rate": 1000,
+                "Value": 1200,
+                "ShowState": -1
+              },
+              {
+                "Rate": 1000,
+                "Value": 1300,
+                "ShowState": -1
+              },
+              {
+                "Rate": 1000,
+                "Value": 1400,
+                "ShowState": -1
+              },
+              {
+                "Rate": 1000,
+                "Value": 1500,
+                "ShowState": -1
+              },
+              {
+                "Rate": 1000,
+                "Value": 1600,
+                "ShowState": -1
+              },
+              {
+                "Rate": 1000,
+                "Value": 1700,
+                "ShowState": -1
+              },
+              {
+                "Rate": 1000,
+                "Value": 1800,
+                "ShowState": -1
+              },
+              {
+                "Rate": 1000,
+                "Value": 2000,
+                "ShowState": -1
+              }
+            ],
+            "funcId": 30005,
+            "script": {},
+            "funcType": "gainNp",
+            "funcGroup": [],
+            "functvals": [],
+            "funcPopupText": "NP増加",
+            "funcTargetTeam": "player",
+            "funcTargetType": "self",
+            "funcquestTvals": [],
+            "overWriteTvalsList": []
+          }
+        ],
+        "skillSvts": [],
+        "condQuestId": 0,
+        "extraPassive": [],
+        "originalName": "魔力装填",
+        "condLimitCount": 0,
+        "condQuestPhase": 0,
+        "strengthStatus": 0,
+        "actIndividuality": [],
+        "unmodifiedDetail": "自身のNPを{{1:Value:y}}%チャージした状態でバトルを開始する[{0}]"
+      },
+      "priority": 1,
+      "unlockMaterials": [
+        {
+          "item": {
+            "id": 70250001,
+            "icon": "https://static.atlasacademy.io/JP/Coins/702500.png",
+            "name": "Servant Coin",
+            "type": "svtCoin",
+            "uses": [],
+            "value": 702500,
+            "detail": "【サーヴァント強化素材】\nサーヴァントの霊基のカケラ。",
+            "script": {},
+            "endedAt": 1910876400,
+            "eventId": 0,
+            "priority": 57,
+            "startedAt": 946652400,
+            "background": "silver",
+            "itemSelects": [],
+            "dropPriority": 1003,
+            "eventGroupId": 0,
+            "originalName": "サーヴァントコイン",
+            "individuality": []
+          },
+          "amount": 120
+        }
+      ]
+    },
+    {
+      "num": 102,
+      "skill": {
+        "id": 3027000,
+        "num": 0,
+        "icon": "https://static.atlasacademy.io/JP/SkillIcons/skill_00417.png",
+        "name": "Anti-Alter Ego (Crit. Res. Up)",
+        "ruby": "",
+        "type": "passive",
+        "svtId": 0,
+        "condLv": 0,
+        "detail": "自身の〔アルターエゴ〕クラスに対する被クリティカル発生耐性を{{1:Value:m}}%アップする",
+        "script": {},
+        "coolDown": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "priority": 0,
+        "skillAdd": [],
+        "functions": [
+          {
+            "buffs": [
+              {
+                "id": 30027,
+                "icon": "https://static.atlasacademy.io/JP/BuffIcons/bufficon_363.png",
+                "name": "Critical Resistance Up (Anti-Alter Ego)",
+                "type": "downCriticalRateDamageTaken",
+                "vals": [
+                  {
+                    "id": 3004,
+                    "name": "buffPositiveEffect"
+                  }
+                ],
+                "tvals": [
+                  {
+                    "id": 109,
+                    "name": "classAlterEgo"
+                  }
+                ],
+                "detail": "〔アルターエゴ〕クラスからクリティカル攻撃を受ける確率を減らす",
+                "script": {},
+                "maxRate": 5000,
+                "ckOpIndv": [
+                  {
+                    "id": 109,
+                    "name": "classAlterEgo"
+                  }
+                ],
+                "buffGroup": 0,
+                "ckSelfIndv": [],
+                "originalName": "被クリティカル発生耐性アップ〔対アルターエゴ〕",
+                "originalScript": {}
+              }
+            ],
+            "svals": [
+              {
+                "Rate": 1000,
+                "Turn": -1,
+                "Count": -1,
+                "Value": 200,
+                "ShowState": -1
+              },
+              {
+                "Rate": 1000,
+                "Turn": -1,
+                "Count": -1,
+                "Value": 210,
+                "ShowState": -1
+              },
+              {
+                "Rate": 1000,
+                "Turn": -1,
+                "Count": -1,
+                "Value": 220,
+                "ShowState": -1
+              },
+              {
+                "Rate": 1000,
+                "Turn": -1,
+                "Count": -1,
+                "Value": 230,
+                "ShowState": -1
+              },
+              {
+                "Rate": 1000,
+                "Turn": -1,
+                "Count": -1,
+                "Value": 240,
+                "ShowState": -1
+              },
+              {
+                "Rate": 1000,
+                "Turn": -1,
+                "Count": -1,
+                "Value": 250,
+                "ShowState": -1
+              },
+              {
+                "Rate": 1000,
+                "Turn": -1,
+                "Count": -1,
+                "Value": 260,
+                "ShowState": -1
+              },
+              {
+                "Rate": 1000,
+                "Turn": -1,
+                "Count": -1,
+                "Value": 270,
+                "ShowState": -1
+              },
+              {
+                "Rate": 1000,
+                "Turn": -1,
+                "Count": -1,
+                "Value": 280,
+                "ShowState": -1
+              },
+              {
+                "Rate": 1000,
+                "Turn": -1,
+                "Count": -1,
+                "Value": 300,
+                "ShowState": -1
+              }
+            ],
+            "funcId": 30083,
+            "script": {},
+            "funcType": "addState",
+            "funcGroup": [],
+            "functvals": [],
+            "funcPopupIcon": "https://static.atlasacademy.io/JP/BuffIcons/bufficon_363.png",
+            "funcPopupText": "被クリティカル発生耐性アップ〔対アルターエゴ〕",
+            "funcTargetTeam": "player",
+            "funcTargetType": "self",
+            "funcquestTvals": [],
+            "overWriteTvalsList": []
+          }
+        ],
+        "skillSvts": [],
+        "condQuestId": 0,
+        "extraPassive": [],
+        "originalName": "対ｱﾙﾀｰｴｺﾞｸﾘﾃｨｶﾙ発生耐性",
+        "condLimitCount": 0,
+        "condQuestPhase": 0,
+        "strengthStatus": 0,
+        "actIndividuality": [],
+        "unmodifiedDetail": "自身の〔アルターエゴ〕クラスに対する被クリティカル発生耐性を{{1:Value:m}}%アップする[{0}]"
+      },
+      "priority": 1,
+      "unlockMaterials": [
+        {
+          "item": {
+            "id": 70250001,
+            "icon": "https://static.atlasacademy.io/JP/Coins/702500.png",
+            "name": "Servant Coin",
+            "type": "svtCoin",
+            "uses": [],
+            "value": 702500,
+            "detail": "【サーヴァント強化素材】\nサーヴァントの霊基のカケラ。",
+            "script": {},
+            "endedAt": 1910876400,
+            "eventId": 0,
+            "priority": 57,
+            "startedAt": 946652400,
+            "background": "silver",
+            "itemSelects": [],
+            "dropPriority": 1003,
+            "eventGroupId": 0,
+            "originalName": "サーヴァントコイン",
+            "individuality": []
+          },
+          "amount": 120
+        }
+      ]
+    },
+    {
+      "num": 103,
+      "skill": {
+        "id": 3033000,
+        "num": 0,
+        "icon": "https://static.atlasacademy.io/JP/SkillIcons/skill_00303.png",
+        "name": "Special Attack Finesse Improvement",
+        "ruby": "",
+        "type": "passive",
+        "svtId": 0,
+        "condLv": 0,
+        "detail": "自身のクリティカル威力を{{1:Value:m}}%アップする",
+        "script": {},
+        "coolDown": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "priority": 0,
+        "skillAdd": [],
+        "functions": [
+          {
+            "buffs": [
+              {
+                "id": 142,
+                "icon": "https://static.atlasacademy.io/JP/BuffIcons/bufficon_324.png",
+                "name": "Critical Strength Up",
+                "type": "upCriticaldamage",
+                "vals": [
+                  {
+                    "id": 3004,
+                    "name": "buffPositiveEffect"
+                  },
+                  {
+                    "id": 3006,
+                    "name": "buffIncreaseDamage"
+                  },
+                  {
+                    "id": 3031,
+                    "name": "buffCritDamageUp"
+                  }
+                ],
+                "tvals": [],
+                "detail": "クリティカル時のダメージをアップ",
+                "script": {},
+                "maxRate": 5000,
+                "ckOpIndv": [],
+                "buffGroup": 0,
+                "ckSelfIndv": [],
+                "originalName": "クリティカル威力アップ",
+                "originalScript": {}
+              }
+            ],
+            "svals": [
+              {
+                "Rate": 1000,
+                "Turn": -1,
+                "Count": -1,
+                "Value": 200,
+                "ShowState": -1
+              },
+              {
+                "Rate": 1000,
+                "Turn": -1,
+                "Count": -1,
+                "Value": 210,
+                "ShowState": -1
+              },
+              {
+                "Rate": 1000,
+                "Turn": -1,
+                "Count": -1,
+                "Value": 220,
+                "ShowState": -1
+              },
+              {
+                "Rate": 1000,
+                "Turn": -1,
+                "Count": -1,
+                "Value": 230,
+                "ShowState": -1
+              },
+              {
+                "Rate": 1000,
+                "Turn": -1,
+                "Count": -1,
+                "Value": 240,
+                "ShowState": -1
+              },
+              {
+                "Rate": 1000,
+                "Turn": -1,
+                "Count": -1,
+                "Value": 250,
+                "ShowState": -1
+              },
+              {
+                "Rate": 1000,
+                "Turn": -1,
+                "Count": -1,
+                "Value": 260,
+                "ShowState": -1
+              },
+              {
+                "Rate": 1000,
+                "Turn": -1,
+                "Count": -1,
+                "Value": 270,
+                "ShowState": -1
+              },
+              {
+                "Rate": 1000,
+                "Turn": -1,
+                "Count": -1,
+                "Value": 280,
+                "ShowState": -1
+              },
+              {
+                "Rate": 1000,
+                "Turn": -1,
+                "Count": -1,
+                "Value": 300,
+                "ShowState": -1
+              }
+            ],
+            "funcId": 200,
+            "script": {},
+            "funcType": "addStateShort",
+            "funcGroup": [],
+            "functvals": [],
+            "funcPopupIcon": "https://static.atlasacademy.io/JP/BuffIcons/bufficon_324.png",
+            "funcPopupText": "クリティカル威力アップ",
+            "funcTargetTeam": "playerAndEnemy",
+            "funcTargetType": "self",
+            "funcquestTvals": [],
+            "overWriteTvalsList": []
+          }
+        ],
+        "skillSvts": [],
+        "condQuestId": 0,
+        "extraPassive": [],
+        "originalName": "特撃技巧向上",
+        "condLimitCount": 0,
+        "condQuestPhase": 0,
+        "strengthStatus": 0,
+        "actIndividuality": [],
+        "unmodifiedDetail": "自身のクリティカル威力を{{1:Value:m}}%アップする[{0}]"
+      },
+      "priority": 1,
+      "unlockMaterials": [
+        {
+          "item": {
+            "id": 70250001,
+            "icon": "https://static.atlasacademy.io/JP/Coins/702500.png",
+            "name": "Servant Coin",
+            "type": "svtCoin",
+            "uses": [],
+            "value": 702500,
+            "detail": "【サーヴァント強化素材】\nサーヴァントの霊基のカケラ。",
+            "script": {},
+            "endedAt": 1910876400,
+            "eventId": 0,
+            "priority": 57,
+            "startedAt": 946652400,
+            "background": "silver",
+            "itemSelects": [],
+            "dropPriority": 1003,
+            "eventGroupId": 0,
+            "originalName": "サーヴァントコイン",
+            "individuality": []
+          },
+          "amount": 120
+        }
+      ]
+    },
+    {
+      "num": 104,
+      "skill": {
+        "id": 3034000,
+        "num": 0,
+        "icon": "https://static.atlasacademy.io/JP/SkillIcons/skill_00613.png",
+        "name": "Skill Reloading",
+        "ruby": "",
+        "type": "passive",
+        "svtId": 0,
+        "condLv": 0,
+        "detail": "自身に「スキル使用後に使用したスキルのチャージを1進める状態」を付与(1回<Lv.6～9だと2回、Lv.10だと3回、スキルごとに1回限り>)",
+        "script": {},
+        "coolDown": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "priority": 0,
+        "skillAdd": [],
+        "functions": [
+          {
+            "buffs": [
+              {
+                "id": 30059,
+                "icon": "https://static.atlasacademy.io/JP/BuffIcons/bufficon_404.png",
+                "name": "Recharge After Skill Usage",
+                "type": "shortenSkillAfterUseSkill",
+                "vals": [
+                  {
+                    "id": 3004,
+                    "name": "buffPositiveEffect"
+                  }
+                ],
+                "tvals": [],
+                "detail": "スキル使用後に使用したスキルのチャージを1進める<スキルごとに1回限り>",
+                "script": {},
+                "maxRate": 0,
+                "ckOpIndv": [],
+                "buffGroup": 0,
+                "ckSelfIndv": [],
+                "originalName": "スキル使用後リチャージ",
+                "originalScript": {}
+              }
+            ],
+            "svals": [
+              {
+                "Rate": 1000,
+                "Turn": -1,
+                "Count": 1,
+                "Value": 1,
+                "ShowState": 1,
+                "ShortenMaxCountEachSkill": [
+                  1,
+                  1,
+                  1
+                ]
+              },
+              {
+                "Rate": 1000,
+                "Turn": -1,
+                "Count": 1,
+                "Value": 1,
+                "ShowState": 1,
+                "ShortenMaxCountEachSkill": [
+                  1,
+                  1,
+                  1
+                ]
+              },
+              {
+                "Rate": 1000,
+                "Turn": -1,
+                "Count": 1,
+                "Value": 1,
+                "ShowState": 1,
+                "ShortenMaxCountEachSkill": [
+                  1,
+                  1,
+                  1
+                ]
+              },
+              {
+                "Rate": 1000,
+                "Turn": -1,
+                "Count": 1,
+                "Value": 1,
+                "ShowState": 1,
+                "ShortenMaxCountEachSkill": [
+                  1,
+                  1,
+                  1
+                ]
+              },
+              {
+                "Rate": 1000,
+                "Turn": -1,
+                "Count": 1,
+                "Value": 1,
+                "ShowState": 1,
+                "ShortenMaxCountEachSkill": [
+                  1,
+                  1,
+                  1
+                ]
+              },
+              {
+                "Rate": 1000,
+                "Turn": -1,
+                "Count": 2,
+                "Value": 1,
+                "ShowState": 1,
+                "ShortenMaxCountEachSkill": [
+                  1,
+                  1,
+                  1
+                ]
+              },
+              {
+                "Rate": 1000,
+                "Turn": -1,
+                "Count": 2,
+                "Value": 1,
+                "ShowState": 1,
+                "ShortenMaxCountEachSkill": [
+                  1,
+                  1,
+                  1
+                ]
+              },
+              {
+                "Rate": 1000,
+                "Turn": -1,
+                "Count": 2,
+                "Value": 1,
+                "ShowState": 1,
+                "ShortenMaxCountEachSkill": [
+                  1,
+                  1,
+                  1
+                ]
+              },
+              {
+                "Rate": 1000,
+                "Turn": -1,
+                "Count": 2,
+                "Value": 1,
+                "ShowState": 1,
+                "ShortenMaxCountEachSkill": [
+                  1,
+                  1,
+                  1
+                ]
+              },
+              {
+                "Rate": 1000,
+                "Turn": -1,
+                "Count": 3,
+                "Value": 1,
+                "ShowState": 1,
+                "ShortenMaxCountEachSkill": [
+                  1,
+                  1,
+                  1
+                ]
+              }
+            ],
+            "funcId": 30170,
+            "script": {},
+            "funcType": "addState",
+            "funcGroup": [],
+            "functvals": [],
+            "funcPopupIcon": "https://static.atlasacademy.io/JP/BuffIcons/bufficon_404.png",
+            "funcPopupText": "",
+            "funcTargetTeam": "playerAndEnemy",
+            "funcTargetType": "self",
+            "funcquestTvals": [],
+            "overWriteTvalsList": []
+          }
+        ],
+        "skillSvts": [],
+        "condQuestId": 0,
+        "extraPassive": [],
+        "originalName": "スキル再装填",
+        "condLimitCount": 0,
+        "condQuestPhase": 0,
+        "strengthStatus": 0,
+        "actIndividuality": [],
+        "unmodifiedDetail": "自身に「スキル使用後に使用したスキルのチャージを1進める状態」を付与[{0}](1回<Lv.6～9だと2回、Lv.10だと3回、スキルごとに1回限り>)"
+      },
+      "priority": 1,
+      "unlockMaterials": [
+        {
+          "item": {
+            "id": 70250001,
+            "icon": "https://static.atlasacademy.io/JP/Coins/702500.png",
+            "name": "Servant Coin",
+            "type": "svtCoin",
+            "uses": [],
+            "value": 702500,
+            "detail": "【サーヴァント強化素材】\nサーヴァントの霊基のカケラ。",
+            "script": {},
+            "endedAt": 1910876400,
+            "eventId": 0,
+            "priority": 57,
+            "startedAt": 946652400,
+            "background": "silver",
+            "itemSelects": [],
+            "dropPriority": 1003,
+            "eventGroupId": 0,
+            "originalName": "サーヴァントコイン",
+            "individuality": []
+          },
+          "amount": 120
+        }
+      ]
+    }
+  ],
+  "trialQuestIds": [],
+  "ascensionImage": [],
+  "noblePhantasms": [
+    {
+      "id": 702501,
+      "num": 1,
+      "card": "2",
+      "icon": "https://static.atlasacademy.io/JP/Servants/Commands/702500/card_servant_np.png",
+      "name": "Shinsengumi",
+      "rank": "C+",
+      "ruby": "しんせんぐみ",
+      "type": "対人宝具",
+      "npNum": 2,
+      "svtId": 702500,
+      "detail": "敵単体に自身のHPが少ないほど威力の高い超強力な攻撃<オーバーチャージで威力アップ>",
+      "npGain": {
+        "np": [
+          108,
+          108,
+          108,
+          108,
+          108
+        ],
+        "arts": [
+          108,
+          108,
+          108,
+          108,
+          108
+        ],
+        "extra": [
+          108,
+          108,
+          108,
+          108,
+          108
+        ],
+        "quick": [
+          108,
+          108,
+          108,
+          108,
+          108
+        ],
+        "buster": [
+          108,
+          108,
+          108,
+          108,
+          108
+        ],
+        "defence": [
+          500,
+          500,
+          500,
+          500,
+          500
+        ]
+      },
+      "npSvts": [
+        {
+          "num": 1,
+          "card": "2",
+          "flag": 0,
+          "npNum": 2,
+          "svtId": 702500,
+          "condLv": 0,
+          "damage": [
+            6,
+            13,
+            20,
+            26,
+            35
+          ],
+          "motion": 50,
+          "priority": 101,
+          "imageIndex": 0,
+          "condQuestId": 0,
+          "condQuestPhase": 0,
+          "strengthStatus": 1,
+          "releaseConditions": [],
+          "condFriendshipRank": 0
+        }
+      ],
+      "script": {},
+      "priority": 101,
+      "functions": [
+        {
+          "buffs": [],
+          "svals": [
+            {
+              "Rate": 1000,
+              "Value": 6000,
+              "Target": 6000
+            },
+            {
+              "Rate": 1000,
+              "Value": 8000,
+              "Target": 6000
+            },
+            {
+              "Rate": 1000,
+              "Value": 9000,
+              "Target": 6000
+            },
+            {
+              "Rate": 1000,
+              "Value": 9500,
+              "Target": 6000
+            },
+            {
+              "Rate": 1000,
+              "Value": 10000,
+              "Target": 6000
+            }
+          ],
+          "funcId": 22,
+          "script": {},
+          "svals2": [
+            {
+              "Rate": 1000,
+              "Value": 6000,
+              "Target": 7000
+            },
+            {
+              "Rate": 1000,
+              "Value": 8000,
+              "Target": 7000
+            },
+            {
+              "Rate": 1000,
+              "Value": 9000,
+              "Target": 7000
+            },
+            {
+              "Rate": 1000,
+              "Value": 9500,
+              "Target": 7000
+            },
+            {
+              "Rate": 1000,
+              "Value": 10000,
+              "Target": 7000
+            }
+          ],
+          "svals3": [
+            {
+              "Rate": 1000,
+              "Value": 6000,
+              "Target": 8000
+            },
+            {
+              "Rate": 1000,
+              "Value": 8000,
+              "Target": 8000
+            },
+            {
+              "Rate": 1000,
+              "Value": 9000,
+              "Target": 8000
+            },
+            {
+              "Rate": 1000,
+              "Value": 9500,
+              "Target": 8000
+            },
+            {
+              "Rate": 1000,
+              "Value": 10000,
+              "Target": 8000
+            }
+          ],
+          "svals4": [
+            {
+              "Rate": 1000,
+              "Value": 6000,
+              "Target": 9000
+            },
+            {
+              "Rate": 1000,
+              "Value": 8000,
+              "Target": 9000
+            },
+            {
+              "Rate": 1000,
+              "Value": 9000,
+              "Target": 9000
+            },
+            {
+              "Rate": 1000,
+              "Value": 9500,
+              "Target": 9000
+            },
+            {
+              "Rate": 1000,
+              "Value": 10000,
+              "Target": 9000
+            }
+          ],
+          "svals5": [
+            {
+              "Rate": 1000,
+              "Value": 6000,
+              "Target": 10000
+            },
+            {
+              "Rate": 1000,
+              "Value": 8000,
+              "Target": 10000
+            },
+            {
+              "Rate": 1000,
+              "Value": 9000,
+              "Target": 10000
+            },
+            {
+              "Rate": 1000,
+              "Value": 9500,
+              "Target": 10000
+            },
+            {
+              "Rate": 1000,
+              "Value": 10000,
+              "Target": 10000
+            }
+          ],
+          "funcType": "damageNpHpratioLow",
+          "funcGroup": [],
+          "functvals": [],
+          "funcPopupText": "なし",
+          "funcTargetTeam": "playerAndEnemy",
+          "funcTargetType": "enemy",
+          "funcquestTvals": [],
+          "overWriteTvalsList": []
+        }
+      ],
+      "condQuestId": 0,
+      "effectFlags": [
+        "attackEnemyOne"
+      ],
+      "originalName": "不滅の誠",
+      "individuality": [
+        {
+          "id": 3000,
+          "name": "attackPhysical"
+        },
+        {
+          "id": 4002,
+          "name": "cardBuster"
+        },
+        {
+          "id": 4007,
+          "name": "cardNP"
+        },
+        {
+          "id": 4102,
+          "name": "stNP"
+        }
+      ],
+      "condQuestPhase": 0,
+      "npDistribution": [
+        6,
+        13,
+        20,
+        26,
+        35
+      ],
+      "strengthStatus": 1,
+      "unmodifiedDetail": "敵単体に自身のHPが少ないほど威力の高い超強力な攻撃[{0}]<オーバーチャージで威力アップ>",
+      "releaseConditions": []
+    },
+    {
+      "id": 702502,
+      "num": 1,
+      "card": "2",
+      "icon": "https://static.atlasacademy.io/JP/Servants/Commands/702500/card_servant_np.png",
+      "name": "Shinsengumi",
+      "rank": "C++",
+      "ruby": "しんせんぐみ",
+      "type": "対人宝具",
+      "npNum": 2,
+      "svtId": 702500,
+      "detail": "敵単体に自身のHPが少ないほど威力の高い超強力な攻撃▲<オーバーチャージで威力アップ>",
+      "npGain": {
+        "np": [
+          108,
+          108,
+          108,
+          108,
+          108
+        ],
+        "arts": [
+          108,
+          108,
+          108,
+          108,
+          108
+        ],
+        "extra": [
+          108,
+          108,
+          108,
+          108,
+          108
+        ],
+        "quick": [
+          108,
+          108,
+          108,
+          108,
+          108
+        ],
+        "buster": [
+          108,
+          108,
+          108,
+          108,
+          108
+        ],
+        "defence": [
+          500,
+          500,
+          500,
+          500,
+          500
+        ]
+      },
+      "npSvts": [
+        {
+          "num": 1,
+          "card": "2",
+          "flag": 0,
+          "npNum": 2,
+          "svtId": 702500,
+          "condLv": 0,
+          "damage": [
+            6,
+            13,
+            20,
+            26,
+            35
+          ],
+          "motion": 50,
+          "priority": 102,
+          "imageIndex": 0,
+          "condQuestId": 91702501,
+          "condQuestPhase": 2,
+          "strengthStatus": 99,
+          "releaseConditions": [],
+          "condFriendshipRank": 0
+        }
+      ],
+      "script": {},
+      "priority": 102,
+      "functions": [
+        {
+          "buffs": [],
+          "svals": [
+            {
+              "Rate": 1000,
+              "Value": 8000,
+              "Target": 8000
+            },
+            {
+              "Rate": 1000,
+              "Value": 10000,
+              "Target": 8000
+            },
+            {
+              "Rate": 1000,
+              "Value": 11000,
+              "Target": 8000
+            },
+            {
+              "Rate": 1000,
+              "Value": 11500,
+              "Target": 8000
+            },
+            {
+              "Rate": 1000,
+              "Value": 12000,
+              "Target": 8000
+            }
+          ],
+          "funcId": 22,
+          "script": {},
+          "svals2": [
+            {
+              "Rate": 1000,
+              "Value": 8000,
+              "Target": 9000
+            },
+            {
+              "Rate": 1000,
+              "Value": 10000,
+              "Target": 9000
+            },
+            {
+              "Rate": 1000,
+              "Value": 11000,
+              "Target": 9000
+            },
+            {
+              "Rate": 1000,
+              "Value": 11500,
+              "Target": 9000
+            },
+            {
+              "Rate": 1000,
+              "Value": 12000,
+              "Target": 9000
+            }
+          ],
+          "svals3": [
+            {
+              "Rate": 1000,
+              "Value": 8000,
+              "Target": 10000
+            },
+            {
+              "Rate": 1000,
+              "Value": 10000,
+              "Target": 10000
+            },
+            {
+              "Rate": 1000,
+              "Value": 11000,
+              "Target": 10000
+            },
+            {
+              "Rate": 1000,
+              "Value": 11500,
+              "Target": 10000
+            },
+            {
+              "Rate": 1000,
+              "Value": 12000,
+              "Target": 10000
+            }
+          ],
+          "svals4": [
+            {
+              "Rate": 1000,
+              "Value": 8000,
+              "Target": 11000
+            },
+            {
+              "Rate": 1000,
+              "Value": 10000,
+              "Target": 11000
+            },
+            {
+              "Rate": 1000,
+              "Value": 11000,
+              "Target": 11000
+            },
+            {
+              "Rate": 1000,
+              "Value": 11500,
+              "Target": 11000
+            },
+            {
+              "Rate": 1000,
+              "Value": 12000,
+              "Target": 11000
+            }
+          ],
+          "svals5": [
+            {
+              "Rate": 1000,
+              "Value": 8000,
+              "Target": 12000
+            },
+            {
+              "Rate": 1000,
+              "Value": 10000,
+              "Target": 12000
+            },
+            {
+              "Rate": 1000,
+              "Value": 11000,
+              "Target": 12000
+            },
+            {
+              "Rate": 1000,
+              "Value": 11500,
+              "Target": 12000
+            },
+            {
+              "Rate": 1000,
+              "Value": 12000,
+              "Target": 12000
+            }
+          ],
+          "funcType": "damageNpHpratioLow",
+          "funcGroup": [],
+          "functvals": [],
+          "funcPopupText": "なし",
+          "funcTargetTeam": "playerAndEnemy",
+          "funcTargetType": "enemy",
+          "funcquestTvals": [],
+          "overWriteTvalsList": []
+        }
+      ],
+      "condQuestId": 91702501,
+      "effectFlags": [
+        "attackEnemyOne"
+      ],
+      "originalName": "不滅の誠",
+      "individuality": [
+        {
+          "id": 3000,
+          "name": "attackPhysical"
+        },
+        {
+          "id": 4002,
+          "name": "cardBuster"
+        },
+        {
+          "id": 4007,
+          "name": "cardNP"
+        },
+        {
+          "id": 4102,
+          "name": "stNP"
+        }
+      ],
+      "condQuestPhase": 2,
+      "npDistribution": [
+        6,
+        13,
+        20,
+        26,
+        35
+      ],
+      "strengthStatus": 99,
+      "unmodifiedDetail": "敵単体に自身のHPが少ないほど威力の高い超強力な攻撃[g][o]▲[/o][/g][{0}]<オーバーチャージで威力アップ>",
+      "releaseConditions": []
+    }
+  ],
+  "relateQuestIds": [
+    91702501,
+    94053191,
+    94090450
+  ],
+  "hitsDistribution": {
+    "1": [
+      33,
+      67
+    ],
+    "2": [
+      33,
+      67
+    ],
+    "3": [
+      16,
+      33,
+      51
+    ],
+    "4": [
+      12,
+      25,
+      63
+    ]
+  },
+  "instantDeathChance": 650,
+  "originalBattleName": "土方歳三"
+}
