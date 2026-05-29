@@ -17,7 +17,7 @@ Object {
   "wave": 1,
   "waveStats": Object {
     "1": Object {
-      "damageDealt": 9315,
+      "damageDealt": 5589,
       "hpRequired": 4500,
     },
   },
@@ -41,7 +41,7 @@ Object {
   "wave": 1,
   "waveStats": Object {
     "1": Object {
-      "damageDealt": 21735,
+      "damageDealt": 13041,
       "hpRequired": 4500,
     },
   },
@@ -65,7 +65,7 @@ Object {
   "wave": 1,
   "waveStats": Object {
     "1": Object {
-      "damageDealt": 22822,
+      "damageDealt": 13693,
       "hpRequired": 4500,
     },
   },
@@ -80,7 +80,7 @@ Object {
     "1": Array [
       Object {
         "collectionNo": 1001,
-        "npGauge": 18,
+        "npGauge": 15.8,
         "slot": 0,
       },
       Object {
@@ -99,7 +99,7 @@ Object {
   "wave": 2,
   "waveStats": Object {
     "1": Object {
-      "damageDealt": 9315,
+      "damageDealt": 5589,
       "hpRequired": 4500,
     },
     "2": Object {
@@ -137,7 +137,7 @@ Object {
   "wave": 2,
   "waveStats": Object {
     "1": Object {
-      "damageDealt": 12110,
+      "damageDealt": 7266,
       "hpRequired": 4500,
     },
     "2": Object {
@@ -157,7 +157,7 @@ Object {
   "wave": 1,
   "waveStats": Object {
     "1": Object {
-      "damageDealt": 15525,
+      "damageDealt": 9315,
       "hpRequired": 4500,
     },
   },
@@ -191,7 +191,7 @@ Object {
   "wave": 2,
   "waveStats": Object {
     "1": Object {
-      "damageDealt": 13973,
+      "damageDealt": 8384,
       "hpRequired": 4500,
     },
     "2": Object {
@@ -245,7 +245,7 @@ Object {
   "wave": 2,
   "waveStats": Object {
     "1": Object {
-      "damageDealt": 13414,
+      "damageDealt": 8048,
       "hpRequired": 4500,
     },
     "2": Object {
@@ -264,7 +264,7 @@ Object {
     "1": Array [
       Object {
         "collectionNo": 1001,
-        "npGauge": 18,
+        "npGauge": 15.8,
         "slot": 0,
       },
       Object {
@@ -283,7 +283,7 @@ Object {
   "wave": 2,
   "waveStats": Object {
     "1": Object {
-      "damageDealt": 11178,
+      "damageDealt": 6707,
       "hpRequired": 4500,
     },
     "2": Object {
@@ -302,7 +302,7 @@ Object {
     "1": Array [
       Object {
         "collectionNo": 1001,
-        "npGauge": 18,
+        "npGauge": 15.8,
         "slot": 0,
       },
       Object {
@@ -321,7 +321,7 @@ Object {
   "wave": 2,
   "waveStats": Object {
     "1": Object {
-      "damageDealt": 9315,
+      "damageDealt": 5589,
       "hpRequired": 4500,
     },
     "2": Object {
@@ -350,7 +350,7 @@ Object {
       },
       Object {
         "collectionNo": 1004,
-        "npGauge": 18,
+        "npGauge": 15.8,
         "slot": 2,
       },
     ],
@@ -359,7 +359,7 @@ Object {
   "wave": 2,
   "waveStats": Object {
     "1": Object {
-      "damageDealt": 9315,
+      "damageDealt": 5589,
       "hpRequired": 4500,
     },
     "2": Object {
