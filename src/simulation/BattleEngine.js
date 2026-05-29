@@ -492,8 +492,9 @@ export class BattleEngine {
     );
 
     let seMod = 1;
-    let isSe = (npCorrTarget && target.traits.includes(npCorrTarget)) ? 1 : 0;
     if (npCorrId) {
+      // damageNpIndividualSum (+ Super Aoko bullets): bonus scales with the
+      // count of matching TargetList traits / magic bullets.
       const ids = Array.isArray(npCorrId) ? npCorrId : [npCorrId];
       if (npCorrTarget === 1) {
         for (const id of ids) seMod += npCorr * target.traits.filter(t => t === id).length;
@@ -501,8 +502,16 @@ export class BattleEngine {
         const bullets = Math.min(10, servant.buffs.buffs.filter(b => b.buff === 'Magic Bullet').length);
         seMod += bullets * npCorr;
       }
+    } else if (npCorrTarget && npCorr > 1 && target.traits.includes(npCorrTarget)) {
+      // damageNpIndividual / damageNpStateIndividualFix: flat super-effective
+      // multiplier (Correction/1000, e.g. 1500 -> x1.5) when the target carries
+      // the single Target trait. This bonus was previously READ but never
+      // applied — seMod only grew inside `if (npCorrId)`, which is null for the
+      // single-trait form — so SE NPs (Kukulkan vs Earth trait 201, etc.)
+      // silently dealt base damage with no super-effective bonus.
+      seMod = npCorr;
     }
-    if (seMod > 1) isSe = 1;
+    const isSe = seMod > 1 ? 1 : 0;
 
     const dist = servant.nps.getNpdist(newId);
     const formula = (
