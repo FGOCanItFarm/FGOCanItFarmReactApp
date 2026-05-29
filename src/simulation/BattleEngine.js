@@ -2,6 +2,8 @@ import { Servant }    from './Servant.js';
 import { Quest }      from './Quest.js';
 import { MysticCode } from './MysticCode.js';
 import { classTraitByName } from './gameData.js';
+import { getEffectHandler } from './effectRegistry.js';
+import { applySkillTransform } from './transforms.js';
 
 // Injected at the start of every NP that has extra gauge above 100%
 const NP_OC_1_TURN = {
@@ -177,14 +179,16 @@ export class BattleEngine {
     const tvals  = buff.tvals || [];
     const hasName = buff.name && buff.name !== 'Unknown';
     const state = {
-      type:      'buff',
-      buff_name: hasName ? buff.name : (buff.type || 'Unknown'),
-      buff_type: buff.type,
-      functvals: hasName ? (effect.functvals || []) : (tvals[0]?.id ?? 'Unknown'),
+      type:           'buff',
+      buff_name:      hasName ? buff.name : (buff.type || 'Unknown'),
+      buff_type:      buff.type,
+      functvals:      hasName ? (effect.functvals || []) : (tvals[0]?.id ?? 'Unknown'),
       tvals,
-      value:     svals.Value || 0,
-      turns:     svals.Turn  || 0,
-      count:     svals.Count ?? -1,
+      value:          svals.Value || 0,
+      turns:          svals.Turn  || 0,
+      count:          svals.Count ?? -1,
+      script:         buff.script,
+      originalScript: buff.originalScript,
     };
 
     // tdTypeChange* (BB Dubai S3, etc.): if the parent skill carried a
@@ -236,7 +240,7 @@ export class BattleEngine {
 
     for (const target of targets) {
       if (!checkCond(target)) continue;
-      const handler = EFFECT_HANDLERS[effect.funcType];
+      const handler = getEffectHandler(effect.funcType);
       if (handler) handler(this, effect, target);
     }
   }
@@ -254,6 +258,8 @@ export class BattleEngine {
       targetClassId:    state.targetClassId,
       targetClassTrait: state.targetClassTrait,
       targetNpId:       state.targetNpId,
+      script:           state.script,
+      originalScript:   state.originalScript,
     });
   }
 
@@ -269,19 +275,10 @@ export class BattleEngine {
     const num = skillNum + 1; // convert to 1-based
     if (!servant.skills.skillAvailable(num)) return false;
 
-    // Mash Holy Sword S2 ("Purple Bullet…"): while "聖剣装填" is loaded her S2 is a
-    // DIFFERENT skill than Atlas's base S2 (which Atlas does not even expose in
-    // the trimmed data). It converts crit stars into NP charge (stars × 4%,
-    // capped at 50 stars → up to 200%) and grants +100% NP strength for 3 turns.
-    // Stars aren't modeled by the engine; assume a reasonable 50 in hand. The
-    // base-S2 effects are intentionally skipped. (Contained special case — FR-5.)
-    if (servant.id === 1 && num === 2 && servant.buffs.buffs.some(b => typeof b.type === 'string' && b.type.startsWith('tdTypeChange'))) {
-      servant.skills.setSkillCooldown(num);
-      const assumedStars = 50;
-      servant.stats.setNpgauge(Math.min(assumedStars, 50) * 4); // +(stars × 4%) NP
-      this.applyBuff(servant, { buff_name: 'NP Strength Up', value: 1000, turns: 3, functvals: [], tvals: [] });
-      return true;
-    }
+    // Consult the transform registry for servants with in-battle state overrides
+    // (e.g. Mash S2 while 「聖剣装填」 is loaded). If an override fires, skip the
+    // Atlas function list for this use — the registry handler is authoritative.
+    if (applySkillTransform(this, servant, num)) return true;
 
     const skill = servant.skills.getSkillByNum(num);
     servant.skills.setSkillCooldown(num);
@@ -389,7 +386,7 @@ export class BattleEngine {
       : this.enemies.reduce((best, e) => (e.hp > best.hp ? e : best), this.enemies[0]);
 
     for (const func of functions) {
-      if (['damageNp', 'damageNpPierce'].includes(func.funcType)) {
+      if (['damageNp', 'damageNpPierce', 'damageNpHpratioLow'].includes(func.funcType)) {
         servant.buffs.processServantBuffs();
         if (func.funcTargetType === 'enemyAll') {
           for (const e of this.enemies) { e.buffs.processEnemyBuffs(); this._applyNpDamage(servant, e, activeNpId, npCardType); }
@@ -451,11 +448,16 @@ export class BattleEngine {
     };
   }
 
-  // Class-advantage multiplier, honouring a 90** enemy vulnerability override
-  // (e.g. Anti-Saber Defense Vulnerability: Saber attackers deal 5× not 2×).
+  // Class-advantage multiplier. Precedence:
+  //   1. Servant-side overwriteClassRelation buff (Kiara Nega-Saver, Kama, etc.)
+  //   2. Enemy-side classAdvantageMod (90** Anti-X vulnerability)
+  //   3. Default class matrix
   _classMultiplier(servant, target) {
-    const override = target.getClassAdvantageMod?.(servant.className);
-    return override != null ? override : servant.stats.getClassMultiplier(target.getClass());
+    const defClass = target.getClass();
+    const servantOverride = servant.classRelationOverrides?.[defClass];
+    if (servantOverride != null) return servantOverride;
+    const enemyOverride = target.getClassAdvantageMod?.(servant.className);
+    return enemyOverride != null ? enemyOverride : servant.stats.getClassMultiplier(defClass);
   }
 
   _applyNpDamage(servant, target, newId = null, cardType = servant.nps.card) {
@@ -465,7 +467,8 @@ export class BattleEngine {
     const [npDamageMultiplier] = servant.nps.getNpDamageValues(
       servant.stats.getOcLevel(), servant.stats.getNpLevel(), newId
     );
-    const total = (
+    const dist = servant.nps.getNpdist(newId);
+    const formula = (
       servant.stats.getBaseAtk() * npDamageMultiplier *
       cardDamageValue * (1 + cardDamageMod - enemyResMod) *
       this._classMultiplier(servant, target) *
@@ -473,10 +476,11 @@ export class BattleEngine {
       (1 + servant.stats.getAtkMod() - target.getDef()) *
       (1 + servant.stats.getNpDamageMod() + servant.stats.getPowerMod(target))
     ) * this.damageMultiplier;
+    const total = formula + (servant.flatDamageMod ?? 0) * dist.length;
 
     this.recordNpDamage(this.wave, total);
     this._recordEnemyStat(target, 'damageTaken', total);
-    this._distributeHits(servant, target, total, cardType, cardNpValue, cardEffMod, newId);
+    this._distributeHits(servant, target, total, cardType, cardNpValue, cardEffMod, newId, dist);
   }
 
   _applyNpOddDamage(servant, target, newId = null, cardType = servant.nps.card) {
@@ -500,7 +504,8 @@ export class BattleEngine {
     }
     if (seMod > 1) isSe = 1;
 
-    const total = (
+    const dist = servant.nps.getNpdist(newId);
+    const formula = (
       servant.stats.getBaseAtk() * npMult *
       cardDamageValue * (1 + cardDamageMod - enemyResMod) *
       this._classMultiplier(servant, target) *
@@ -509,18 +514,19 @@ export class BattleEngine {
       (1 + servant.stats.getNpDamageMod() + servant.stats.getPowerMod(target)) *
       (1 + (isSe ? seMod - 1 : 0))
     ) * this.damageMultiplier;
+    const total = formula + (servant.flatDamageMod ?? 0) * dist.length;
 
     this.recordNpDamage(this.wave, total);
     this._recordEnemyStat(target, 'damageTaken', total);
-    this._distributeHits(servant, target, total, cardType, cardNpValue, cardEffMod, newId);
+    this._distributeHits(servant, target, total, cardType, cardNpValue, cardEffMod, newId, dist);
   }
 
   /** Spread total damage across NP hit distribution, apply NP refund per hit. */
-  _distributeHits(servant, target, totalDamage, cardType, cardNpValue, cardEffMod, newId = null) {
+  _distributeHits(servant, target, totalDamage, cardType, cardNpValue, cardEffMod, newId = null, dist = null) {
     // Use the FIRED NP's gain + hit distribution (not the default last NP) so an
     // NP swap (e.g. Mash's Holy Sword) refunds and distributes against the right NP.
     const npGain  = servant.nps.getNpgain(cardType, newId) * servant.stats.getNpGainMod();
-    const dist    = servant.nps.getNpdist(newId);
+    if (!dist) dist = servant.nps.getNpdist(newId);
     const perHit  = dist.map(v => totalDamage * v / 100);
     let cumulative = 0;
     for (let i = 0; i < dist.length; i++) {
@@ -533,45 +539,7 @@ export class BattleEngine {
   }
 }
 
-// ─── Dispatch table for effect funcTypes ──────────────────────────────────────
-// Probabilistic skill effects (`svals.Rate < 1000`) are treated as full
-// uptime: addState / addStateShort / gainNp / shortenSkill all apply
-// unconditionally, ignoring Rate. This matches the player's expected
-// best-case (e.g. Space Ishtar S3 「Multiple Sterling EX」 — Arts/Buster/Quick
-// Up at 80% chance — assumed to always land, so the +20% buff is fully
-// active for the planned 3-turn window). Star-conditional skills follow the
-// same policy: Mash S2 「Purple Bullet」 assumes 50 stars in hand (see
-// useSkill above); future star-based choosers (Kukulkan etc.) should
-// likewise assume max-stars rather than expose a player choice.
-// `instantDeath` is the lone Rate-checked handler because it derives the
-// outcome flag the rest of the engine reads.
-const EFFECT_HANDLERS = {
-  addState:      (eng, eff, tgt) => eng.applyBuff(tgt, eng.extractState(eff)),
-  addStateShort: (eng, eff, tgt) => eng.applyBuff(tgt, eng.extractState(eff)),
-
-  gainNp: (eng, eff, tgt) => {
-    const { value } = eng.extractState(eff);
-    if (value) tgt.setNpgauge(value / 100);
-  },
-
-  shortenSkill: (eng, eff, tgt) => {
-    const val = (Array.isArray(eff.svals) ? eff.svals[0] : eff.svals)?.Value ?? 0;
-    tgt.skills.decrementCooldowns(val);
-  },
-
-  addFieldChangeToField: (eng, eff) => {
-    eng.addField(eng.extractState(eff));
-  },
-
-  transformServant: () => {},  // Handled per-servant inside useNp
-
-  gainMultiplyNp: (eng, eff, tgt) => tgt.setNpgauge(tgt.getNpgauge()),
-
-  forceInstantDeath: (eng, eff, tgt) => { tgt.kill = true; },
-
-  instantDeath: (eng, eff, tgt) => {
-    const rate   = (Array.isArray(eff.svals) ? eff.svals[0] : eff.svals)?.Rate ?? 0;
-    const chance = rate / 1000;
-    if (chance * (tgt.deathRate / 1000) > 0.5) tgt.setHp(tgt.hp);
-  },
-};
+// Handlers live in effectRegistry.js; imported at top of file via getEffectHandler.
+// Rate policy: addState / addStateShort / gainNp / shortenSkill all apply
+// unconditionally (full-uptime assumption for planning). `instantDeath` is the
+// lone Rate-checked handler because it derives the outcome flag the engine reads.

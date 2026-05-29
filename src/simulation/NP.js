@@ -142,6 +142,13 @@ export class NP {
         const sval = NP.safeSvalAtLevel(func, oc, npLevel);
         return [(sval.Value ?? 0) / 1000, null, null, null, null];
       }
+      // HP-ratio scaling NP (Hijikata, Anne B&M, Aśvatthāman): damage increases as
+      // own HP decreases. The engine does not track servant HP, so we use the
+      // Value/1000 fixed baseline (= damage at 100% HP). Owner-approved approximation.
+      if (func.funcType === 'damageNpHpratioLow') {
+        const sval = NP.safeSvalAtLevel(func, oc, npLevel);
+        return [(sval.Value ?? 0) / 1000, null, null, null, null];
+      }
       if (['damageNpIndividual', 'damageNpStateIndividualFix'].includes(func.funcType)) {
         const sval = NP.safeSvalAtLevel(func, 1, npLevel);
         return [

@@ -83,6 +83,8 @@ export class Buffs {
     s.busterCardDamageUp = s.userBusterDamageUp;
     s.artsCardDamageUp  = s.userArtsDamageUp;
     s.quickCardDamageUp = s.userQuickDamageUp;
+    s.flatDamageMod         = 0;
+    s.classRelationOverrides = {};
 
     let boostNpStrengthUpActive = false;
 
@@ -124,6 +126,22 @@ export class Buffs {
               for (const tval of (buff.tvals || [])) {
                 if (!(tval in s.powerMod)) s.powerMod[tval] = 0;
                 s.powerMod[tval] += buff.value || 0;
+              }
+            } else if (buff.type === 'addDamage' || buff.type === 'addSelfdamage') {
+              // Flat per-hit damage bonus (Damage Plus, Divinity passives).
+              // Accumulated raw (FGO units) — _applyNpDamage adds × numHits.
+              s.flatDamageMod += buff.value || 0;
+            } else if (buff.type === 'overwriteClassRelation') {
+              // Class affinity override (Kiara Nega-Saver, Semiramis, Kama, etc.).
+              // script.relationId.atkSide[servantClass][defenderClass].damageRate
+              // gives the forced multiplier (÷ 1000). Only the entries for THIS
+              // servant's current className are applied; other attacker-class rows
+              // (carried for other class-states) are ignored.
+              const atkSide = buff.script?.relationId?.atkSide?.[s.className] ?? {};
+              for (const [defClass, entry] of Object.entries(atkSide)) {
+                if (entry?.damageRate != null) {
+                  s.classRelationOverrides[defClass] = entry.damageRate / 1000;
+                }
               }
             }
             // NOTE: per-turn NP gain ("Triggers Each Turn …", "NP Gain Each
