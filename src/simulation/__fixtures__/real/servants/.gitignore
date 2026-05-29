@@ -1,0 +1,12 @@
+# Ignore bulk-downloaded servant fixtures — only committed examples are tracked.
+*.json
+!1.json
+!16.json
+!150.json
+!280.json
+!314.json
+!316.json
+!373.json
+!421.json
+!426.json
+!461.json
