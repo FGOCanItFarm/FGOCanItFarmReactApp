@@ -3,6 +3,7 @@ import { Quest }      from './Quest.js';
 import { MysticCode } from './MysticCode.js';
 import { classTraitByName } from './gameData.js';
 import { getEffectHandler } from './effectRegistry.js';
+import { applySkillTransform } from './transforms.js';
 
 // Injected at the start of every NP that has extra gauge above 100%
 const NP_OC_1_TURN = {
@@ -274,19 +275,10 @@ export class BattleEngine {
     const num = skillNum + 1; // convert to 1-based
     if (!servant.skills.skillAvailable(num)) return false;
 
-    // Mash Holy Sword S2 ("Purple Bullet…"): while "聖剣装填" is loaded her S2 is a
-    // DIFFERENT skill than Atlas's base S2 (which Atlas does not even expose in
-    // the trimmed data). It converts crit stars into NP charge (stars × 4%,
-    // capped at 50 stars → up to 200%) and grants +100% NP strength for 3 turns.
-    // Stars aren't modeled by the engine; assume a reasonable 50 in hand. The
-    // base-S2 effects are intentionally skipped. (Contained special case — FR-5.)
-    if (servant.id === 1 && num === 2 && servant.buffs.buffs.some(b => typeof b.type === 'string' && b.type.startsWith('tdTypeChange'))) {
-      servant.skills.setSkillCooldown(num);
-      const assumedStars = 50;
-      servant.stats.setNpgauge(Math.min(assumedStars, 50) * 4); // +(stars × 4%) NP
-      this.applyBuff(servant, { buff_name: 'NP Strength Up', value: 1000, turns: 3, functvals: [], tvals: [] });
-      return true;
-    }
+    // Consult the transform registry for servants with in-battle state overrides
+    // (e.g. Mash S2 while 「聖剣装填」 is loaded). If an override fires, skip the
+    // Atlas function list for this use — the registry handler is authoritative.
+    if (applySkillTransform(this, servant, num)) return true;
 
     const skill = servant.skills.getSkillByNum(num);
     servant.skills.setSkillCooldown(num);
