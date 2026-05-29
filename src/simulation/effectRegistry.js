@@ -31,34 +31,35 @@ registerEffect('gainNp', (eng, eff, tgt) => {
   if (value) tgt.setNpgauge(value / 100);
 });
 
-// Charges own NP proportional to count(living allies whose traits include Value2).
-// Used by: Kazuradrop (Sakura-type allies), Kurohime, Miyu (Illya-type allies).
-// svals: { Value: chargePerMatch (× 0.01% per unit), Value2: traitId to match }
+// Charges own NP proportional to count(living allies), capped at Value2.
+// GainNpTargetPassiveIndividuality:1 is a boolean flag meaning "use passive
+// individuality filter" — the faction filter (Illya, Sakura series, etc.) is
+// not resolvable from trimmed servant data. We count ALL living servants and
+// cap at Value2, which gives the correct maximum for a full faction team.
+// Used by: Kazuradrop (Sakura-type), Kurohime, Miyu (Illya-type).
+// svals: { Value: chargePerAlly (× 0.01%), Value2: max ally count cap }
 registerEffect('gainNpTargetSum', (eng, eff, tgt) => {
-  const svals = Array.isArray(eff.svals) ? eff.svals[0] : eff.svals ?? {};
-  const chargePerMatch = (svals.Value ?? 0) / 100;
-  const traitId        = svals.Value2 ?? null;
-  if (!chargePerMatch) return;
-  const count = traitId != null
-    ? eng.servants.filter(s => s.traits.includes(Number(traitId))).length
-    : eng.servants.length;
-  tgt.setNpgauge(chargePerMatch * count);
+  const svals        = Array.isArray(eff.svals) ? eff.svals[0] : eff.svals ?? {};
+  const chargeEach   = (svals.Value ?? 0) / 100;
+  const maxCount     = svals.Value2 ?? Infinity;
+  if (!chargeEach) return;
+  const count = Math.min(eng.servants.filter(s => !s.kill).length, maxCount);
+  tgt.setNpgauge(chargeEach * count);
 });
 
-// Charges own NP proportional to count(matching individuality traits on target enemy).
+// Charges own NP proportional to count(matching individuality traits on living enemies).
 // Used by: Elisabeth (Halloween/base), MHXX Alter.
-// svals: { Value: chargePerTrait (× 0.01%), Value2: traitId to count on target }
+// svals: { Value: chargePerTrait (× 0.01%), Value2: traitId to count on enemies }
 registerEffect('gainNpIndividualSum', (eng, eff, tgt) => {
-  const svals = Array.isArray(eff.svals) ? eff.svals[0] : eff.svals ?? {};
-  const chargePerTrait = (svals.Value ?? 0) / 100;
-  const traitId        = svals.Value2 ?? null;
-  if (!chargePerTrait) return;
-  // Count the trait on each living enemy (can stack if an enemy has it multiple times)
+  const svals        = Array.isArray(eff.svals) ? eff.svals[0] : eff.svals ?? {};
+  const chargeEach   = (svals.Value ?? 0) / 100;
+  const traitId      = svals.Value2 ?? null;
+  if (!chargeEach) return;
   let count = 0;
   for (const enemy of eng.enemies) {
     if (enemy.hp > 0) count += enemy.traits.filter(t => t === Number(traitId)).length;
   }
-  tgt.setNpgauge(chargePerTrait * count);
+  tgt.setNpgauge(chargeEach * count);
 });
 
 // Charges own NP proportional to count(own active buffs, regardless of type).
