@@ -132,6 +132,10 @@ export function summarizeEngine(engine) {
       ])
     ),
     stats: { waves, overall_clear_probability },
+    // Verbose runtime trace (wave rosters + per-NP damage breakdowns). Display /
+    // debugging only — deliberately OUTSIDE stats.waves so submit_run never
+    // persists it. Absent on engines built before the trace existed.
+    debug: engine.trace ?? [],
   };
 }
 

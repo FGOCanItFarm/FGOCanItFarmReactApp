@@ -13,6 +13,9 @@ const NP_OC_1_TURN = {
   buffs: [{ name: 'Overcharge Lv. Up', functvals: '', tvals: [], svals: null, value: 0, turns: 1 }],
 };
 
+// Round to 3 decimals for the (display-only) verbose damage trace.
+const round3 = (n) => Math.round((n + Number.EPSILON) * 1000) / 1000;
+
 export class BattleEngine {
   /**
    * @param {Array<{rawData: object, opts: object}>} servantDataList
@@ -38,6 +41,10 @@ export class BattleEngine {
     this.waveStats   = {};
     this.questCleared       = false;
     this.servantsAtWaveEnd  = {};
+    // Runtime-only verbose trace (wave rosters + per-NP damage breakdowns).
+    // NEVER persisted — summarizeEngine exposes it as result.debug, outside the
+    // stats.waves blob that submit_run stores. Regenerated on every run.
+    this.trace = [];
 
     this._recordInitialWaveHp();
     this._syncFields();
@@ -70,6 +77,15 @@ export class BattleEngine {
     this.waveStats[this.wave].enemies = this.enemies.map((e, i) => ({
       index: i, name: e.name, maxHp: e.maxHp, damageTaken: 0, npRefund: 0,
     }));
+    // Verbose trace: full enemy roster incl. class / attribute / traits (these
+    // stay out of the persisted per_enemy stats).
+    this.trace.push({
+      type: 'wave', wave: this.wave,
+      enemies: this.enemies.map((e, i) => ({
+        index: i, name: e.name, className: e.getClass?.() ?? e.className,
+        attribute: e.attribute, maxHp: e.maxHp, traits: [...(e.traits || [])],
+      })),
+    });
   }
 
   recordNpDamage(wave, damage) {
@@ -481,6 +497,16 @@ export class BattleEngine {
     this.recordNpDamage(this.wave, total);
     this._recordEnemyStat(target, 'damageTaken', total);
     this._distributeHits(servant, target, total, cardType, cardNpValue, cardEffMod, newId, dist);
+    this._traceNp(servant, target, cardType, total, dist, {
+      baseAtk: Math.round(servant.stats.getBaseAtk()), npMult: npDamageMultiplier,
+      card: cardDamageValue, cardMod: round3(cardDamageMod - enemyResMod),
+      classAdv: this._classMultiplier(servant, target),
+      attribute: servant.stats.getAttributeModifier(target),
+      atkMod: round3(servant.stats.getAtkMod()), npDmgMod: round3(servant.stats.getNpDamageMod()),
+      powerMod: round3(servant.stats.getPowerMod(target)),
+      superEffective: 1, flatDamage: servant.flatDamageMod ?? 0,
+      rollMultiplier: this.damageMultiplier,
+    });
   }
 
   _applyNpOddDamage(servant, target, newId = null, cardType = servant.nps.card) {
@@ -528,6 +554,30 @@ export class BattleEngine {
     this.recordNpDamage(this.wave, total);
     this._recordEnemyStat(target, 'damageTaken', total);
     this._distributeHits(servant, target, total, cardType, cardNpValue, cardEffMod, newId, dist);
+    this._traceNp(servant, target, cardType, total, dist, {
+      baseAtk: Math.round(servant.stats.getBaseAtk()), npMult,
+      card: cardDamageValue, cardMod: round3(cardDamageMod - enemyResMod),
+      classAdv: this._classMultiplier(servant, target),
+      attribute: servant.stats.getAttributeModifier(target),
+      atkMod: round3(servant.stats.getAtkMod()), npDmgMod: round3(servant.stats.getNpDamageMod()),
+      powerMod: round3(servant.stats.getPowerMod(target)),
+      superEffective: isSe ? round3(seMod) : 1, flatDamage: servant.flatDamageMod ?? 0,
+      rollMultiplier: this.damageMultiplier,
+    });
+  }
+
+  /** Push one verbose per-NP damage-breakdown entry onto the runtime trace. */
+  _traceNp(servant, target, cardType, total, dist, breakdown) {
+    this.trace.push({
+      type: 'np', wave: this.wave,
+      servant: { collectionNo: servant.id, name: servant.name, className: servant.className },
+      card: cardType,
+      target: { index: this.enemies.indexOf(target), name: target.name, traits: [...(target.traits || [])] },
+      total: Math.round(total),
+      perHit: (dist || []).map(v => Math.round(total * v / 100)),
+      breakdown,
+      activeBuffs: servant.buffs.buffs.map(b => ({ name: b.buff, value: b.value, turns: b.turns })),
+    });
   }
 
   /** Spread total damage across NP hit distribution, apply NP refund per hit. */

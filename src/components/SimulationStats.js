@@ -141,6 +141,60 @@ const WaveCard = ({ waveNum, wave, servants }) => {
   );
 };
 
+// Render the runtime verbose trace (result.debug) as a copy-pasteable text log:
+// per-wave enemy rosters (class / attribute / traits) and per-NP damage
+// breakdowns (every multiplier, per-hit damage, active buffs). Generated each
+// run, never stored — handy for debugging a non-clear and for bug reports.
+const formatTrace = (debug) => {
+  const lines = [];
+  for (const e of debug) {
+    if (e.type === 'wave') {
+      lines.push(`── Wave ${e.wave} ──`);
+      for (const en of e.enemies) {
+        lines.push(`  [${en.index}] ${en.name} · ${en.className || '?'} · ${en.attribute || '?'} · HP ${fmtNum(en.maxHp)} · traits [${(en.traits || []).join(', ')}]`);
+      }
+    } else if (e.type === 'np') {
+      const b = e.breakdown || {};
+      lines.push(`▸ W${e.wave} ${e.servant.name} [${e.servant.className}] NP (${e.card}) → ${e.target.name}`);
+      lines.push(`    total ${fmtNum(e.total)} · perHit [${(e.perHit || []).map(fmtNum).join(', ')}]`);
+      lines.push(`    ATK ${fmtNum(b.baseAtk)} × npMult ${b.npMult} × card ${b.card} × class ${b.classAdv} × attr ${b.attribute} × SE ${b.superEffective} × roll ${b.rollMultiplier}`);
+      lines.push(`    +mods: atkMod ${b.atkMod} · npDmg ${b.npDmgMod} · power ${b.powerMod} · cardMod ${b.cardMod}${b.flatDamage ? ` · flat ${fmtNum(b.flatDamage)}` : ''}`);
+      const buffs = (e.activeBuffs || []).filter(x => x.name);
+      lines.push(`    buffs: ${buffs.length ? buffs.map(x => `${x.name}(${x.value}${x.turns >= 0 ? `,${x.turns}t` : ''})`).join(', ') : '—'}`);
+    }
+  }
+  return lines.join('\n');
+};
+
+const DebugLog = ({ debug }) => {
+  const [open, setOpen] = React.useState(false);
+  if (!debug || debug.length === 0) return null;
+  const npCount = debug.filter(e => e.type === 'np').length;
+  return (
+    <Box mt={2}>
+      <Box
+        onClick={() => setOpen(o => !o)}
+        sx={{ cursor: 'pointer', userSelect: 'none', display: 'flex', alignItems: 'center', gap: 0.5 }}
+      >
+        {open ? <ExpandLessIcon fontSize="small" /> : <ExpandMoreIcon fontSize="small" />}
+        <Typography variant="subtitle2">Detailed run log ({npCount} NP hit{npCount === 1 ? '' : 's'})</Typography>
+      </Box>
+      <Collapse in={open}>
+        <Box
+          component="pre"
+          sx={{
+            fontFamily: 'monospace', fontSize: '0.72rem', whiteSpace: 'pre-wrap', m: 0, mt: 1,
+            p: 1.5, borderRadius: 1, maxHeight: 480, overflow: 'auto',
+            backgroundColor: 'var(--color-surface-2)', color: 'var(--color-text)',
+          }}
+        >
+          {formatTrace(debug)}
+        </Box>
+      </Collapse>
+    </Box>
+  );
+};
+
 const SimulationStats = ({ result }) => {
   if (!result) return null;
 
@@ -170,6 +224,7 @@ const SimulationStats = ({ result }) => {
     servants_at_wave_end,
     failed_token_count,
     first_failed_token,
+    debug,
   } = result;
 
   const waves = stats?.waves || {};
@@ -214,6 +269,8 @@ const SimulationStats = ({ result }) => {
           {first_failed_token ? ` — first: "${first_failed_token}"` : ''}
         </Typography>
       )}
+
+      <DebugLog debug={debug} />
     </Box>
   );
 };
