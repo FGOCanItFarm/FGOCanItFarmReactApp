@@ -246,8 +246,13 @@ export async function resimulateSavedRun(run) {
   const team = Array.from({ length: 6 }, (_, i) => ({
     collectionNo: colls[i] != null ? String(colls[i]) : '',
   }));
+  // FR-11: restore the persisted per-servant effect inputs (attack / charge /
+  // buffs) so the NPs charge and the token string reproduces. Falls back to
+  // np_levels only for legacy rows submitted before servant_effects existed.
+  const effects = Array.isArray(run.servant_effects) ? run.servant_effects : [];
   const servantEffects = Array.from({ length: 6 }, (_, i) => ({
-    np: Number(run.np_levels?.[i] ?? 1),
+    ...(effects[i] || {}),
+    np: Number(effects[i]?.np ?? run.np_levels?.[i] ?? 1),
   }));
 
   const { data: qRow, error: qErr } = await supabase

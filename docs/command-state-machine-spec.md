@@ -404,6 +404,45 @@ LATER optimization servants "graduate" into, not a prerequisite.
 
 ---
 
+## 11. Post-FR-9 backlog (new feature requests)
+
+Priority order set by owner: **FR-11 → FR-10 → FR-12.** FR-13 deferred.
+
+### FR-10 Enemy-targeting UI (enemy picker)
+Command Input must let the user pick **which enemy** a single-target skill/NP
+hits, emitting the existing `~N` (skill) / `eN` (NP) grammar. Default to the
+highest-HP living enemy when unpicked. The engine already supports this:
+FR-4 grammar + `applyEffect`'s highest-HP default for `funcTargetType:'enemy'`
++ `_highestHpEnemy()`. UI must handle up to ~9 enemies on a stage and show each
+enemy's HP (the dashboard already renders HP bars). Motivating case: Kazuradrop
+needs her two DEF-downs spread across the two big wave-3 enemies (`c~2 f~1`).
+
+### FR-11 Persist servant effects in saved_runs (re-sim fix) — DO FIRST
+`resimulateSavedRun` rebuilds the team from `np_levels` only, dropping each
+servant's `attack` / `initialCharge` / buff inputs — so the saved run's NPs
+can't charge and `Driver.run` returns false. This is the "Re-sim error:
+invalid token sequence or skill error" seen on Community Runs. Fix: store the
+per-servant effects on submit (new `saved_runs.servant_effects` jsonb +
+migration + `submit_run` arg + `App.handleSubmitRun`), and restore them in
+`resimulateSavedRun`. Backfill the seeded examples. Also make the saved-runs
+page less cumbersome to browse.
+
+### FR-12 Command Input layout rework
+The Mystic Code controls consume too much horizontal space; rework the layout
+so the combat/enemy view has room. Keep the dark theme and existing features.
+
+### FR-13 (deferred) Quest enemy-spawn variations (hashes)
+A quest id has several **randomly-chosen** enemy layouts
+(`data.availableEnemyHashes`); e.g. 94095710 has 4 hashes — some give wave 2 six
+enemies (~80k HP), others four. We currently store one hash. Eventually capture
+all hashes per quest and let a run target/declare the variation. Not now.
+
+### Engine modeling landed for these (FR-5 family, done)
+Kazuradrop same-class STR up (enemy class-trait injection), default-highest-HP
+enemy targeting, "Buff Regeneration" per-turn quick-resist-down re-apply.
+
+---
+
 ## 10. Open questions for the owner
 - Enemy-target delimiter preference (e.g., `4e2` for NP, `a~2` for skills)?
 - Choice-effect dispatch: in scope for this work, or a separate task?

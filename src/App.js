@@ -230,6 +230,9 @@ const App = () => {
     const p_quest_id = selectedQuest?.id ?? null;
     const p_wave_results = simulationResult?.stats?.waves ?? {};
     const p_mystic_code_id = selectedMysticCode?.id ?? null;
+    // FR-11: persist each filled slot's effect inputs (attack / initialCharge /
+    // card & NP buffs) so resimulateSavedRun can reproduce the run.
+    const p_servant_effects = filledSlots.map(({ index }) => servantEffects[index] || {});
 
     const { error } = await supabase.rpc('submit_run', {
       p_quest_id,
@@ -239,6 +242,7 @@ const App = () => {
       p_token_string,
       p_wave_results,
       p_mystic_code_id,
+      p_servant_effects,
     });
 
     if (error) return { success: false, error: error.message };
