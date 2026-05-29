@@ -285,6 +285,12 @@ lookups. Caveat: MCP results flow into the model's context, so don't pull large
 `data` blobs (servants/quests) through it — `curl` PostgREST to a file, or rely
 on the trimmed rows.
 
+Schema changes live in `supabase/migrations/` (applied by hand in numeric order —
+see `supabase/README.md`). The DB is **not** CLI-linked, so a committed migration
+is not necessarily deployed; verify with the SQL checks in that README before
+assuming a table/RPC exists. FR-9 run submission + bug reports require migration
+`004`.
+
 ## Data Blob Trimming (sync pipeline)
 
 `shared/atlasSync.js` trims each `data` blob before upsert so the engine gets
