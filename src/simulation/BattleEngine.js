@@ -2,6 +2,7 @@ import { Servant }    from './Servant.js';
 import { Quest }      from './Quest.js';
 import { MysticCode } from './MysticCode.js';
 import { classTraitByName } from './gameData.js';
+import { getEffectHandler } from './effectRegistry.js';
 
 // Injected at the start of every NP that has extra gauge above 100%
 const NP_OC_1_TURN = {
@@ -236,7 +237,7 @@ export class BattleEngine {
 
     for (const target of targets) {
       if (!checkCond(target)) continue;
-      const handler = EFFECT_HANDLERS[effect.funcType];
+      const handler = getEffectHandler(effect.funcType);
       if (handler) handler(this, effect, target);
     }
   }
@@ -533,45 +534,7 @@ export class BattleEngine {
   }
 }
 
-// ─── Dispatch table for effect funcTypes ──────────────────────────────────────
-// Probabilistic skill effects (`svals.Rate < 1000`) are treated as full
-// uptime: addState / addStateShort / gainNp / shortenSkill all apply
-// unconditionally, ignoring Rate. This matches the player's expected
-// best-case (e.g. Space Ishtar S3 「Multiple Sterling EX」 — Arts/Buster/Quick
-// Up at 80% chance — assumed to always land, so the +20% buff is fully
-// active for the planned 3-turn window). Star-conditional skills follow the
-// same policy: Mash S2 「Purple Bullet」 assumes 50 stars in hand (see
-// useSkill above); future star-based choosers (Kukulkan etc.) should
-// likewise assume max-stars rather than expose a player choice.
-// `instantDeath` is the lone Rate-checked handler because it derives the
-// outcome flag the rest of the engine reads.
-const EFFECT_HANDLERS = {
-  addState:      (eng, eff, tgt) => eng.applyBuff(tgt, eng.extractState(eff)),
-  addStateShort: (eng, eff, tgt) => eng.applyBuff(tgt, eng.extractState(eff)),
-
-  gainNp: (eng, eff, tgt) => {
-    const { value } = eng.extractState(eff);
-    if (value) tgt.setNpgauge(value / 100);
-  },
-
-  shortenSkill: (eng, eff, tgt) => {
-    const val = (Array.isArray(eff.svals) ? eff.svals[0] : eff.svals)?.Value ?? 0;
-    tgt.skills.decrementCooldowns(val);
-  },
-
-  addFieldChangeToField: (eng, eff) => {
-    eng.addField(eng.extractState(eff));
-  },
-
-  transformServant: () => {},  // Handled per-servant inside useNp
-
-  gainMultiplyNp: (eng, eff, tgt) => tgt.setNpgauge(tgt.getNpgauge()),
-
-  forceInstantDeath: (eng, eff, tgt) => { tgt.kill = true; },
-
-  instantDeath: (eng, eff, tgt) => {
-    const rate   = (Array.isArray(eff.svals) ? eff.svals[0] : eff.svals)?.Rate ?? 0;
-    const chance = rate / 1000;
-    if (chance * (tgt.deathRate / 1000) > 0.5) tgt.setHp(tgt.hp);
-  },
-};
+// Handlers live in effectRegistry.js; imported at top of file via getEffectHandler.
+// Rate policy: addState / addStateShort / gainNp / shortenSkill all apply
+// unconditionally (full-uptime assumption for planning). `instantDeath` is the
+// lone Rate-checked handler because it derives the outcome flag the engine reads.
