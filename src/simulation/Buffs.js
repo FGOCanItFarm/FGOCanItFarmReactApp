@@ -83,6 +83,7 @@ export class Buffs {
     s.busterCardDamageUp = s.userBusterDamageUp;
     s.artsCardDamageUp  = s.userArtsDamageUp;
     s.quickCardDamageUp = s.userQuickDamageUp;
+    s.flatDamageMod     = 0;
 
     let boostNpStrengthUpActive = false;
 
@@ -125,6 +126,10 @@ export class Buffs {
                 if (!(tval in s.powerMod)) s.powerMod[tval] = 0;
                 s.powerMod[tval] += buff.value || 0;
               }
+            } else if (buff.type === 'addDamage' || buff.type === 'addSelfdamage') {
+              // Flat per-hit damage bonus (Damage Plus, Divinity passives).
+              // Accumulated raw (FGO units) — _applyNpDamage adds × numHits.
+              s.flatDamageMod += buff.value || 0;
             }
             // NOTE: per-turn NP gain ("Triggers Each Turn …", "NP Gain Each
             // Turn") is applied once per turn in processEndTurnSkills, NOT here —

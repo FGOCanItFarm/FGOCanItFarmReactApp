@@ -390,7 +390,7 @@ export class BattleEngine {
       : this.enemies.reduce((best, e) => (e.hp > best.hp ? e : best), this.enemies[0]);
 
     for (const func of functions) {
-      if (['damageNp', 'damageNpPierce'].includes(func.funcType)) {
+      if (['damageNp', 'damageNpPierce', 'damageNpHpratioLow'].includes(func.funcType)) {
         servant.buffs.processServantBuffs();
         if (func.funcTargetType === 'enemyAll') {
           for (const e of this.enemies) { e.buffs.processEnemyBuffs(); this._applyNpDamage(servant, e, activeNpId, npCardType); }
@@ -466,7 +466,8 @@ export class BattleEngine {
     const [npDamageMultiplier] = servant.nps.getNpDamageValues(
       servant.stats.getOcLevel(), servant.stats.getNpLevel(), newId
     );
-    const total = (
+    const dist = servant.nps.getNpdist(newId);
+    const formula = (
       servant.stats.getBaseAtk() * npDamageMultiplier *
       cardDamageValue * (1 + cardDamageMod - enemyResMod) *
       this._classMultiplier(servant, target) *
@@ -474,10 +475,11 @@ export class BattleEngine {
       (1 + servant.stats.getAtkMod() - target.getDef()) *
       (1 + servant.stats.getNpDamageMod() + servant.stats.getPowerMod(target))
     ) * this.damageMultiplier;
+    const total = formula + (servant.flatDamageMod ?? 0) * dist.length;
 
     this.recordNpDamage(this.wave, total);
     this._recordEnemyStat(target, 'damageTaken', total);
-    this._distributeHits(servant, target, total, cardType, cardNpValue, cardEffMod, newId);
+    this._distributeHits(servant, target, total, cardType, cardNpValue, cardEffMod, newId, dist);
   }
 
   _applyNpOddDamage(servant, target, newId = null, cardType = servant.nps.card) {
@@ -501,7 +503,8 @@ export class BattleEngine {
     }
     if (seMod > 1) isSe = 1;
 
-    const total = (
+    const dist = servant.nps.getNpdist(newId);
+    const formula = (
       servant.stats.getBaseAtk() * npMult *
       cardDamageValue * (1 + cardDamageMod - enemyResMod) *
       this._classMultiplier(servant, target) *
@@ -510,18 +513,19 @@ export class BattleEngine {
       (1 + servant.stats.getNpDamageMod() + servant.stats.getPowerMod(target)) *
       (1 + (isSe ? seMod - 1 : 0))
     ) * this.damageMultiplier;
+    const total = formula + (servant.flatDamageMod ?? 0) * dist.length;
 
     this.recordNpDamage(this.wave, total);
     this._recordEnemyStat(target, 'damageTaken', total);
-    this._distributeHits(servant, target, total, cardType, cardNpValue, cardEffMod, newId);
+    this._distributeHits(servant, target, total, cardType, cardNpValue, cardEffMod, newId, dist);
   }
 
   /** Spread total damage across NP hit distribution, apply NP refund per hit. */
-  _distributeHits(servant, target, totalDamage, cardType, cardNpValue, cardEffMod, newId = null) {
+  _distributeHits(servant, target, totalDamage, cardType, cardNpValue, cardEffMod, newId = null, dist = null) {
     // Use the FIRED NP's gain + hit distribution (not the default last NP) so an
     // NP swap (e.g. Mash's Holy Sword) refunds and distributes against the right NP.
     const npGain  = servant.nps.getNpgain(cardType, newId) * servant.stats.getNpGainMod();
-    const dist    = servant.nps.getNpdist(newId);
+    if (!dist) dist = servant.nps.getNpdist(newId);
     const perHit  = dist.map(v => totalDamage * v / 100);
     let cumulative = 0;
     for (let i = 0; i < dist.length; i++) {
