@@ -1,6 +1,13 @@
 import { supabase } from '../supabaseClient';
 import { Driver } from './Driver';
 
+// FGO damage rolls uniformly in [0.9, 1.1]. The forward simulation advances
+// waves on the MAX (1.1) roll — a wave counts as clearable if its best roll
+// kills — and the per-wave statistics then report how likely that is (the
+// minimum roll needed + probability). See summarizeEngine.
+const MIN_ROLL = 0.9;
+const MAX_ROLL = 1.1;
+
 /**
  * Build the BattleEngine inputs from app state (FR-2): fetch servant `data`,
  * mystic-code `data`, normalise servantEffects, and read the pre-loaded
@@ -68,7 +75,9 @@ export async function prepareSimInputs({ team, selectedQuest, selectedMysticCode
     servantDataList,
     questData: selectedQuest._fullData,
     mcData,
-    damageMultiplier: 1.0,
+    // Advance waves on the best-case roll (see MAX_ROLL): a wave is treated as
+    // clearable when its 1.1 roll kills; summarizeEngine reports the odds.
+    damageMultiplier: MAX_ROLL,
   };
 }
 
@@ -79,20 +88,29 @@ export async function prepareSimInputs({ team, selectedQuest, selectedMysticCode
  * byte-for-byte.
  */
 export function summarizeEngine(engine) {
+  // The engine advanced waves on the roll it ran at (MAX_ROLL = 1.1 for the
+  // app); damageDealt is at that roll. Recover the 1.0 baseline and report the
+  // full [0.9, 1.0, 1.1] band from it so the labels are correct regardless.
+  const roll = engine.damageMultiplier || 1.0;
   const waves = {};
   for (const [waveKey, waveData] of Object.entries(engine.waveStats)) {
     const { hpRequired, damageDealt } = waveData;
-    const damage_at_09 = damageDealt * 0.9;
-    const damage_at_10 = damageDealt;
-    const damage_at_11 = damageDealt * 1.1;
+    const baseline = damageDealt / roll;
+    const damage_at_09 = baseline * MIN_ROLL;
+    const damage_at_10 = baseline;
+    const damage_at_11 = baseline * MAX_ROLL;
 
+    // Minimum roll that clears, and the odds of rolling at least that (rolls are
+    // ~uniform on [0.9, 1.1]). guaranteed = even the worst roll clears; rng =
+    // some roll in the band clears; impossible = even the best roll falls short.
+    const min_multiplier_needed = baseline > 0 ? hpRequired / baseline : null;
     let outcome, clear_probability;
     if (damage_at_09 >= hpRequired) {
       outcome = 'guaranteed';
       clear_probability = 1.0;
-    } else if (damage_at_10 >= hpRequired) {
+    } else if (damage_at_11 >= hpRequired) {
       outcome = 'rng';
-      clear_probability = 0.5;
+      clear_probability = Math.min(1, Math.max(0, (MAX_ROLL - min_multiplier_needed) / (MAX_ROLL - MIN_ROLL)));
     } else {
       outcome = 'impossible';
       clear_probability = 0.0;
@@ -105,7 +123,7 @@ export function summarizeEngine(engine) {
       damage_at_11,
       outcome,
       clear_probability,
-      min_multiplier_needed: damage_at_10 > 0 ? hpRequired / damage_at_10 : null,
+      min_multiplier_needed,
       // FR-8: per-enemy granular stats (camelCase engine → snake_case UI)
       per_enemy: (waveData.enemies || []).map(e => ({
         index: e.index,
@@ -117,8 +135,11 @@ export function summarizeEngine(engine) {
     };
   }
 
+  // Whole-run success = every wave clears, and each wave's roll is independent,
+  // so multiply the per-wave odds (a single rng wave at 30% caps the run at 30%;
+  // two such waves ~9%). All-guaranteed runs stay at 1.0.
   const waveProbs = Object.values(waves).map(w => w.clear_probability);
-  const overall_clear_probability = waveProbs.length > 0 ? Math.min(...waveProbs) : 0;
+  const overall_clear_probability = waveProbs.length > 0 ? waveProbs.reduce((a, b) => a * b, 1) : 0;
 
   return {
     success: true,

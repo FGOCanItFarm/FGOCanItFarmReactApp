@@ -177,17 +177,17 @@ User clicks Run
   total_waves: number,
   servants_at_wave_end: { 'wave1': [{ slot, collectionNo, np_gauge }], … },
   stats: {
-    overall_clear_probability: number,   // 0–1
+    overall_clear_probability: number,   // 0–1; PRODUCT of per-wave probs
     waves: {
       'wave1': {
         hp_required: number,
-        damage_at_09: number,
+        damage_at_09: number,   // 1.0-baseline damage × 0.9 / 1.0 / 1.1
         damage_at_10: number,
         damage_at_11: number,
         outcome: 'guaranteed' | 'rng' | 'impossible',
-        clear_probability: number,
-        min_multiplier_needed: number | null,
-        per_enemy: [                          // FR-8 granular stats
+        clear_probability: number,            // continuous (uniform roll model)
+        min_multiplier_needed: number | null, // roll needed to clear (e.g. 1.04)
+        per_enemy: [                          // FR-8 granular stats (at the sim roll)
           { index: number, name: string, max_hp: number,
             damage_taken: number, np_refund: number },
         ],
@@ -196,6 +196,16 @@ User clicks Run
   },
 }
 ```
+**Roll model (RunAdapter):** FGO damage rolls ~uniformly on [0.9, 1.1]. The app
+runs `prepareSimInputs` at `damageMultiplier = MAX_ROLL (1.1)`, so the forward
+sim **advances waves on the best-case roll** — a wave is clearable if its 1.1
+roll kills. `summarizeEngine` recovers the 1.0 baseline (`damageDealt / roll`)
+to label `damage_at_09/10/11`, then classifies: `guaranteed` (0.9 clears) /
+`rng` (clears somewhere in the band; `clear_probability = (1.1 −
+min_multiplier_needed)/0.2`) / `impossible` (1.1 falls short). `per_enemy`
+damage is at the sim roll (1.1); the engine `trace` (`result.debug`, NOT
+persisted) is also at the sim roll. Tests built via `buildSimInputs` default to
+roll 1.0.
 
 ## Supabase Tables
 

@@ -105,7 +105,7 @@ const WaveCard = ({ waveNum, wave, servants }) => {
               </Tooltip>
             </Grid>
             <Grid item xs={6} sm={3}>
-              <Tooltip title="NP damage at best-case 1.1× roll (what was simulated)">
+              <Tooltip title="NP damage at best-case 1.1× roll — waves advance on this roll">
                 <Box>
                   <Typography variant="caption" color="text.secondary">DMG @ 1.1×</Typography>
                   <Typography variant="body2">{fmtNum(wave.damage_at_11)}</Typography>
@@ -116,7 +116,7 @@ const WaveCard = ({ waveNum, wave, servants }) => {
 
           {wave.outcome === 'rng' && wave.min_multiplier_needed != null && (
             <Typography variant="caption" color="warning.main" display="block" mt={1}>
-              Needs ≥{wave.min_multiplier_needed.toFixed(3)}× roll
+              Needs ≥{wave.min_multiplier_needed.toFixed(3)}× roll — clears ~{fmtPct(prob)} of the time
             </Typography>
           )}
 
