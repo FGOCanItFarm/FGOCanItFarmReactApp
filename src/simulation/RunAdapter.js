@@ -95,26 +95,42 @@ export function summarizeEngine(engine) {
   const waves = {};
   for (const [waveKey, waveData] of Object.entries(engine.waveStats)) {
     const { hpRequired, damageDealt } = waveData;
-    const baseline = damageDealt / roll;
+    const baseline = damageDealt / roll;          // wave total at the 1.0 roll
     const damage_at_09 = baseline * MIN_ROLL;
     const damage_at_10 = baseline;
     const damage_at_11 = baseline * MAX_ROLL;
 
-    // Minimum roll that clears, and the odds of rolling at least that (rolls are
-    // ~uniform on [0.9, 1.1]). guaranteed = even the worst roll clears; rng =
-    // some roll in the band clears; impossible = even the best roll falls short.
-    const min_multiplier_needed = baseline > 0 ? hpRequired / baseline : null;
+    // A wave clears only when EVERY enemy individually dies — for an AoE NP the
+    // toughest enemy sets the bar, NOT the total (total >= total HP can be true
+    // while the biggest enemy survives). The roll a wave needs is therefore the
+    // worst per-enemy roll: max over enemies of maxHp / (its baseline damage).
+    // (Fall back to total-vs-total only if per-enemy stats are absent.)
+    const enemies = waveData.enemies || [];
+    let min_multiplier_needed;
+    if (enemies.length) {
+      min_multiplier_needed = 0;
+      for (const e of enemies) {
+        const eBaseline = (e.damageTaken || 0) / roll;
+        const need = eBaseline > 0 ? e.maxHp / eBaseline : Infinity;
+        if (need > min_multiplier_needed) min_multiplier_needed = need;
+      }
+    } else {
+      min_multiplier_needed = baseline > 0 ? hpRequired / baseline : Infinity;
+    }
+
+    // Odds of rolling at least the needed multiplier (rolls ~uniform on [0.9,1.1]).
     let outcome, clear_probability;
-    if (damage_at_09 >= hpRequired) {
+    if (min_multiplier_needed <= MIN_ROLL) {
       outcome = 'guaranteed';
       clear_probability = 1.0;
-    } else if (damage_at_11 >= hpRequired) {
+    } else if (min_multiplier_needed <= MAX_ROLL) {
       outcome = 'rng';
-      clear_probability = Math.min(1, Math.max(0, (MAX_ROLL - min_multiplier_needed) / (MAX_ROLL - MIN_ROLL)));
+      clear_probability = (MAX_ROLL - min_multiplier_needed) / (MAX_ROLL - MIN_ROLL);
     } else {
       outcome = 'impossible';
       clear_probability = 0.0;
     }
+    if (!isFinite(min_multiplier_needed)) min_multiplier_needed = null;
 
     waves[waveKey] = {
       hp_required: hpRequired,
