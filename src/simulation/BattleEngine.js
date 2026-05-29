@@ -171,7 +171,27 @@ export class BattleEngine {
       return true;
     }
     this.getNextWave();
+    this._processTurnStartRegen();
     return true;
+  }
+
+  // Kazuradrop "Buff Regeneration" (selfturnstartFunction「ピクシー・フィンガー」):
+  // her S1 plants a self-buff that, at the start of each of the next `count`
+  // turns, re-applies her S1 enemy Quick Card Resist Down (50%) to the live
+  // wave. Modeled here as a contained per-turn re-application (the referenced
+  // sub-skill id isn't resolvable from trimmed data). Runs after the wave
+  // advances so it lands on the new enemies.
+  _processTurnStartRegen() {
+    for (const s of this.servants.slice(0, 3)) {
+      const regen = s.buffs?.buffs.find(
+        b => b.buff === 'ピクシー・フィンガー' && (typeof b.count !== 'number' || b.count > 0)
+      );
+      if (!regen) continue;
+      for (const e of this.enemies) {
+        if (e.hp > 0) e.addBuff({ buff: 'Quick Card Resist Down', functvals: [], value: 500, tvals: [], turns: 1 });
+      }
+      if (typeof regen.count === 'number') regen.count -= 1;
+    }
   }
 
   _decrementBuffs() {
