@@ -241,7 +241,17 @@ const App = () => {
       p_mystic_code_id,
     });
 
-    if (error) return { success: false, error: error.message };
+    if (error) {
+      // The 7-arg submit_run lives in Supabase migration 004. If only 002 is
+      // deployed, PostgREST can't find the overload (PGRST202 / "function ...
+      // does not exist") — surface the actual fix instead of the raw error.
+      const missingFn = error.code === 'PGRST202' ||
+        /function .*submit_run.* does not exist/i.test(error.message || '');
+      if (missingFn) {
+        return { success: false, error: 'Run submission needs Supabase migration 004 (see supabase/README.md).' };
+      }
+      return { success: false, error: error.message };
+    }
     return { success: true };
   };
 
