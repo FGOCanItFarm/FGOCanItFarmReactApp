@@ -178,14 +178,16 @@ export class BattleEngine {
     const tvals  = buff.tvals || [];
     const hasName = buff.name && buff.name !== 'Unknown';
     const state = {
-      type:      'buff',
-      buff_name: hasName ? buff.name : (buff.type || 'Unknown'),
-      buff_type: buff.type,
-      functvals: hasName ? (effect.functvals || []) : (tvals[0]?.id ?? 'Unknown'),
+      type:           'buff',
+      buff_name:      hasName ? buff.name : (buff.type || 'Unknown'),
+      buff_type:      buff.type,
+      functvals:      hasName ? (effect.functvals || []) : (tvals[0]?.id ?? 'Unknown'),
       tvals,
-      value:     svals.Value || 0,
-      turns:     svals.Turn  || 0,
-      count:     svals.Count ?? -1,
+      value:          svals.Value || 0,
+      turns:          svals.Turn  || 0,
+      count:          svals.Count ?? -1,
+      script:         buff.script,
+      originalScript: buff.originalScript,
     };
 
     // tdTypeChange* (BB Dubai S3, etc.): if the parent skill carried a
@@ -255,6 +257,8 @@ export class BattleEngine {
       targetClassId:    state.targetClassId,
       targetClassTrait: state.targetClassTrait,
       targetNpId:       state.targetNpId,
+      script:           state.script,
+      originalScript:   state.originalScript,
     });
   }
 
@@ -452,11 +456,16 @@ export class BattleEngine {
     };
   }
 
-  // Class-advantage multiplier, honouring a 90** enemy vulnerability override
-  // (e.g. Anti-Saber Defense Vulnerability: Saber attackers deal 5× not 2×).
+  // Class-advantage multiplier. Precedence:
+  //   1. Servant-side overwriteClassRelation buff (Kiara Nega-Saver, Kama, etc.)
+  //   2. Enemy-side classAdvantageMod (90** Anti-X vulnerability)
+  //   3. Default class matrix
   _classMultiplier(servant, target) {
-    const override = target.getClassAdvantageMod?.(servant.className);
-    return override != null ? override : servant.stats.getClassMultiplier(target.getClass());
+    const defClass = target.getClass();
+    const servantOverride = servant.classRelationOverrides?.[defClass];
+    if (servantOverride != null) return servantOverride;
+    const enemyOverride = target.getClassAdvantageMod?.(servant.className);
+    return enemyOverride != null ? enemyOverride : servant.stats.getClassMultiplier(defClass);
   }
 
   _applyNpDamage(servant, target, newId = null, cardType = servant.nps.card) {
