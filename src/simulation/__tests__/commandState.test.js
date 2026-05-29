@@ -176,3 +176,17 @@ describe('snapshotAt memo', () => {
     expect(sAoko.snapshot.front[0].collectionNo).toBe(4132);
   });
 });
+
+describe('Driver strict (FR-6) — unknown tokens fail the run', () => {
+  const { Driver } = require('../Driver');
+
+  test('Driver.run returns false on an unknown token mid-sequence', () => {
+    const result = new Driver(sim).run('a Swap Servants b');
+    expect(result).toBe(false);
+  });
+
+  test('Driver.run still succeeds on an all-valid sequence', () => {
+    const result = new Driver(sim).run('a b c');
+    expect(result).not.toBe(false);
+  });
+});

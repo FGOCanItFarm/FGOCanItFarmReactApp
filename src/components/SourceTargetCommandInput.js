@@ -5,18 +5,28 @@ import '../ui-vars.css';
 import '../CommandInputPage.css';
 import { generateSkillCommand, ChoiceSelector } from './CommandInputMenu';
 
-// Servants whose skills open a choice/target sub-menu (handled by ChoiceSelector
-// so the generated tokens match the simulation grammar exactly).
-const isChoiceSkill = (collectionNo, skillIndex) => {
-  const num = Number(collectionNo);
+// Skills that open a choice/target sub-menu (rendered by ChoiceSelector so the
+// generated tokens match the simulation grammar exactly). Detection is
+// data-driven via parseServantSkills(): NP-type-chooser skills are spotted
+// from `script.selectTreasureDeviceInfo` or 2+ suffixed `tdTypeChange*`
+// functions, so new servants (Emiya / Space Ishtar / future swaps) light up
+// without code edits. The hardcoded fallback covers target-mode choosers
+// (Sieg's S3 alignment trait pick, Castoria/Tamamo-style ally-mode skills,
+// etc.) whose choice doesn't go through tdTypeChange.
+const HARDCODED_CHOICE_SKILLS = (num, skillIndex) => {
   switch (num) {
     case 373: return true;
     case 428: return skillIndex === 1;
-    case 268: return skillIndex === 2;
-    case 421: case 11: case 391: case 424: case 425: case 414: case 259:
+    case 424: case 425: case 414: case 259:
       return skillIndex === 3;
     default: return false;
   }
+};
+
+const isChoiceSkill = (collectionNo, skillIndex, selectedSkills = null) => {
+  const fromData = selectedSkills?.[skillIndex - 1]?.isChoice;
+  if (fromData) return true;
+  return HARDCODED_CHOICE_SKILLS(Number(collectionNo), skillIndex);
 };
 
 // Command controls for the unit currently selected in the right-hand Team panel.
@@ -59,7 +69,7 @@ const SourceTargetCommandInput = ({
   const handleSkillClick = (skillIndex) => {
     if (!isFrontRow || !selectedServant) return;
     setPendingSkill(null);
-    if (isChoiceSkill(selectedServant.collectionNo, skillIndex)) {
+    if (isChoiceSkill(selectedServant.collectionNo, skillIndex, selectedSkills)) {
       setChoiceSkill(prev => (prev === skillIndex ? null : skillIndex));
       return;
     }

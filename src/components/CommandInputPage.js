@@ -7,6 +7,9 @@ import CombatDashboard from './CombatDashboard';
 import SimulationStats from './SimulationStats';
 import { supabase } from '../supabaseClient';
 import { parseServantSkills } from './skillInfo';
+import CommandChips from './CommandChips';
+import { prepareSimInputs } from '../simulation/RunAdapter';
+import { buildEngineAt } from '../simulation/CommandState';
 
 const CommandInputPage = ({
   team, servants, setTeam, activeServant, setActiveServant,
@@ -21,6 +24,7 @@ const CommandInputPage = ({
   const [submitStatus, setSubmitStatus] = React.useState(null);
   const [submitError, setSubmitError] = React.useState('');
   const [skillInfo, setSkillInfo] = React.useState({}); // collectionNo -> parsed skills
+  const [simInputs, setSimInputs] = React.useState(null); // engine-replay validation source
 
   // Fetch full data for the current team so the builder can label skills and
   // know which need an ally target. Keyed by the team's collection numbers.
@@ -44,6 +48,43 @@ const CommandInputPage = ({
     setSubmitStatus(null);
     setSubmitError('');
   }, [simulationResult]);
+
+  // FR-6: build a fresh simInputs whenever the team / quest / MC / effects
+  // change so chip validation can replay the prefix through a real engine
+  // (catches "skill on cooldown" / "NP not ready" mid-sequence, not just
+  // syntactic invalid tokens). Quietly no-ops if the quest data hasn't been
+  // hydrated yet — chips fall back to syntactic-only validation in that case.
+  const fxKey = JSON.stringify(servantEffects);
+  React.useEffect(() => {
+    if (!selectedQuest?._fullData || team.every(s => !s.collectionNo)) {
+      setSimInputs(null);
+      return;
+    }
+    let cancelled = false;
+    (async () => {
+      try {
+        const next = await prepareSimInputs({ team, selectedQuest, selectedMysticCode, servantEffects });
+        if (!cancelled) setSimInputs(next);
+      } catch {
+        if (!cancelled) setSimInputs(null);
+      }
+    })();
+    return () => { cancelled = true; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [teamKey, selectedQuest?.id, selectedMysticCode, fxKey]);
+
+  // Engine-replay failedIndex. -1 means every token applied cleanly; ≥ 0 marks
+  // the first token that the engine refused (cooldown / charge / missing
+  // target / unknown grammar). When simInputs isn't ready CommandChips falls
+  // back to its own syntactic check.
+  const failedIndex = React.useMemo(() => {
+    if (!simInputs || commands.length === 0) return -1;
+    try {
+      return buildEngineAt(simInputs, commands).failedIndex;
+    } catch {
+      return -1;
+    }
+  }, [simInputs, commands]);
 
   const filledCount = team.filter(s => s.collectionNo).length;
   const canRun = commands.length > 0 && !!selectedQuest && filledCount > 0;
@@ -149,6 +190,16 @@ const CommandInputPage = ({
             size="small"
             variant="outlined"
             label={`${commands.length} tokens`}
+          />
+        </Box>
+
+        <Box mb={1}>
+          <CommandChips
+            commands={commands}
+            team={team}
+            servants={servants}
+            setCommands={setCommandsWithHistory}
+            failedIndex={failedIndex}
           />
         </Box>
 

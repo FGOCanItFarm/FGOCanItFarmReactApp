@@ -1,4 +1,4 @@
-import { baseMultipliers } from './gameData.js';
+import { baseMultipliers, classTraitByName } from './gameData.js';
 import { Stats }  from './Stats.js';
 import { Skills } from './Skills.js';
 import { Buffs }  from './Buffs.js';
@@ -85,6 +85,13 @@ export class Servant {
     this.artsCardDamageUp   = artsDamageUp;
     this.quickCardDamageUp  = quickDamageUp;
 
+    // Baseline class state — captured once so processServantBuffs can revert any
+    // active overwriteBattleclass override (Kazuradrop S3 etc.) when it expires.
+    this._baseClassName  = this.className;
+    this._baseClassId    = this.classId;
+    this._baseClassTrait = classTraitByName[this.className] ?? null;
+    this._baseTraits     = [...this.traits];
+
     this.passives = this.buffs.parsePassive(rawData.classPassive || []);
     this.applyPassiveBuffs();
   }
@@ -113,11 +120,14 @@ export class Servant {
       for (const func of passive.functions) {
         for (const buff of func.buffs) {
           this.applyBuff({
-            buff_name: buff.name || 'Unknown',
-            value:     func.svals?.Value ?? 0,
-            turns:     -1,
-            functvals: func.functvals || [],
-            tvals:     [],
+            buff_name:      buff.name || 'Unknown',
+            buff_type:      buff.type,
+            value:          func.svals?.Value ?? 0,
+            turns:          -1,
+            functvals:      func.functvals || [],
+            tvals:          buff.tvals || [],
+            script:         buff.script,
+            originalScript: buff.originalScript,
           });
         }
       }
@@ -126,11 +136,14 @@ export class Servant {
 
   applyBuff(state) {
     this.buffs.addBuff({
-      buff:      state.buff_name,
-      functvals: state.functvals,
-      value:     state.value,
-      tvals:     (state.tvals || []).map(t => t.id ?? t),
-      turns:     state.turns,
+      buff:           state.buff_name,
+      type:           state.buff_type,
+      functvals:      state.functvals,
+      value:          state.value,
+      tvals:          (state.tvals || []).map(t => t.id ?? t),
+      turns:          state.turns,
+      script:         state.script,
+      originalScript: state.originalScript,
     });
   }
 

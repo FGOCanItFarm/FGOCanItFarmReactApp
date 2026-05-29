@@ -43,8 +43,35 @@ export class Buffs {
     }
   }
 
+  // Applies any active `overwriteBattleclass` buff (Kazuradrop S3 「月の蛹」, etc.)
+  // by swapping the servant's className/classId/class-trait to the recorded
+  // target class. When no such buff is active (or it has decayed) the baseline
+  // captured at construction is restored. Runs at the top of
+  // processServantBuffs so the downstream powerMod / class-advantage paths see
+  // the effective class. classBaseMultiplier (atk multiplier) is intentionally
+  // NOT recomputed — in FGO class-change does not retroactively rescale ATK.
+  applyBattleClassOverride() {
+    const s = this.servant;
+    if (s._baseClassName == null) return; // pre-init (e.g. fixture stubs)
+    const override = this.buffs.find(b => b.type === 'overwriteBattleclass' && b.targetClassName);
+    if (override) {
+      s.className = override.targetClassName;
+      s.classId   = override.targetClassId ?? s._baseClassId;
+      const swapOut = s._baseClassTrait;
+      const swapIn  = override.targetClassTrait;
+      s.traits = s._baseTraits
+        .filter(t => t !== swapOut)
+        .concat(swapIn != null ? [swapIn] : []);
+    } else {
+      s.className = s._baseClassName;
+      s.classId   = s._baseClassId;
+      s.traits    = [...s._baseTraits];
+    }
+  }
+
   processServantBuffs() {
     const s = this.servant;
+    this.applyBattleClassOverride();
     s.atkMod            = s.userAtkMod;
     s.bUp               = s.userBUp;
     s.aUp               = s.userAUp;
@@ -61,7 +88,9 @@ export class Buffs {
 
     for (const buff of this.buffs) {
       const requiredField = buff.script?.INDIVIDUALITIE?.id ?? buff.originalScript?.INDIVIDUALITIE ?? null;
-      if (requiredField === null || s.fields.includes(requiredField)) {
+      if (requiredField === null
+          || s.fields.includes(requiredField)
+          || (s.traits && s.traits.includes(requiredField))) {
         if (buff.buff === 'NP Strength Up' || buff.buff === 'upNpdamage') {
           s.npDamageMod += buff.value / 1000;
         } else if (buff.buff === 'Boost NP Strength Up') {
@@ -74,7 +103,9 @@ export class Buffs {
 
     for (const buff of this.buffs) {
       const requiredField = buff.script?.INDIVIDUALITIE?.id ?? buff.originalScript?.INDIVIDUALITIE ?? null;
-      if (requiredField === null || s.fields.includes(requiredField)) {
+      if (requiredField === null
+          || s.fields.includes(requiredField)
+          || (s.traits && s.traits.includes(requiredField))) {
         switch (buff.buff) {
           case 'ATK Up':                 s.atkMod  += buff.value / 1000; break;
           case 'Buster Up':              s.bUp     += buff.value / 1000; break;
@@ -87,7 +118,9 @@ export class Buffs {
           case 'Arts Card Damage Up':    s.artsCardDamageUp   += buff.value / 1000; break;
           case 'Quick Card Damage Up':   s.quickCardDamageUp  += buff.value / 1000; break;
           default:
-            if (buff.buff.includes('STR Up') || buff.buff.includes('Strength Up')) {
+            if (buff.type === 'upDamage'
+                || buff.buff.includes('STR Up')
+                || buff.buff.includes('Strength Up')) {
               for (const tval of (buff.tvals || [])) {
                 if (!(tval in s.powerMod)) s.powerMod[tval] = 0;
                 s.powerMod[tval] += buff.value || 0;

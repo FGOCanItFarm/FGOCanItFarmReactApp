@@ -59,3 +59,27 @@ export const attributeDict = {
   star:  { human: 1.0, earth: 1.0,  sky: 1.0,  star: 1.0, beast: 1.1 },
   beast: { human: 1.0, earth: 1.0,  sky: 1.0,  star: 1.1, beast: 1.0 },
 };
+
+// Atlas trait individuality ids per class (used for class-conditional passives
+// like Kazuradrop 同属嫌悪, and the overwriteBattleclass class-swap path).
+// Beast is intentionally absent — no servant class-changes into Beast.
+export const classTraitByName = {
+  saber:      100,
+  archer:     102,
+  lancer:     101,
+  rider:      103,
+  caster:     104,
+  assassin:   105,
+  berserker:  106,
+  shielder:   107,
+  ruler:      108,
+  alterEgo:   109,
+  avenger:    110,
+  moonCancer: 115,
+  foreigner:  117,
+  pretender:  120,
+};
+
+export const classNameByTrait = Object.fromEntries(
+  Object.entries(classTraitByName).map(([name, id]) => [id, name])
+);

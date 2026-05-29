@@ -1,6 +1,7 @@
 import { Servant }    from './Servant.js';
 import { Quest }      from './Quest.js';
 import { MysticCode } from './MysticCode.js';
+import { classTraitByName } from './gameData.js';
 
 // Injected at the start of every NP that has extra gauge above 100%
 const NP_OC_1_TURN = {
@@ -175,15 +176,40 @@ export class BattleEngine {
     const buff   = buffs[0] || {};
     const tvals  = buff.tvals || [];
     const hasName = buff.name && buff.name !== 'Unknown';
-    return {
+    const state = {
       type:      'buff',
       buff_name: hasName ? buff.name : (buff.type || 'Unknown'),
+      buff_type: buff.type,
       functvals: hasName ? (effect.functvals || []) : (tvals[0]?.id ?? 'Unknown'),
       tvals,
       value:     svals.Value || 0,
       turns:     svals.Turn  || 0,
       count:     svals.Count ?? -1,
     };
+
+    // tdTypeChange* (BB Dubai S3, etc.): if the parent skill carried a
+    // `selectTreasureDeviceInfo` entry for the chosen option, embed its NP id
+    // on the buff so NP.tdTypeChangeNewId can resolve to the exact group
+    // member. Without it, the NP-side card-key fallback handles selection.
+    if (typeof buff.type === 'string' && buff.type.startsWith('tdTypeChange') && this._pendingChoiceNpId != null) {
+      state.targetNpId = this._pendingChoiceNpId;
+    }
+
+    // overwriteBattleclass (Kazuradrop S3 「月の蛹」): the buff is self-target,
+    // but the class to copy comes from the enemy the skill was pinned to.
+    // Capture the target enemy's class so processServantBuffs can swap class /
+    // class-trait while the buff is active. If no enemy target was provided
+    // (bare `g`/`g1`), fall back to the first surviving enemy (FGO defaults to
+    // the highest-HP / leftmost enemy in practice).
+    if (buff.type === 'overwriteBattleclass') {
+      const enemy = this._skillTargetEnemy ?? this.enemies?.find(e => e.hp > 0) ?? null;
+      if (enemy) {
+        state.targetClassName = enemy.className;
+        state.targetClassId   = enemy.classId;
+        state.targetClassTrait = classTraitByName[enemy.className] ?? null;
+      }
+    }
+    return state;
   }
 
   applyEffect(effect, servant, allyTarget = null) {
@@ -194,7 +220,8 @@ export class BattleEngine {
 
     let targets = [];
     switch (effect.funcTargetType) {
-      case 'self':      targets = servant ? [servant] : [];           break;
+      case 'self':                          targets = servant ? [servant] : [];           break;
+      case 'commandTypeSelfTreasureDevice': targets = servant ? [servant] : [];           break;
       case 'enemyAll':  targets = this.getEnemies();                  break;
       case 'enemy':     targets = [allyTarget];                       break;
       case 'ptOther':   targets = this.servants.filter(s => s !== servant); break;
@@ -216,12 +243,17 @@ export class BattleEngine {
 
   applyBuff(target, state) {
     target.buffs.addBuff({
-      buff:      state.buff_name,
-      functvals: state.functvals,
-      value:     state.value,
-      tvals:     (state.tvals || []).map(t => t.id ?? t),
-      turns:     state.turns,
-      count:     state.count ?? -1,
+      buff:             state.buff_name,
+      type:             state.buff_type,
+      functvals:        state.functvals,
+      value:            state.value,
+      tvals:            (state.tvals || []).map(t => t.id ?? t),
+      turns:            state.turns,
+      count:            state.count ?? -1,
+      targetClassName:  state.targetClassName,
+      targetClassId:    state.targetClassId,
+      targetClassTrait: state.targetClassTrait,
+      targetNpId:       state.targetNpId,
     });
   }
 
@@ -243,7 +275,7 @@ export class BattleEngine {
     // capped at 50 stars → up to 200%) and grants +100% NP strength for 3 turns.
     // Stars aren't modeled by the engine; assume a reasonable 50 in hand. The
     // base-S2 effects are intentionally skipped. (Contained special case — FR-5.)
-    if (servant.id === 1 && num === 2 && servant.buffs.buffs.some(b => b.buff === '聖剣装填')) {
+    if (servant.id === 1 && num === 2 && servant.buffs.buffs.some(b => typeof b.type === 'string' && b.type.startsWith('tdTypeChange'))) {
       servant.skills.setSkillCooldown(num);
       const assumedStars = 50;
       servant.stats.setNpgauge(Math.min(assumedStars, 50) * 4); // +(stars × 4%) NP
@@ -253,11 +285,57 @@ export class BattleEngine {
 
     const skill = servant.skills.getSkillByNum(num);
     servant.skills.setSkillCooldown(num);
-    // choice is stored for future modal-variable skill handling (Space Ishtar, Emiya)
+    // choice = [choiceCount, optionIdx] from token like [Ch2A] / [Ch3B].
+    // optionIdx is 0-based (A→0, B→1, C→2). Used to route NP-type-chooser
+    // skills (BB Dubai S3, Emiya S3, etc.) — see _resolveChoiceTargetNpId.
     this._pendingChoice = choice;
-    for (const effect of skill.functions) this.applyEffect(effect, servant, target);
+    this._pendingChoiceNpId = this._resolveChoiceTargetNpId(skill, choice);
+    // If the user pinned the skill to an enemy (e.g. `g~2`), retain it so
+    // self-target effects that depend on a target (overwriteBattleclass class
+    // copy, etc.) can read it from extractState. ptOne/ally targets are stored
+    // here too but cleared after — extractState filters by inclusion in
+    // this.enemies.
+    this._skillTargetEnemy = (target && this.enemies?.includes(target)) ? target : null;
+    for (const effect of skill.functions) {
+      if (this._shouldSkipChoiceEffect(skill, effect, choice)) continue;
+      this.applyEffect(effect, servant, target);
+    }
+    this._skillTargetEnemy = null;
     this._pendingChoice = null;
+    this._pendingChoiceNpId = null;
     return true;
+  }
+
+  // NP-type-chooser routing (BB Dubai S3 etc.): when a skill has multiple
+  // `tdTypeChange{Arts,Buster,Quick}` (suffixed, non-generic) buff functions —
+  // each representing one of the player-selectable variants — fire only the
+  // one matching `choice[1]` (option idx). The generic `tdTypeChange` buff and
+  // all non-tdTypeChange functions fire unconditionally. With no choice, the
+  // first variant is kept (default to option A) so single-fire scenarios still
+  // behave reasonably.
+  _shouldSkipChoiceEffect(skill, effect, choice) {
+    const buffType = effect.buffs?.[0]?.type;
+    if (typeof buffType !== 'string') return false;
+    if (!buffType.startsWith('tdTypeChange') || buffType === 'tdTypeChange') return false;
+    const variants = (skill.functions || []).filter(f => {
+      const t = f.buffs?.[0]?.type;
+      return typeof t === 'string' && t.startsWith('tdTypeChange') && t !== 'tdTypeChange';
+    });
+    if (variants.length <= 1) return false;
+    const optionIdx = Array.isArray(choice) ? (choice[1] || 0) : 0;
+    return variants.indexOf(effect) !== Math.min(optionIdx, variants.length - 1);
+  }
+
+  // Map the chosen option to an Atlas NP id, when the skill exposes
+  // `selectTreasureDeviceInfo` (BB Dubai). Used by extractState to embed
+  // `targetNpId` on the resulting `tdTypeChange*` buff so the NP resolver can
+  // pick the exact group member regardless of card-type. Returns null for
+  // skills without the metadata (Emiya / Space Ishtar — handled via buff-type
+  // → card-key fallback in NP.tdTypeChangeNewId).
+  _resolveChoiceTargetNpId(skill, choice) {
+    if (!Array.isArray(choice) || !skill?.selectTreasureDeviceInfo) return null;
+    const opt = skill.selectTreasureDeviceInfo[choice[1] || 0];
+    return opt?.id ?? null;
   }
 
   useMysticCodeSkill(skillNum, target = null) {
@@ -280,17 +358,16 @@ export class BattleEngine {
       servant.buffs.processServantBuffs();
     }
 
-    // Mash NP swap (contained special case — see FR-5): she fires the default
-    // Lord Chaldeas (Arts, id 800107), which loads "聖剣装填" (Holy Sword); once
-    // that buff is active her NP becomes the offensive Holy Sword (Buster, id
-    // 800108). Other servants resolve to their default NP (activeNpId = null).
-    let activeNpId = null;
-    let npCardType = servant.nps.card;
-    if (servant.id === 1) {
-      const holySwordLoaded = servant.buffs.buffs.some(b => b.buff === '聖剣装填');
-      activeNpId = servant.nps.tdTypeChangeNewId(holySwordLoaded);
-      if (activeNpId != null) npCardType = servant.nps.getNpById(activeNpId).card;
-    }
+    // NP swap (FR-5): any servant whose NPs declare `script.tdTypeChangeIDs`
+    // resolves to the alternate NP when any `tdTypeChange*` state buff is
+    // active. Covers Mash (default Lord Chaldeas → 「聖剣装填」 arms Holy Sword)
+    // and any future 2-NP swap servants out of the box. Servants without an
+    // NP-swap group resolve to null (their default NP). 3-NP groups (Emiya,
+    // Space Ishtar) need choice-token plumbing — tracked under FR-3.
+    let activeNpId = servant.nps.tdTypeChangeNewId(servant.buffs.buffs);
+    let npCardType = (activeNpId != null)
+      ? servant.nps.getNpById(activeNpId).card
+      : servant.nps.card;
 
     // Recompute derived stats so OC level reflects all currently-active buffs
     // (incl. an Overcharge Lv. Up carried from a prior wave) — getNpValues
@@ -457,6 +534,17 @@ export class BattleEngine {
 }
 
 // ─── Dispatch table for effect funcTypes ──────────────────────────────────────
+// Probabilistic skill effects (`svals.Rate < 1000`) are treated as full
+// uptime: addState / addStateShort / gainNp / shortenSkill all apply
+// unconditionally, ignoring Rate. This matches the player's expected
+// best-case (e.g. Space Ishtar S3 「Multiple Sterling EX」 — Arts/Buster/Quick
+// Up at 80% chance — assumed to always land, so the +20% buff is fully
+// active for the planned 3-turn window). Star-conditional skills follow the
+// same policy: Mash S2 「Purple Bullet」 assumes 50 stars in hand (see
+// useSkill above); future star-based choosers (Kukulkan etc.) should
+// likewise assume max-stars rather than expose a player choice.
+// `instantDeath` is the lone Rate-checked handler because it derives the
+// outcome flag the rest of the engine reads.
 const EFFECT_HANDLERS = {
   addState:      (eng, eff, tgt) => eng.applyBuff(tgt, eng.extractState(eff)),
   addStateShort: (eng, eff, tgt) => eng.applyBuff(tgt, eng.extractState(eff)),
