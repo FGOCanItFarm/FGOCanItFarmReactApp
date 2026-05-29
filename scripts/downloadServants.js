@@ -16,17 +16,20 @@
 const fs = require('fs');
 const path = require('path');
 
-// Load .env if present (no dependency on dotenv — manual parse)
-const envPath = path.join(__dirname, '..', '.env');
-if (fs.existsSync(envPath)) {
-  fs.readFileSync(envPath, 'utf8').split('\n').forEach(line => {
+// Load env vars from .env or worker/.dev.vars (no dotenv dependency)
+function loadEnvFile(filePath) {
+  if (!fs.existsSync(filePath)) return;
+  fs.readFileSync(filePath, 'utf8').split('\n').forEach(line => {
     const m = line.match(/^([^#=]+)=(.*)$/);
-    if (m) process.env[m[1].trim()] = m[2].trim().replace(/^['"]|['"]$/g, '');
+    if (m) process.env[m[1].trim()] ??= m[2].trim().replace(/^['"]|['"]$/g, '');
   });
 }
+loadEnvFile(path.join(__dirname, '..', '.env'));
+loadEnvFile(path.join(__dirname, '..', 'worker', '.dev.vars'));
 
-const SUPABASE_URL = process.env.REACT_APP_SUPABASE_URL;
-const SUPABASE_KEY = process.env.REACT_APP_SUPABASE_ANON_KEY;
+const SUPABASE_URL = process.env.REACT_APP_SUPABASE_URL || process.env.SUPABASE_URL;
+const SUPABASE_KEY = process.env.REACT_APP_SUPABASE_ANON_KEY
+  || process.env.SUPABASE_SERVICE_ROLE_KEY;
 const OUT_DIR = path.join(__dirname, '..', 'src', 'simulation', '__fixtures__', 'real', 'servants');
 const FORCE = process.argv.includes('--force');
 const PAGE_SIZE = 200;
