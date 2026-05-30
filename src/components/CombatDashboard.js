@@ -87,6 +87,17 @@ const CombatDashboard = ({ team, selectedQuest, selectedMysticCode, servantEffec
   };
   const onPickAlly = (slot) => { if (pending?.option?.targetClass === 'ally') commit(resolveToken(pending.option, { allySlot: slot + 1 })); };
   const onPickEnemy = (index1) => { if (pending?.option?.targetClass === 'enemyOne') commit(resolveToken(pending.option, { enemyIndex: index1 })); };
+  // FR-10: click an enemy (outside a pending action) to set the sticky `@N`
+  // focus. Branches from the cursor and collapses an immediately-preceding focus.
+  const onFocusEnemy = (index1) => {
+    const prefix = commands.slice(0, step);
+    if (/^@\d+$/.test(prefix[prefix.length - 1] || '')) prefix.pop();
+    setCommands([...prefix, `@${index1}`]); setCursor(null); setPending(null);
+  };
+  const onEnemyClick = (e) => {
+    if (pending?.option?.targetClass === 'enemyOne') { if (e.hp > 0) onPickEnemy(e.index); }
+    else onFocusEnemy(e.index);
+  };
 
   const deleteAt = (i) => { setCommands(commands.filter((_, j) => j !== i)); setCursor(null); setPending(null); };
   const trimToHere = () => { setCommands(commands.slice(0, step)); setCursor(null); };
@@ -124,13 +135,17 @@ const CombatDashboard = ({ team, selectedQuest, selectedMysticCode, servantEffec
       <Box className="dash__grid">
         {/* Enemies (left) */}
         <Box className={`dash__enemies ${pickingEnemy ? 'dash--picking' : ''}`}>
-          <Typography variant="overline" className="dash__col-title">Enemies</Typography>
+          <Typography variant="overline" className="dash__col-title">
+            Enemies{snapshot.focusEnemyIdx != null && snapshot.enemies[snapshot.focusEnemyIdx]
+              ? ` · focus ◎ ${snapshot.enemies[snapshot.focusEnemyIdx].name}` : ''}
+          </Typography>
           {snapshot.enemies.map((e) => (
             <Box key={e.index}
-              className={`enemy ${e.hp <= 0 ? 'enemy--dead' : ''} ${pickingEnemy ? 'enemy--target' : ''}`}
-              onClick={() => pickingEnemy && e.hp > 0 && onPickEnemy(e.index)}>
+              className={`enemy ${e.hp <= 0 ? 'enemy--dead' : ''} ${pickingEnemy ? 'enemy--target' : ''} ${e.focused ? 'enemy--focused' : ''}`}
+              title={pickingEnemy ? 'Target this enemy' : 'Click to focus (sticky target)'}
+              onClick={() => onEnemyClick(e)}>
               <div className="enemy__row">
-                <span className="enemy__name">{e.index}. {e.name}</span>
+                <span className="enemy__name">{e.focused ? '◎ ' : ''}{e.index}. {e.name}</span>
                 <span className="enemy__class">{e.className || ''}</span>
               </div>
               <div className="enemy__hpbar">

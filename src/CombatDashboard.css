@@ -116,3 +116,11 @@
   background: color-mix(in srgb, var(--color-error) 14%, transparent);
   border-color: color-mix(in srgb, var(--color-error) 30%, transparent);
 }
+
+/* ── FR-10 sticky enemy focus ──────────────────────────────────────────────── */
+.enemy { cursor: pointer; }
+.enemy--focused {
+  border: 1px solid var(--color-gold) !important;
+  box-shadow: 0 0 0 1px var(--color-gold) inset;
+  background: var(--color-gold-dim);
+}

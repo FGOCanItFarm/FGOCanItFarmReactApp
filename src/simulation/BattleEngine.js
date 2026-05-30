@@ -45,6 +45,10 @@ export class BattleEngine {
     // NEVER persisted — summarizeEngine exposes it as result.debug, outside the
     // stats.waves blob that submit_run stores. Regenerated on every run.
     this.trace = [];
+    // FR-10 sticky focus target (0-based enemy index, set by the `@N` token).
+    // Single-target NPs/skills with no explicit per-action target default to it
+    // (when alive), else highest-HP. Reset on wave change.
+    this.focusEnemyIdx = null;
 
     this._recordInitialWaveHp();
     this._syncFields();
@@ -110,6 +114,7 @@ export class BattleEngine {
 
   getNextWave() {
     this.wave++;
+    this.focusEnemyIdx = null; // new wave = new enemies; re-pick the focus
     if (this.wave > this.totalWaves) return;
     this.enemies = this.quest.getWave(this.wave);
     this._recordInitialWaveHp();
@@ -120,6 +125,22 @@ export class BattleEngine {
   /** Highest-HP living enemy (default target for single-enemy NPs/skills). */
   _highestHpEnemy() {
     return this.enemies.reduce((best, e) => (e.hp > 0 && (!best || e.hp > best.hp) ? e : best), null);
+  }
+
+  /** The sticky-focus enemy (`@N`) if set and still alive, else null. */
+  _focusedEnemy() {
+    const e = this.focusEnemyIdx != null ? this.enemies[this.focusEnemyIdx] : null;
+    return e && e.hp > 0 ? e : null;
+  }
+
+  /**
+   * Resolve a single-target enemy: explicit per-action target (`a~2`/`4e2`) wins,
+   * then the sticky focus (`@N`, if alive), then the highest-HP living enemy.
+   * @param {Enemy|null} explicit - a living enemy pinned for this action only
+   */
+  _resolveEnemyTarget(explicit = null) {
+    if (explicit && explicit.hp > 0) return explicit;
+    return this._focusedEnemy() || this._highestHpEnemy();
   }
 
   swapServants(frontlineIdx, backlineIdx) {
@@ -269,12 +290,11 @@ export class BattleEngine {
       case 'commandTypeSelfTreasureDevice': targets = servant ? [servant] : [];           break;
       case 'enemyAll':  targets = this.getEnemies();                  break;
       case 'enemy': {
-        // Single-target enemy effect (DEF Down, etc.). Use the explicitly
-        // pinned enemy (`f~2`) if any; otherwise default to the highest-HP
-        // living enemy — matching bare-NP targeting — instead of mis-applying
-        // to the casting servant (the old allyTarget=self fallback).
+        // Single-target enemy effect (DEF Down, etc.): explicit pinned enemy
+        // (`f~2`) → sticky focus (`@N`) → highest-HP, instead of mis-applying to
+        // the casting servant (the old allyTarget=self fallback).
         const pinned = (allyTarget && this.enemies.includes(allyTarget) && allyTarget.hp > 0) ? allyTarget : null;
-        const tgt = pinned || this._highestHpEnemy();
+        const tgt = this._resolveEnemyTarget(pinned);
         targets = tgt ? [tgt] : [];
         break;
       }
@@ -428,12 +448,9 @@ export class BattleEngine {
     servant.buffs.consumeOverchargeBuffs();
     servant.stats.setNpgauge(0);
 
-    // FR-4: an explicit, living enemy target wins; otherwise default to the
-    // highest-HP living enemy.
+    // Target resolution (FR-4 explicit `4e2` → FR-10 sticky focus `@N` → highest-HP).
     const explicit = (enemyTargetIdx != null) ? this.enemies[enemyTargetIdx] : null;
-    const mainTarget = (explicit && explicit.hp > 0)
-      ? explicit
-      : this.enemies.reduce((best, e) => (e.hp > best.hp ? e : best), this.enemies[0]);
+    const mainTarget = this._resolveEnemyTarget(explicit);
 
     for (const func of functions) {
       if (['damageNp', 'damageNpPierce', 'damageNpHpratioLow'].includes(func.funcType)) {
