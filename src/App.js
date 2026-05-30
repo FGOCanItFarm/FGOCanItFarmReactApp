@@ -343,6 +343,7 @@ const App = () => {
         team={team}
         servants={servants}
         selectedMysticCode={selectedMysticCode}
+        setSelectedMysticCode={setSelectedMysticCode}
         selectedQuest={selectedQuest}
         servantEffects={servantEffects}
         updateServantEffects={updateServantEffects}

@@ -296,12 +296,32 @@ export function legalNextTokens(engine) {
 
 function servantSnapshot(servant, slot) {
   if (!servant) return null;
+  // Net stat totals: fold configured effects (seeded into user* fields) + live
+  // buffs into the servant's derived mods. Idempotent recompute on the throwaway
+  // replay engine; guarded so fixture stubs without a full Buffs don't throw.
+  let stats = null;
+  try {
+    servant.buffs?.processServantBuffs?.();
+    stats = {
+      atkUp: servant.atkMod ?? 0,
+      busterUp: servant.bUp ?? 0,
+      artsUp: servant.aUp ?? 0,
+      quickUp: servant.qUp ?? 0,
+      busterDmgUp: servant.busterCardDamageUp ?? 0,
+      artsDmgUp: servant.artsCardDamageUp ?? 0,
+      quickDmgUp: servant.quickCardDamageUp ?? 0,
+      npDmgUp: servant.npDamageMod ?? 0,
+      npGen: (servant.npGainMod ?? 1) - 1,
+      oc: servant.ocLevel ?? 1,
+    };
+  } catch { stats = null; }
   return {
     slot,
     collectionNo: servant.id,
     name: servant.name,
     faceUrl: servant.data?.face_url ?? null,
     npGauge: Math.round(servant.npGauge * 10) / 10,
+    stats,
     cooldowns: [servant.skills.cooldowns[1], servant.skills.cooldowns[2], servant.skills.cooldowns[3]],
     maxCooldowns: [servant.skills.maxCooldowns[1], servant.skills.maxCooldowns[2], servant.skills.maxCooldowns[3]],
     // Active buffs for the step-through view (name · value · turns; -1 turns = permanent).

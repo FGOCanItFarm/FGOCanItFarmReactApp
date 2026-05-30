@@ -2,18 +2,15 @@ import React from 'react';
 import { Button, Typography, Box, Container, Modal, Chip, CircularProgress, Alert } from '@mui/material';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import '../CommandInputPage.css';
-import SourceTargetCommandInput from './SourceTargetCommandInput';
 import CombatDashboard from './CombatDashboard';
 import SimulationStats from './SimulationStats';
-import { supabase } from '../supabaseClient';
-import { parseServantSkills } from './skillInfo';
 import CommandChips from './CommandChips';
 import { prepareSimInputs } from '../simulation/RunAdapter';
 import { buildEngineAt } from '../simulation/CommandState';
 
 const CommandInputPage = ({
-  team, servants, setTeam, activeServant, setActiveServant,
-  commands, setCommands, selectedQuest, selectedMysticCode, setSelectedMysticCode,
+  team, servants,
+  commands, setCommands, selectedQuest, selectedMysticCode,
   servantEffects,
   handleSubmit, openModal, handleOpenModal, handleCloseModal,
   simulationResult, setSimulationResult,
@@ -23,26 +20,10 @@ const CommandInputPage = ({
   const [commandsHistory, setCommandsHistory] = React.useState([]);
   const [submitStatus, setSubmitStatus] = React.useState(null);
   const [submitError, setSubmitError] = React.useState('');
-  const [skillInfo, setSkillInfo] = React.useState({}); // collectionNo -> parsed skills
   const [simInputs, setSimInputs] = React.useState(null); // engine-replay validation source
 
-  // Fetch full data for the current team so the builder can label skills and
-  // know which need an ally target. Keyed by the team's collection numbers.
+  // Keyed by the team's collection numbers — drives the simInputs rebuild below.
   const teamKey = team.map(s => s.collectionNo || '').join(',');
-  React.useEffect(() => {
-    const ids = team.map(s => s.collectionNo).filter(Boolean).map(Number);
-    if (ids.length === 0) { setSkillInfo({}); return; }
-    let cancelled = false;
-    (async () => {
-      const { data, error } = await supabase.from('servants').select('collection_no, data').in('collection_no', ids);
-      if (error || cancelled) return;
-      const map = {};
-      for (const row of data || []) map[String(row.collection_no)] = parseServantSkills(row.data);
-      if (!cancelled) setSkillInfo(map);
-    })();
-    return () => { cancelled = true; };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [teamKey]);
 
   React.useEffect(() => {
     setSubmitStatus(null);
@@ -88,13 +69,6 @@ const CommandInputPage = ({
 
   const filledCount = team.filter(s => s.collectionNo).length;
   const canRun = commands.length > 0 && !!selectedQuest && filledCount > 0;
-
-  const addCommand = (command) => {
-    setCommands(prev => {
-      setCommandsHistory(h => [...h, prev]);
-      return [...prev, command];
-    });
-  };
 
   const setCommandsWithHistory = (newCommands) => {
     setCommands(prev => {
@@ -148,19 +122,6 @@ const CommandInputPage = ({
 
   return (
     <Container className="command-input-container" disableGutters maxWidth={false} style={{ marginRight: 'var(--team-panel-width)' }}>
-      <SourceTargetCommandInput
-        team={team}
-        servants={servants}
-        setTeam={setTeam}
-        selectedMysticCode={selectedMysticCode}
-        setSelectedMysticCode={setSelectedMysticCode}
-        addCommand={addCommand}
-        updateCommands={setCommands}
-        selectedSlot={activeServant}
-        setSelectedSlot={setActiveServant}
-        skillInfo={skillInfo}
-      />
-
       <CombatDashboard
         team={team}
         selectedQuest={selectedQuest}

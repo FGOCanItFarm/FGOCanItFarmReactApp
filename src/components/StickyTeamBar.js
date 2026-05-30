@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { Box, Button, Typography, TextField, Checkbox, InputAdornment } from '@mui/material';
+import { Box, Button, Typography, TextField, Checkbox, InputAdornment, Select, MenuItem } from '@mui/material';
 import ServantAvatar from './ServantAvatar';
 import '../ui-vars.css';
 import '../team-sticky.css';
@@ -36,6 +36,7 @@ const StickyTeamBar = ({
   team = [],
   servants = [],
   selectedMysticCode,
+  setSelectedMysticCode = () => {},
   selectedQuest,
   servantEffects = [],
   updateServantEffects = () => {},
@@ -178,9 +179,22 @@ const StickyTeamBar = ({
       </div>
 
       <div className="team-panel-info">
-        <Typography variant="caption" sx={{ display: 'block', color: 'var(--color-text-dim)' }}>
-          MC: {selectedMysticCode ? (MYSTIC_CODE_NAMES[selectedMysticCode] || `ID ${selectedMysticCode}`) : 'None'}
+        <Typography variant="caption" sx={{ display: 'block', color: 'var(--color-text-dim)', mb: 0.25 }}>
+          Mystic Code
         </Typography>
+        <Select
+          value={selectedMysticCode ?? ''}
+          onChange={(e) => setSelectedMysticCode(e.target.value === '' ? null : e.target.value)}
+          displayEmpty
+          fullWidth
+          size="small"
+          sx={{ mb: 1, fontSize: '0.78rem' }}
+        >
+          <MenuItem value=""><em>None</em></MenuItem>
+          {Object.entries(MYSTIC_CODE_NAMES).map(([id, name]) => (
+            <MenuItem key={id} value={Number(id)} sx={{ fontSize: '0.78rem' }}>{name}</MenuItem>
+          ))}
+        </Select>
         <Typography variant="caption" sx={{ display: 'block', color: 'var(--color-text-dim)' }} noWrap>
           Quest: {selectedQuest?.name || 'None'}
         </Typography>

@@ -48,6 +48,29 @@ const Buffs = ({ buffs }) => {
   );
 };
 
+/** Net stat totals (config effects + live buffs) for a frontline servant.
+ *  Renders only the stats that differ from their neutral baseline. */
+const StatTotals = ({ stats }) => {
+  if (!stats) return null;
+  const pct = (v) => `${v > 0 ? '+' : ''}${Math.round(v * 100)}%`;
+  const items = [
+    ['ATK', stats.atkUp], ['Buster', stats.busterUp], ['Arts', stats.artsUp], ['Quick', stats.quickUp],
+    ['B.DMG', stats.busterDmgUp], ['A.DMG', stats.artsDmgUp], ['Q.DMG', stats.quickDmgUp],
+    ['NP DMG', stats.npDmgUp], ['NP Gen', stats.npGen],
+  ].filter(([, v]) => Math.abs(v || 0) >= 0.005);
+  if (stats.oc > 1) items.push(['OC', stats.oc]);
+  if (!items.length) return null;
+  return (
+    <div className="ally__stats">
+      {items.map(([label, v]) => (
+        <span key={label} className="stat-pill" title={`${label} net total`}>
+          {label} {label === 'OC' ? `×${v}` : pct(v)}
+        </span>
+      ))}
+    </div>
+  );
+};
+
 /**
  * FR-7 in-combat dashboard + step-through scrubber. Enemies left, frontline
  * allies right, palette + command chips middle. A cursor lets you view the live
@@ -152,6 +175,26 @@ const CombatDashboard = ({ team, selectedQuest, selectedMysticCode, servantEffec
   // Currently-fireable frontline NPs — previewed in every enemy box.
   const readyNps = options.filter((o) => o.kind === 'np' && o.available);
 
+  // FR-3 palette, grouped for legibility: one section per occupied front slot
+  // (that servant's skills, then its NP), then Mystic Code, Swaps, End Turn.
+  const actionGroups = [];
+  [0, 1, 2].forEach((slot) => {
+    const s = snapshot.front[slot];
+    const opts = options.filter(
+      (o) => (o.kind === 'skill' || o.kind === 'np') && o.servantSlot === slot,
+    );
+    if (!opts.length) return;
+    // Skills first, NP last.
+    opts.sort((a, b) => (a.kind === b.kind ? 0 : a.kind === 'np' ? 1 : -1));
+    actionGroups.push({ key: `s${slot}`, label: `S${slot + 1} · ${s?.name || 'Servant'}`, options: opts });
+  });
+  const mcOpts = options.filter((o) => o.kind === 'mc');
+  if (mcOpts.length) actionGroups.push({ key: 'mc', label: 'Mystic Code', options: mcOpts });
+  const swapOpts = options.filter((o) => o.kind === 'swap');
+  if (swapOpts.length) actionGroups.push({ key: 'swap', label: 'Swaps', options: swapOpts });
+  const endOpts = options.filter((o) => o.kind === 'endTurn');
+  if (endOpts.length) actionGroups.push({ key: 'end', label: 'End Turn', options: endOpts });
+
   return (
     <Box className="dash">
       <Box className="dash__header">
@@ -223,20 +266,27 @@ const CombatDashboard = ({ team, selectedQuest, selectedMysticCode, servantEffec
             Actions {atEnd ? '' : `(branch from step ${step})`}
           </Typography>
           <Box className="dash__palette">
-            {options.map((opt) => (
-              <Tooltip key={opt.token}
-                title={opt.available ? humanizeToken(resolveToken(opt, {}), engine) : (opt.reason || 'unavailable')}
-                arrow>
-                <span>
-                  <Button size="small"
-                    variant={pending?.option?.token === opt.token ? 'contained' : 'outlined'}
-                    disabled={!opt.available}
-                    className={`palette-btn palette-btn--${opt.kind} palette-btn--${opt.targetClass}`}
-                    onClick={() => onOption(opt)}>
-                    {opt.label}{!opt.available && opt.reason ? ` (${opt.reason})` : ''}
-                  </Button>
-                </span>
-              </Tooltip>
+            {actionGroups.map((g) => (
+              <Box key={g.key} className="dash__pgroup">
+                <span className="dash__pgroup-label">{g.label}</span>
+                <Box className="dash__pgroup-btns">
+                  {g.options.map((opt) => (
+                    <Tooltip key={opt.token}
+                      title={opt.available ? humanizeToken(resolveToken(opt, {}), engine) : (opt.reason || 'unavailable')}
+                      arrow>
+                      <span>
+                        <Button size="small"
+                          variant={pending?.option?.token === opt.token ? 'contained' : 'outlined'}
+                          disabled={!opt.available}
+                          className={`palette-btn palette-btn--${opt.kind} palette-btn--${opt.targetClass}`}
+                          onClick={() => onOption(opt)}>
+                          {opt.label}{!opt.available && opt.reason ? ` (${opt.reason})` : ''}
+                        </Button>
+                      </span>
+                    </Tooltip>
+                  ))}
+                </Box>
+              </Box>
             ))}
           </Box>
 
@@ -290,6 +340,7 @@ const CombatDashboard = ({ team, selectedQuest, selectedMysticCode, servantEffec
                       <span key={k} className={`cd-pip ${cd === 0 ? 'cd-pip--ready' : ''}`}>{cd === 0 ? '✓' : cd}</span>
                     ))}
                   </div>
+                  <StatTotals stats={s.stats} />
                   <Buffs buffs={s.buffs} />
                 </>
               ) : <span className="ally__slot-empty">Empty</span>}
