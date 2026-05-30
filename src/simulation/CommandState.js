@@ -300,6 +300,10 @@ function servantSnapshot(servant, slot) {
     npGauge: Math.round(servant.npGauge * 10) / 10,
     cooldowns: [servant.skills.cooldowns[1], servant.skills.cooldowns[2], servant.skills.cooldowns[3]],
     maxCooldowns: [servant.skills.maxCooldowns[1], servant.skills.maxCooldowns[2], servant.skills.maxCooldowns[3]],
+    // Active buffs for the step-through view (name · value · turns; -1 turns = permanent).
+    buffs: (servant.buffs?.buffs ?? [])
+      .filter((b) => b && b.buff)
+      .map((b) => ({ name: b.buff, value: b.value ?? 0, turns: b.turns ?? -1 })),
     skills: [1, 2, 3].map((num) => {
       const sk = peekSkill(servant, num);
       return {
@@ -320,6 +324,10 @@ export function engineSnapshot(engine) {
     back: engine.servants.slice(3).map((s, i) => servantSnapshot(s, i + 3)),
     enemies: engine.enemies.map((e, idx) => ({
       index: idx + 1, name: e.name, className: e.className, hp: e.hp, maxHp: e.maxHp,
+      // Debuffs landed on this enemy (DEF Down, card-resist down, etc.).
+      buffs: (e.buffs?.buffs ?? [])
+        .filter((b) => b && b.buff)
+        .map((b) => ({ name: b.buff, value: b.value ?? 0, turns: b.turns ?? -1 })),
     })),
     wave: engine.wave,
     totalWaves: engine.totalWaves,
