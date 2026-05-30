@@ -153,9 +153,10 @@ function runGuardrailPipeline(data) {
 // collectionNo, name, className, classId, gender, attribute, rarity, traits,
 // atkGrowth, skills, noblePhantasms, classPassive — but per product decision we
 // also keep lightweight stat/display fields (atk/hp base+growth, cards,
-// cardDetails, hitsDistribution, star*) and ascensionAdd (some servants' chosen
-// ascension changes attribute/skill effects, e.g. Melusine 312). skills and
-// noblePhantasms are kept WHOLE (their svals/buff arrays are damage-critical).
+// cardDetails, hitsDistribution, star*). The heavy `ascensionAdd` blob is
+// collapsed into a compact derived `forms[]` (see extractForms) — distinct
+// per-ascension trait/attribute sets, e.g. Melusine 312 Analog vs Cruise.
+// skills and noblePhantasms are kept WHOLE (their svals/buff arrays are damage-critical).
 // We drop the heavy flavour/material/growth-curve fields below and reduce
 // extraAssets to just the face thumbnails (full art is the biggest offender;
 // face_url is also extracted into its own column).
@@ -198,6 +199,43 @@ function trimSkillsToMaxLevel(skills) {
   }));
 }
 
+// Collapse the bloated `ascensionAdd` blob into a compact `forms[]` — the
+// DISTINCT trait/attribute sets a servant can present across its ascensions.
+// The engine indexes traits by id and the team-panel Identity card shows the
+// names, so each form carries both. `isBase` marks the form whose traits match
+// the servant's default top-level `traits` (i.e. the form used when the player
+// hasn't picked one — keeps sims byte-identical to the pre-forms behaviour).
+// Single-form servants return [] (no choice to offer; engine uses base traits).
+export function extractForms(data) {
+  const ascInd  = data?.ascensionAdd?.individuality?.ascension || {};
+  const ascAttr = data?.ascensionAdd?.attribute?.ascension || {};
+  const ascName = data?.ascensionAdd?.overWriteServantName?.ascension || {};
+  const sig = (ids) => ids.slice().sort((a, b) => a - b).join(',');
+  const baseIds = (data?.traits || []).map((t) => t.id);
+  const baseSig = sig(baseIds);
+
+  const seen = new Set();
+  const forms = [];
+  for (const key of Object.keys(ascInd).sort((a, b) => Number(a) - Number(b))) {
+    const arr = ascInd[key];
+    if (!Array.isArray(arr) || arr.length === 0) continue; // [] = inherits base
+    const ids = arr.map((t) => t.id);
+    const s = sig(ids);
+    if (seen.has(s)) continue;
+    seen.add(s);
+    forms.push({
+      key: Number(key),
+      label: (ascName[key] && ascName[key] !== data.name) ? ascName[key] : null,
+      attribute: ascAttr[key] || data.attribute || null,
+      traitIds: ids,
+      traits: arr.map((t) => t.name).filter(Boolean),
+      isBase: s === baseSig,
+    });
+  }
+  if (forms.length <= 1) return []; // no genuine choice
+  return forms;
+}
+
 export function stripServantData(data) {
   const out = { ...data };
   for (const key of SERVANT_DROP_FIELDS) delete out[key];
@@ -207,6 +245,12 @@ export function stripServantData(data) {
     out.extraAssets = out.extraAssets.faces ? { faces: out.extraAssets.faces } : {};
   }
   if (Array.isArray(out.skills)) out.skills = trimSkillsToMaxLevel(out.skills);
+  // Derive a compact forms[] (distinct per-ascension trait/attribute sets).
+  // NOTE: ascensionAdd is intentionally KEPT for now — forms can also drive
+  // per-form skill/NP changes (FR-5), and the source fields for that modelling
+  // still live under ascensionAdd / the NP tdTypeChange scripts. Don't drop it
+  // until the full per-form model is settled (see docs / owner discussion).
+  out.forms = extractForms(data);
   return out;
 }
 

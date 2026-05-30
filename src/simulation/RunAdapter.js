@@ -68,6 +68,8 @@ export async function prepareSimInputs({ team, selectedQuest, selectedMysticCode
       quickDamageUp:  Number(fx.quickDamageUp  ?? 0),
       artsDamageUp:   Number(fx.artsDamageUp   ?? 0),
       append5:        !!(fx.append5 ?? fx.append_5 ?? true),
+      // Selected ascension/form key (null = default/base form → no override).
+      formKey:        fx.formKey ?? null,
     };
     return { rawData, opts };
   });

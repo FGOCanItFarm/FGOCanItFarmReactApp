@@ -30,36 +30,27 @@ const STRUCTURAL_TRAIT = (name) =>
 const traitNames = (arr) => (arr || []).map(t => (typeof t === 'string' ? t : t?.name)).filter(Boolean);
 const meaningful = (names) => names.filter(n => !STRUCTURAL_TRAIT(n));
 
+const formLabel = (form, i) => form.label || (form.isBase ? 'Base form' : `Form ${i + 1}`);
+
 /**
- * Read-only identity summary for the team panel. Derives attribute, alignment,
- * and meaningful traits from the trimmed servant `data` blob, and collapses
- * `ascensionAdd.individuality.ascension` into the DISTINCT trait sets a servant
- * can present (its "forms"), so users can see what each ascension/form does.
- * NOTE: purely informational today — the simulation engine does not yet switch
- * servant traits/attribute by form (see Servant.js), so this educates the
- * picker without claiming a damage effect.
+ * Identity summary for the team panel, driven by the derived `data.forms[]`
+ * (distinct per-ascension trait/attribute sets from the sync pipeline). Shows
+ * attribute, alignment, and the *selected* form's meaningful traits. The form
+ * the player selects is fed to the engine (Servant.js formKey) so trait-
+ * conditional damage matches what's shown.
  */
-function describeIdentity(data, mode = 1) {
+function describeIdentity(data, selectedFormKey) {
   if (!data) return null;
   const base = traitNames(data.traits);
-  const attribute = cap(data.attribute || base.find(n => /^attribute/.test(n))?.replace(/^attribute/, '') || '');
+  const forms = Array.isArray(data.forms) ? data.forms : [];
+  const baseForm = forms.find(f => f.isBase) || null;
+  const active = (selectedFormKey != null && forms.find(f => Number(f.key) === Number(selectedFormKey))) || baseForm;
+
+  const attribute = cap(active?.attribute || data.attribute || '');
   const alignment = base.filter(n => /^alignment/.test(n)).map(n => cap(n.replace(/^alignment/, ''))).join(' · ');
+  const shownTraits = meaningful(active ? (active.traits || []) : base);
 
-  // Distinct, non-empty per-ascension trait sets → forms.
-  const ascMap = data.ascensionAdd?.individuality?.ascension || {};
-  const seen = new Set();
-  const forms = [];
-  for (const key of Object.keys(ascMap).sort((a, b) => Number(a) - Number(b))) {
-    const names = traitNames(ascMap[key]);
-    if (!names.length) continue;                       // [] = inherits base
-    const sig = names.slice().sort().join('|');
-    if (seen.has(sig)) continue;
-    seen.add(sig);
-    forms.push({ ascension: Number(key), traits: meaningful(names) });
-  }
-  const multiForm = forms.length > 1;
-
-  return { attribute, alignment, baseTraits: meaningful(base), forms, multiForm, mode };
+  return { attribute, alignment, traits: shownTraits, forms, multiForm: forms.length > 1, baseForm, active };
 }
 
 const FLAT_FIELDS = [
@@ -139,7 +130,7 @@ const StickyTeamBar = ({
     })();
     return () => { cancelled = true; };
   }, [cno, traitCache]);
-  const identity = describeIdentity(cno ? traitCache[cno] : null, effects.mode || effects.formMode || 1);
+  const identity = describeIdentity(cno ? traitCache[cno] : null, effects.formKey ?? null);
 
   // Keep the selection on a filled slot when possible.
   useEffect(() => {
@@ -155,7 +146,6 @@ const StickyTeamBar = ({
 
   const npLevel = effects.np ?? effects.npLevel ?? 1;
   const append5 = effects.append_5 ?? effects.append5 ?? true;
-  const mode = effects.mode || effects.formMode || 1;
 
   return (
     <aside className="team-panel" aria-label="Team panel">
@@ -253,20 +243,28 @@ const StickyTeamBar = ({
             </Typography>
           </Box>
 
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 0.5 }}>
-            <Typography variant="body2" sx={{ color: editable ? undefined : 'var(--color-text-dim)' }}>Form</Typography>
-            {[1, 2, 3].map(m => (
-              <Button key={m} size="small" disabled={!editable}
-                variant={editable && mode === m ? 'contained' : 'outlined'}
-                onClick={() => set('mode', m)} sx={{ minWidth: 34 }}>
-                {m}
-              </Button>
-            ))}
-          </Box>
+          {/* Form picker — only for servants with real ascension/form variation.
+              Selecting a form feeds Servant.js (formKey) so the simulation uses
+              that form's traits/attribute. Defaults to the base form. */}
+          {editable && identity?.multiForm && (
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mt: 0.75, flexWrap: 'wrap' }}>
+              <Typography variant="body2">Form</Typography>
+              {identity.forms.map((f, i) => {
+                const selectedKey = effects.formKey ?? identity.baseForm?.key;
+                return (
+                  <Button key={f.key} size="small"
+                    variant={Number(selectedKey) === Number(f.key) ? 'contained' : 'outlined'}
+                    onClick={() => set('formKey', f.key)} sx={{ textTransform: 'none' }}>
+                    {formLabel(f, i)}
+                  </Button>
+                );
+              })}
+            </Box>
+          )}
 
           {/* Identity — fills the gap above the Mystic Code picker so users can
-              eyeball attribute / alignment / traits (and per-form trait deltas)
-              without leaving the builder. */}
+              eyeball attribute / alignment / traits of the active form without
+              leaving the builder. */}
           {editable && identity && (
             <div className="team-panel-identity">
               <Typography variant="caption" className="ident-label">Identity</Typography>
@@ -278,24 +276,9 @@ const StickyTeamBar = ({
                   <div className="ident-row"><span>Alignment</span><b>{identity.alignment}</b></div>
                 )}
               </div>
-              {identity.baseTraits.length > 0 && (
+              {identity.traits.length > 0 && (
                 <div className="ident-traits">
-                  {identity.baseTraits.map(t => <span key={t} className="ident-trait">{t}</span>)}
-                </div>
-              )}
-              {identity.multiForm && (
-                <div className="ident-forms">
-                  <Typography variant="caption" className="ident-label">
-                    Forms (trait sets by ascension)
-                  </Typography>
-                  {identity.forms.map((f) => (
-                    <div key={f.ascension} className="ident-form">
-                      <span className="ident-form-tag">Asc {f.ascension}+</span>
-                      <div className="ident-traits">
-                        {f.traits.map(t => <span key={t} className="ident-trait">{t}</span>)}
-                      </div>
-                    </div>
-                  ))}
+                  {identity.traits.map(t => <span key={t} className="ident-trait">{t}</span>)}
                 </div>
               )}
             </div>

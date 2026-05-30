@@ -26,6 +26,7 @@ export class Servant {
     quickDamageUp  = 0,
     artsDamageUp   = 0,
     append5        = true,
+    formKey        = null,
   } = {}) {
     this.id        = rawData.collectionNo;
     this.data      = rawData;
@@ -47,6 +48,19 @@ export class Servant {
       this.attribute = 'human';
       this.atkGrowth = this.atkGrowth.slice();
       this.atkGrowth[89] = 10835; // 5★ ATK @ Lv90 (Stats reads index 89 for rarity 5)
+    }
+
+    // Ascension/form override (declarative `forms[]` from the sync pipeline).
+    // When the player picks a form, swap to its trait ids + attribute BEFORE the
+    // baseline class/trait snapshot below, so trait-conditional damage and any
+    // overwriteBattleclass revert resolve against the chosen form. No formKey (or
+    // an unknown one) leaves base traits untouched → identical to pre-forms sims.
+    if (formKey != null && Array.isArray(rawData.forms) && rawData.forms.length) {
+      const form = rawData.forms.find(f => Number(f.key) === Number(formKey));
+      if (form) {
+        this.traits = (form.traitIds || []).slice();
+        if (form.attribute) this.attribute = form.attribute;
+      }
     }
 
     this.skills  = new Skills(rawData.skills || [], append5);

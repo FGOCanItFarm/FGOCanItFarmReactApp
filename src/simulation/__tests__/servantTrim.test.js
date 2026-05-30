@@ -5,7 +5,7 @@
  * arrays to the max-level entry is identical to what the engine's Skills.safeSval
  * selects at runtime, while noblePhantasms keep their full level/OC grid.
  */
-import { stripServantData } from '../../../shared/atlasSync';
+import { stripServantData, extractForms } from '../../../shared/atlasSync';
 import { Skills } from '../Skills';
 
 const tenLevels = (key) =>
@@ -49,7 +49,7 @@ describe('stripServantData', () => {
     for (const k of [
       'collectionNo', 'name', 'className', 'classId', 'gender', 'attribute',
       'rarity', 'traits', 'atkGrowth', 'skills', 'noblePhantasms', 'classPassive',
-      'appendPassive', 'cards', 'hpGrowth', 'ascensionAdd',
+      'appendPassive', 'cards', 'hpGrowth', 'forms', 'ascensionAdd',
     ]) expect(out).toHaveProperty(k);
   });
 
@@ -60,6 +60,10 @@ describe('stripServantData', () => {
       'valentineScript', 'bondEquip', 'bondEquips', 'bondEquipOwner', 'bondGifts',
       'bondGrowth', 'expGrowth', 'expFeed', 'growthCurve', 'limits',
     ]) expect(out).not.toHaveProperty(k);
+  });
+
+  test('single-form servant gets an empty forms[]', () => {
+    expect(out.forms).toEqual([]);
   });
 
   test('reduces extraAssets to face thumbnails only', () => {
@@ -89,5 +93,43 @@ describe('stripServantData', () => {
     expect(input).toHaveProperty('profile');
     expect(input.skills[0].functions[0].svals).toHaveLength(10);
     expect(Object.keys(input.extraAssets)).toHaveLength(3);
+  });
+});
+
+describe('extractForms', () => {
+  // Mélusine-style: ascension 0 = Analog (knightsOfTheRound, no fly);
+  // ascension 3 = Cruise (canFlyInSpace) == base traits. 1/2 inherit ([]).
+  const melusine = () => ({
+    name: 'Mélusine', attribute: 'earth',
+    traits: [{ id: 2 }, { id: 101 }, { id: 201 }, { id: 2924, name: 'canFlyInSpace' }],
+    ascensionAdd: {
+      attribute: { ascension: {} },
+      overWriteServantName: { ascension: {} },
+      individuality: { ascension: {
+        0: [{ id: 2 }, { id: 101 }, { id: 201 }, { id: 2795, name: 'knightsOfTheRound' }],
+        1: [], 2: [],
+        3: [{ id: 2 }, { id: 101 }, { id: 201 }, { id: 2924, name: 'canFlyInSpace' }],
+        4: [{ id: 2 }, { id: 101 }, { id: 201 }, { id: 2924, name: 'canFlyInSpace' }],
+      } },
+    },
+  });
+
+  test('collapses distinct per-ascension trait sets into forms[]', () => {
+    const forms = extractForms(melusine());
+    expect(forms).toHaveLength(2);
+    expect(forms.map(f => f.key)).toEqual([0, 3]);
+    expect(forms[0].traitIds).toContain(2795);
+    expect(forms[1].traitIds).toContain(2924);
+  });
+
+  test('marks the form whose traits match the base as isBase', () => {
+    const forms = extractForms(melusine());
+    const base = forms.find(f => f.isBase);
+    expect(base.key).toBe(3);
+    expect(forms.find(f => f.key === 0).isBase).toBe(false);
+  });
+
+  test('returns [] for a single-form servant', () => {
+    expect(extractForms({ traits: [{ id: 1 }], ascensionAdd: { individuality: { ascension: { 0: [] } } } })).toEqual([]);
   });
 });
