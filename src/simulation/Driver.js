@@ -17,6 +17,7 @@ const RE_NP_TARGET     = /^([456])e(\d+)$/;                         // 4e2 (NP �
 const RE_SKILL_ENEMY   = /^([a-i])~(\d+)$/;                         // a~2 (skill → enemy 2)
 const RE_SKILL_TARGET  = /^([a-i])(\d)$/;                           // a1
 const RE_MC_TARGET     = /^([jkl])(\d)$/;                           // j1
+const RE_FOCUS         = /^@(\d+)$/;                                // @2 (sticky enemy focus, FR-10)
 
 /**
  * Canonical swap-token builder — the single source of truth for the `x<f><b>`
@@ -67,6 +68,14 @@ export class Driver {
   executeToken(token) {
     const eng = this.engine;
     let m;
+
+    // @2  — sticky enemy focus (FR-10): set the default single-target enemy for
+    // subsequent bare NPs/skills. A selection, not a turn-consuming action; never
+    // fails (an out-of-range index just falls back to highest-HP at use time).
+    if ((m = RE_FOCUS.exec(token))) {
+      eng.focusEnemyIdx = parseInt(m[1], 10) - 1;
+      return eng;
+    }
 
     // a([Ch1A]2)  — choice + explicit target
     if ((m = RE_CHOICE_TARGET.exec(token))) {

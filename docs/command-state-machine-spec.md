@@ -408,14 +408,18 @@ LATER optimization servants "graduate" into, not a prerequisite.
 
 Priority order set by owner: **FR-11 → FR-10 → FR-12.** FR-13 deferred.
 
-### FR-10 Enemy-targeting UI (enemy picker)
-Command Input must let the user pick **which enemy** a single-target skill/NP
-hits, emitting the existing `~N` (skill) / `eN` (NP) grammar. Default to the
-highest-HP living enemy when unpicked. The engine already supports this:
-FR-4 grammar + `applyEffect`'s highest-HP default for `funcTargetType:'enemy'`
-+ `_highestHpEnemy()`. UI must handle up to ~9 enemies on a stage and show each
-enemy's HP (the dashboard already renders HP bars). Motivating case: Kazuradrop
-needs her two DEF-downs spread across the two big wave-3 enemies (`c~2 f~1`).
+### FR-10 Enemy-targeting UI (enemy picker) — IMPLEMENTED
+Sticky focus + per-action override (owner-chosen). New **`@N`** token (1-based)
+sets `BattleEngine.focusEnemyIdx`; single-target resolve order = explicit
+`~N`/`eN` suffix → focus (if alive) → highest-HP (`_resolveEnemyTarget`); focus
+resets each wave (`getNextWave`); `enemyAll` actions ignore it. CommandState
+classifies/humanizes `@N` and exposes `focusEnemyIdx`/`enemies[i].focused`;
+`CombatDashboard` clicking an enemy (outside a pending action) emits `@N` and
+highlights it, while the pending single-target flow still emits the `~N`/`eN`
+override. Guarded by `focusTarget.test.js`. Targeting is single-target or
+all-enemies only (incl. trait/alignment/attribute-filtered all) — no arbitrary
+multi-select. Motivating case: Kazuradrop's two DEF-downs spread across the two
+big wave-3 enemies via focus + override.
 
 ### FR-11 Persist servant effects in saved_runs (re-sim fix) — DO FIRST
 `resimulateSavedRun` rebuilds the team from `np_levels` only, dropping each

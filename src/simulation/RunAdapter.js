@@ -261,7 +261,9 @@ export async function resimulateSavedRun(run) {
   if (!qRow?.data) return { success: false, error: `Quest ${run.quest_id} data not found.` };
 
   const selectedQuest = { id: run.quest_id, _fullData: qRow.data };
-  const selectedMysticCode = run.mystic_code_id != null ? { id: run.mystic_code_id } : null;
+  // prepareSimInputs treats selectedMysticCode AS the id (the app's <Select>
+  // value), so pass the bare id — not an object (which became id=eq.[object Object]).
+  const selectedMysticCode = run.mystic_code_id ?? null;
   const commands = (run.token_string || '').split(/\s+/).filter(Boolean);
 
   return runSimulation({ team, commands, selectedQuest, selectedMysticCode, servantEffects });

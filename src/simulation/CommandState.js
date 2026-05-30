@@ -28,6 +28,7 @@ const RE_NP_TARGET = /^([456])e(\d+)$/;                          // 4e2 (FR-4)
 const RE_SKILL_ENEMY = /^([a-i])~(\d+)$/;                        // a~2 (FR-4)
 const RE_SKILL_TARGET = /^([a-i])(\d)$/;                          // a1
 const RE_MC_TARGET = /^([jkl])(\d)$/;                             // j1
+const RE_FOCUS = /^@(\d+)$/;                                      // @2 (sticky focus, FR-10)
 
 /**
  * Parse one token into a structural descriptor WITHOUT executing it.
@@ -37,6 +38,9 @@ const RE_MC_TARGET = /^([jkl])(\d)$/;                             // j1
  */
 export function classifyToken(token) {
   let m;
+  if ((m = RE_FOCUS.exec(token))) {
+    return { kind: 'focus', enemyTarget: parseInt(m[1], 10) };
+  }
   if ((m = RE_CHOICE_TARGET.exec(token))) {
     const idx = SKILL_LETTERS.indexOf(m[1]);
     return { kind: 'choice', servantIdx: Math.floor(idx / 3), skillIdx: idx % 3,
@@ -300,6 +304,10 @@ function servantSnapshot(servant, slot) {
     npGauge: Math.round(servant.npGauge * 10) / 10,
     cooldowns: [servant.skills.cooldowns[1], servant.skills.cooldowns[2], servant.skills.cooldowns[3]],
     maxCooldowns: [servant.skills.maxCooldowns[1], servant.skills.maxCooldowns[2], servant.skills.maxCooldowns[3]],
+    // Active buffs for the step-through view (name · value · turns; -1 turns = permanent).
+    buffs: (servant.buffs?.buffs ?? [])
+      .filter((b) => b && b.buff)
+      .map((b) => ({ name: b.buff, value: b.value ?? 0, turns: b.turns ?? -1 })),
     skills: [1, 2, 3].map((num) => {
       const sk = peekSkill(servant, num);
       return {
@@ -320,7 +328,13 @@ export function engineSnapshot(engine) {
     back: engine.servants.slice(3).map((s, i) => servantSnapshot(s, i + 3)),
     enemies: engine.enemies.map((e, idx) => ({
       index: idx + 1, name: e.name, className: e.className, hp: e.hp, maxHp: e.maxHp,
+      focused: engine.focusEnemyIdx === idx, // FR-10 sticky `@N` target
+      // Debuffs landed on this enemy (DEF Down, card-resist down, etc.).
+      buffs: (e.buffs?.buffs ?? [])
+        .filter((b) => b && b.buff)
+        .map((b) => ({ name: b.buff, value: b.value ?? 0, turns: b.turns ?? -1 })),
     })),
+    focusEnemyIdx: engine.focusEnemyIdx ?? null,
     wave: engine.wave,
     totalWaves: engine.totalWaves,
     cleared: engine.enemies.every((e) => e.hp <= 0),
@@ -363,6 +377,8 @@ export function humanizeToken(token, engineOrSnapshot) {
     }
     case 'np':
       return desc.enemyTarget ? `S${desc.slot + 1} NP → enemy ${desc.enemyTarget}` : `S${desc.slot + 1} NP`;
+    case 'focus':
+      return `Focus → enemy ${desc.enemyTarget}`;
     case 'endTurn':
       return 'End turn';
     default:

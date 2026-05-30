@@ -229,7 +229,8 @@ const App = () => {
     const p_token_string = commands.join(' ');
     const p_quest_id = selectedQuest?.id ?? null;
     const p_wave_results = simulationResult?.stats?.waves ?? {};
-    const p_mystic_code_id = selectedMysticCode?.id ?? null;
+    // selectedMysticCode is the id (the <Select> value), not an object.
+    const p_mystic_code_id = selectedMysticCode ?? null;
     // FR-11: persist each filled slot's effect inputs (attack / initialCharge /
     // card & NP buffs) so resimulateSavedRun can reproduce the run.
     const p_servant_effects = filledSlots.map(({ index }) => servantEffects[index] || {});
@@ -337,6 +338,11 @@ const App = () => {
             <SearchPage
               team={team}
               selectedQuest={selectedQuest}
+              setTeam={setTeam}
+              setCommands={setCommands}
+              setSelectedQuest={setSelectedQuest}
+              setSelectedMysticCode={setSelectedMysticCode}
+              setServantEffects={setServantEffects}
             />
           } />
           <Route path="/" element={<Instructions />} />

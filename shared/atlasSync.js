@@ -301,6 +301,44 @@ function extractEnemyMeta(stages) {
 // cosmetic svt fields, and top-level metadata that already lives in its own
 // columns) is safe and shrinks the blob ~20×. enemyHash/availableEnemyHashes are
 // kept (tiny) so a stored quest records which wave-variation spawn it represents.
+// Gather every buff across an enemy's skills / passives / NP (enemy `skills` is
+// an object {skill1,skill2,skill3}; passives are arrays).
+function collectEnemyBuffs(e) {
+  const skills = [];
+  const sk = e.skills;
+  if (Array.isArray(sk)) skills.push(...sk);
+  else if (sk && typeof sk === 'object') skills.push(...Object.values(sk).filter(v => v && typeof v === 'object'));
+  for (const key of ['classPassive', 'extraPassive', 'appendPassive', 'noblePhantasm']) {
+    const v = e[key];
+    if (Array.isArray(v)) skills.push(...v);
+    else if (v && typeof v === 'object') skills.push(v);
+  }
+  const buffs = [];
+  for (const s of skills) for (const f of (s.functions ?? [])) for (const b of (f.buffs ?? [])) buffs.push(b);
+  return buffs;
+}
+
+// 90** class-vulnerability ("Anti-<Class> Defense Vulnerability"): an enemy
+// overwriteClassRelation buff whose script.relationId.defSide[attacker][defender]
+// forces a damage multiplier (e.g. saber→lancer damageRate 5000 = 5×). Flatten
+// the entries for THIS enemy's class into { attackerClassName: multiplier } so
+// the engine (Enemy.classAdvantageMod) can apply it. Runs before the trim drops
+// the enemy buffs. Returns null when the enemy has no such vulnerability.
+export function extractClassAdvantageMod(e) {
+  const defClass = e.svt?.className;
+  if (!defClass) return null;
+  const mod = {};
+  for (const b of collectEnemyBuffs(e)) {
+    if (b.type !== 'overwriteClassRelation') continue;
+    const defSide = b.script?.relationId?.defSide ?? {};
+    for (const [atkClass, defenders] of Object.entries(defSide)) {
+      const rate = defenders?.[defClass]?.damageRate;
+      if (rate != null) mod[atkClass] = rate / 1000;
+    }
+  }
+  return Object.keys(mod).length ? mod : null;
+}
+
 function stripQuestData(data) {
   return {
     id:                   data.id,
@@ -310,17 +348,21 @@ function stripQuestData(data) {
     availableEnemyHashes: data.availableEnemyHashes ?? null,
     individuality:        data.individuality ?? [],
     stages: (data.stages ?? []).map(stage => ({
-      enemies: (stage.enemies ?? []).map(e => ({
-        name:      e.name,
-        hp:        e.hp,
-        deathRate: e.deathRate,
-        state:     e.state ?? null,
-        svt: {
-          className: e.svt?.className,
-          attribute: e.svt?.attribute,
-          traits:    (e.svt?.traits ?? []).map(t => ({ id: t.id })),
-        },
-      })),
+      enemies: (stage.enemies ?? []).map(e => {
+        const classAdvantageMod = extractClassAdvantageMod(e);
+        return {
+          name:      e.name,
+          hp:        e.hp,
+          deathRate: e.deathRate,
+          state:     e.state ?? null,
+          ...(classAdvantageMod ? { classAdvantageMod } : {}),
+          svt: {
+            className: e.svt?.className,
+            attribute: e.svt?.attribute,
+            traits:    (e.svt?.traits ?? []).map(t => ({ id: t.id })),
+          },
+        };
+      }),
     })),
   };
 }
@@ -329,9 +371,15 @@ async function upsertQuest(supabase, data, warId, warName) {
   const questId = data.id;
   const stages  = data.stages ?? [];
   if (!questId || stages.length === 0 || !stages[0].enemies) { console.error(`Quest ${questId}: missing id or empty enemies`); return; }
+  // The nice quest carries its CANONICAL war (`warId`/`warLongName`). Prefer it
+  // over the war we happened to scan it under: comeback campaigns (CBC, etc.)
+  // re-run old quests, so the scan war's longName ("CBC 2025 …") mislabels them
+  // (and a quest in several wars would otherwise win non-deterministically).
+  const canonicalWarId   = data.warId ?? warId;
+  const canonicalWarName = data.warLongName ?? data.warName ?? warName;
   const enemyMeta = extractEnemyMeta(stages);
   const { error } = await supabase.from('quests').upsert({
-    id: questId, name: data.name ?? '', war_id: warId, war_name: warName,
+    id: questId, name: data.name ?? '', war_id: canonicalWarId, war_name: canonicalWarName,
     recommend_lv: data.recommendLv ?? '', consume: data.consume ?? 0,
     after_clear: data.afterClear ?? '', opened_at: data.openedAt,
     ...enemyMeta,

@@ -340,18 +340,19 @@ svt.{className, attribute, traits[].id}}` (+ `enemyHash`/`availableEnemyHashes`)
 ~45× smaller. Runs after `extractEnemyMeta` (which reads full stages for the
 `enemy_*`/`wave_*` columns), so trimming is safe.
 
-> **90** class-vulnerability — `classAdvantageMod` (PARTIALLY WIRED):** the
+> **90** class-vulnerability — `classAdvantageMod` (WIRED end-to-end):** the
 > engine reads an optional per-enemy `classAdvantageMod` map
 > (`{ attackerClassName: multiplier }`) that **overrides** the normal
 > class-advantage multiplier — e.g. `{ saber: 5 }` makes Saber attackers deal 5×
 > instead of 2× (the "Anti-Saber Defense Vulnerability" 90** gimmick).
 > `Quest.js` → `Enemy.classAdvantageMod`, applied in
-> `BattleEngine._classMultiplier` (used by both NP-damage paths). **Pending:**
-> `stripQuestData` does NOT yet extract this from the Atlas enemy vulnerability
-> buff (enemy `skills`/buffs are trimmed away), so it only fires where a row
-> carries the field. The fixture `real/quests/94100501.json` is hand-annotated
-> (Great Dragon, Vritra → `{saber:5}`) to exercise the engine; production needs
-> the trim to parse the buff (blocked on the raw Atlas buff shape).
+> `BattleEngine._classMultiplier` (used by both NP-damage paths). The sync now
+> extracts it: `extractClassAdvantageMod` (`atlasSync.js`) reads the enemy's
+> `overwriteClassRelation` buff `script.relationId.defSide[attacker][thisClass]
+> .damageRate` (÷1000) before `stripQuestData` drops enemy buffs (verified
+> against Atlas 94100501 Great Dragon/Vritra → `{saber:5}`;
+> `classAdvantageModSync.test.js`). **A quest synced before this fix lacks the
+> field** until re-synced — 94100501 was hand-patched in the live DB.
 
 ### Field read-map traps (verified against `src/simulation/*`)
 - Engine-read servant fields: `collectionNo, name, className, classId, gender,
@@ -498,5 +499,5 @@ border: 1px solid color-mix(in srgb, var(--color-success) 30%, transparent);
 - `selectedQuest._fullData` is populated at quest-selection time by `QuestSelection.js`; `RunAdapter` reads it directly — no re-fetch
 - `team` is always length 6; empty slots have `collectionNo: ''`
 - `servantEffects` is always length 6 (parallel to `team`)
-- Command grammar (see `Driver.js`): `a`–`i` = frontline servant skills (`a/b/c`→servant 1, `d/e/f`→servant 2, `g/h/i`→servant 3); `j`/`k`/`l` = mystic-code skills; `4`/`5`/`6` = fire NP for frontline slot 1/2/3; `a1` = skill targeting ally slot 1–3; `a~2` = skill targeting enemy 2 (1-based, FR-4); `4e2`/`5e2`/`6e2` = fire NP at enemy 2 (1-based, FR-4; bare `4`/`5`/`6` keep the highest-HP default); `x12` = swap frontline 1 ↔ backline 2; `#` = end turn; `a[Ch1A]` / `a([Ch1A]2)` = choice tokens (parsed but currently inert). NP tokens (`4`/`5`/`6`) are counted for `total_np_cost` in saved runs. Unknown tokens are silently ignored (`Driver.js:110`).
+- Command grammar (see `Driver.js`): `a`–`i` = frontline servant skills (`a/b/c`→servant 1, `d/e/f`→servant 2, `g/h/i`→servant 3); `j`/`k`/`l` = mystic-code skills; `4`/`5`/`6` = fire NP for frontline slot 1/2/3; `a1` = skill targeting ally slot 1–3; `a~2` = skill targeting enemy 2 (1-based, FR-4); `4e2`/`5e2`/`6e2` = fire NP at enemy 2 (1-based, FR-4); `@2` = sticky enemy focus (FR-10): set the default single-target enemy for subsequent bare NPs/skills (resolve order = explicit `~`/`e` suffix → focus → highest-HP; focus resets each wave; `enemyAll` actions ignore it; bare `4`/`a` with no focus keep the highest-HP default); `x12` = swap frontline 1 ↔ backline 2; `#` = end turn; `a[Ch1A]` / `a([Ch1A]2)` = choice tokens (parsed but currently inert). NP tokens (`4`/`5`/`6`) are counted for `total_np_cost` in saved runs. Unknown tokens are silently ignored (`Driver.js:110`).
 - The `supabase` export from `supabaseClient.js` is always defined (uses placeholder URL if env vars missing); check `supabaseMisconfigured` export if you need to warn the user
