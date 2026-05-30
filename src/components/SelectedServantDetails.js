@@ -10,6 +10,25 @@ const SelectedServantDetails = ({ servant, handleEffectChange }) => {
     handleEffectChange(field, value);
   };
 
+  // Buff fields are stored as decimals (0.20) but entered/shown as percent (20%).
+  const handlePct = (field) => (event) => {
+    handleEffectChange(field, Math.max(0, Number(event.target.value) || 0) / 100);
+  };
+  const PctField = ({ label, field, title }) => (
+    <div className="detail-item">
+      <label>{label}</label>
+      <TextField
+        type="number"
+        title={title}
+        value={Math.round((servant[field] || 0) * 100)}
+        onChange={handlePct(field)}
+        autoComplete="off"
+        inputProps={{ min: 0 }}
+        InputProps={{ endAdornment: <InputAdornment position="end">%</InputAdornment> }}
+      />
+    </div>
+  );
+
   const handleCheckboxChange = (field) => (event) => {
     const checked = event.target.checked;
     handleEffectChange(field, checked);
@@ -90,126 +109,16 @@ const SelectedServantDetails = ({ servant, handleEffectChange }) => {
             }}
           />
         </div>
-        <div className="detail-item">
-          <label>Atk Up</label>
-          <TextField
-            type="number"
-            value={servant.atkUp || 0}
-            onChange={handleChange('atkUp')}
-            autoComplete="off"
-            inputProps={{ min: 0 }}
-            InputProps={{
-              endAdornment: <InputAdornment position="end">%</InputAdornment>
-            }}
-          />
-        </div>
-        <div className="detail-item">
-          <label>Arts Up</label>
-          <TextField
-            type="number"
-            value={servant.artsUp || 0}
-            onChange={handleChange('artsUp')}
-            autoComplete="off"
-            inputProps={{ min: 0 }}
-            InputProps={{
-              endAdornment: <InputAdornment position="end">%</InputAdornment>
-            }}
-          />
-        </div>
-        <div className="detail-item">
-          <label>Arts Damage Up</label>
-          <TextField
-            type="number"
-            title='Acts like Valentines 2025 color boost chocolate or Class Score'
-            value={servant.artsDamageUp || 0}
-            onChange={handleChange('artsDamageUp')}
-            autoComplete="off"
-            inputProps={{ min: 0 }}
-            InputProps={{
-              endAdornment: <InputAdornment position="end">%</InputAdornment>
-            }}
-          />
-        </div>
-        <div className="detail-item">
-          <label>Quick Up</label>
-          <TextField
-            type="number"
-            value={servant.quickUp || 0}
-            onChange={handleChange('quickUp')}
-            autoComplete="off"
-            inputProps={{ min: 0 }}
-            InputProps={{
-              endAdornment: <InputAdornment position="end">%</InputAdornment>
-            }}
-          />
-        </div>
-        <div className="detail-item">
-          <label>Quick Damage Up</label>
-          <TextField
-            type="number"
-            title='Acts like Valentines 2025 color boost chocolate or Class Score'
-            value={servant.quickDamageUp || 0}
-            onChange={handleChange('quickDamageUp')}
-            autoComplete="off"
-            inputProps={{ min: 0 }}
-            InputProps={{
-              endAdornment: <InputAdornment position="end">%</InputAdornment>
-            }}
-          />
-        </div>
-        <div className="detail-item">
-          <label>Buster Up</label>
-          <TextField
-            type="number"
-            value={servant.busterUp || 0}
-            onChange={handleChange('busterUp')}
-            autoComplete="off"
-            inputProps={{ min: 0 }}
-            InputProps={{
-              endAdornment: <InputAdornment position="end">%</InputAdornment>
-            }}
-          />
-        </div>
-        <div className="detail-item">
-          <label>Buster Damage Up</label>
-          <TextField
-            type="number"
-            title='Acts like Valentines 2025 color boost chocolate or Class Score'
-            value={servant.busterDamageUp || 0}
-            onChange={handleChange('busterDamageUp')}
-            autoComplete="off"
-            inputProps={{ min: 0 }}
-            InputProps={{
-              endAdornment: <InputAdornment position="end">%</InputAdornment>
-            }}
-          />
-        </div>
-        <div className="detail-item">
-          <label>NP Up</label>
-          <TextField
-            type="number"
-            value={servant.npUp || 0}
-            onChange={handleChange('npUp')}
-            autoComplete="off"
-            inputProps={{ min: 0 }}
-            InputProps={{
-              endAdornment: <InputAdornment position="end">%</InputAdornment>
-            }}
-          />
-        </div>
-        <div className="detail-item">
-          <label>Generic Damage Up</label>
-          <TextField
-            type="number"
-            value={servant.damageUp || 0}
-            onChange={handleChange('damageUp')}
-            autoComplete="off"
-            inputProps={{ min: 0 }}
-            InputProps={{
-              endAdornment: <InputAdornment position="end">%</InputAdornment>
-            }}
-          />
-        </div>
+        <PctField label="Atk Up" field="atkUp" />
+        <PctField label="Arts Up (card)" field="artsUp" />
+        <PctField label="Arts Damage Up" field="artsDamageUp" title="Acts like Valentines 2025 color boost chocolate or Class Score" />
+        <PctField label="Quick Up (card)" field="quickUp" />
+        <PctField label="Quick Damage Up" field="quickDamageUp" title="Acts like Valentines 2025 color boost chocolate or Class Score" />
+        <PctField label="Buster Up (card)" field="busterUp" />
+        <PctField label="Buster Damage Up" field="busterDamageUp" title="Acts like Valentines 2025 color boost chocolate or Class Score" />
+        <PctField label="NP Damage Up" field="npUp" title="Increases Noble Phantasm DAMAGE (not gauge gain)." />
+        <PctField label="NP Gen Up" field="npGenUp" title="Increases NP gauge gain rate (e.g. some event/CE bonuses)." />
+        <PctField label="Generic Damage Up" field="damageUp" />
       </div>
     </Box>
   );

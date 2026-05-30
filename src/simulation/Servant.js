@@ -20,6 +20,7 @@ export class Servant {
     quickUp        = 0,
     busterUp       = 0,
     npUp           = 0,
+    npGenUp        = 0,
     damageUp       = 0,
     busterDamageUp = 0,
     quickDamageUp  = 0,
@@ -77,6 +78,7 @@ export class Servant {
     this.userAUp           = artsUp;
     this.userQUp           = quickUp;
     this.userNpDamageMod   = npUp;
+    this.userNpGainMod     = npGenUp; // user-input NP gauge-gain rate up (decimal)
     this.userBusterDamageUp = busterDamageUp;
     this.userQuickDamageUp  = quickDamageUp;
     this.userArtsDamageUp   = artsDamageUp;

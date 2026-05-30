@@ -86,7 +86,8 @@ export class Buffs {
     s.powerMod          = {};
     s.npDamageMod       = s.userNpDamageMod;
     s.ocLevel           = 1;
-    s.npGainMod         = 1;
+    s.npGainMod         = 1 + (s.userNpGainMod || 0); // user-input NP gen rate up
+
     s.busterCardDamageUp = s.userBusterDamageUp;
     s.artsCardDamageUp  = s.userArtsDamageUp;
     s.quickCardDamageUp = s.userQuickDamageUp;
