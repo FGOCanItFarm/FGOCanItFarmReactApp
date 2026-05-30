@@ -120,6 +120,36 @@ const WaveCard = ({ waveNum, wave, servants }) => {
             </Typography>
           )}
 
+          {/* Per-enemy: damage taken vs HP — a wave clears only when EVERY enemy
+              dies, so the wave total can hide a surviving tough enemy. */}
+          {Array.isArray(wave.per_enemy) && wave.per_enemy.length > 0 && (
+            <Box mt={1.5}>
+              <Typography variant="caption" color="text.secondary">Per enemy (best-case 1.1× roll):</Typography>
+              <Box mt={0.5} display="flex" flexDirection="column" gap={0.6}>
+                {wave.per_enemy.map((e) => {
+                  const killed = e.damage_taken >= e.max_hp;
+                  const pct = e.max_hp > 0 ? Math.min(100, (e.damage_taken / e.max_hp) * 100) : 100;
+                  const col = killed ? 'var(--color-success)' : 'var(--color-error)';
+                  return (
+                    <Box key={e.index}>
+                      <Box display="flex" justifyContent="space-between" gap={1}>
+                        <Typography variant="caption" sx={{ color: 'var(--color-text)' }} noWrap>
+                          {e.index + 1}. {e.name}
+                        </Typography>
+                        <Typography variant="caption" sx={{ color: col, whiteSpace: 'nowrap' }}>
+                          {fmtNum(e.damage_taken)} / {fmtNum(e.max_hp)} {killed ? '✓' : '✗ survives'}
+                        </Typography>
+                      </Box>
+                      <Box sx={{ height: 4, borderRadius: 2, mt: 0.2, backgroundColor: 'var(--color-surface-2)', overflow: 'hidden' }}>
+                        <Box sx={{ width: `${pct}%`, height: '100%', backgroundColor: col }} />
+                      </Box>
+                    </Box>
+                  );
+                })}
+              </Box>
+            </Box>
+          )}
+
           {servants && servants.length > 0 && (
             <Box mt={1.5}>
               <Typography variant="caption" color="text.secondary">NP gauge at wave end:</Typography>

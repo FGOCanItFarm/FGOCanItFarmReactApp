@@ -431,9 +431,16 @@ migration + `submit_run` arg + `App.handleSubmitRun`), and restore them in
 `resimulateSavedRun`. Backfill the seeded examples. Also make the saved-runs
 page less cumbersome to browse.
 
-### FR-12 Command Input layout rework
+### FR-12 Command Input layout rework + per-enemy observability
 The Mystic Code controls consume too much horizontal space; rework the layout
 so the combat/enemy view has room. Keep the dark theme and existing features.
+
+**Per-enemy results (done):** the wave result must NOT collapse to a single
+summed damage number — a wave clears only when EVERY enemy dies, so the sum
+hides a surviving tough enemy (5×1-HP + 1×5M-HP). `SimulationStats` now shows,
+per enemy, `damage_taken / max_hp` + a kill ✓/✗ and a fill bar (from FR-8
+`per_enemy`, best-case roll). Pair with the FR-7 stepper (per-step enemy HP /
+NP gauges / buffs) for full observability.
 
 ### FR-13 (deferred) Quest enemy-spawn variations (hashes)
 A quest id has several **randomly-chosen** enemy layouts
