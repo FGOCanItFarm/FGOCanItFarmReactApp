@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   Box, Typography, TextField, Select, MenuItem, FormControl, InputLabel,
   Paper, Chip, IconButton, Tooltip, Collapse, CircularProgress, Button, Alert
@@ -21,7 +22,7 @@ const fmtDate = (iso) => {
   return new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
 };
 
-const RunCard = ({ run, servantMap }) => {
+const RunCard = ({ run, servantMap, onLoad }) => {
   const [expanded, setExpanded] = useState(false);
   const [copied, setCopied] = useState(false);
   // FR-9 verify-by-re-sim state.
@@ -218,13 +219,21 @@ const RunCard = ({ run, servantMap }) => {
 
           {/* FR-9: re-simulate and reconcile against the stored summary. */}
           <Box mt={1.5} onClick={(e) => e.stopPropagation()}>
-            <Button
-              size="small" variant="outlined"
-              onClick={handleVerify}
-              disabled={verify.status === 'running'}
-            >
-              {verify.status === 'running' ? 'Re-simulating…' : 'Verify (re-sim)'}
-            </Button>
+            <Box display="flex" gap={1} flexWrap="wrap">
+              <Button
+                size="small" variant="contained" color="primary"
+                onClick={() => onLoad(run)}
+              >
+                Load into builder
+              </Button>
+              <Button
+                size="small" variant="outlined"
+                onClick={handleVerify}
+                disabled={verify.status === 'running'}
+              >
+                {verify.status === 'running' ? 'Re-simulating…' : 'Verify (re-sim)'}
+              </Button>
+            </Box>
 
             {verify.status === 'match' && (
               <Alert severity="success" sx={{ mt: 1 }}>Re-sim matches the stored result.</Alert>
@@ -262,7 +271,11 @@ const RunCard = ({ run, servantMap }) => {
   );
 };
 
-const SearchPage = ({ team, selectedQuest: activeQuest }) => {
+const SearchPage = ({
+  team, selectedQuest: activeQuest,
+  setTeam, setCommands, setSelectedQuest, setSelectedMysticCode, setServantEffects,
+}) => {
+  const navigate = useNavigate();
   const [quests, setQuests] = useState([]);
   const [questsLoading, setQuestsLoading] = useState(true);
   const [questSearch, setQuestSearch] = useState('');
@@ -326,6 +339,35 @@ const SearchPage = ({ team, selectedQuest: activeQuest }) => {
     };
     loadRuns();
   }, [selectedQuestId]);
+
+  // Load a saved run into the live builder: team / commands / effects / mystic
+  // code, plus the quest (with _fullData fetched the same way QuestSelection
+  // does), then jump to Command Input.
+  const handleLoad = async (run) => {
+    const colls = run.servant_collection_nos || [];
+    const newTeam = Array.from({ length: 6 }, (_, i) => ({
+      collectionNo: colls[i] != null ? String(colls[i]) : '',
+    }));
+    const effects = Array.isArray(run.servant_effects) ? run.servant_effects : [];
+    const newEffects = Array.from({ length: 6 }, (_, i) => effects[i] || {});
+
+    const { data: qRow } = await supabase
+      .from('quests')
+      .select('id, name, war_name, recommend_lv, data')
+      .eq('id', run.quest_id)
+      .maybeSingle();
+
+    if (setSelectedQuest) {
+      setSelectedQuest(qRow
+        ? { id: qRow.id, name: qRow.name, war_name: qRow.war_name, recommend_lv: qRow.recommend_lv, _fullData: qRow.data }
+        : { id: run.quest_id });
+    }
+    if (setTeam) setTeam(newTeam);
+    if (setServantEffects) setServantEffects(newEffects);
+    if (setCommands) setCommands((run.token_string || '').split(/\s+/).filter(Boolean));
+    if (setSelectedMysticCode) setSelectedMysticCode(run.mystic_code_id ?? null);
+    navigate('/command-input');
+  };
 
   const filteredQuests = quests.filter(q => {
     if (!questSearch) return true;
@@ -406,7 +448,7 @@ const SearchPage = ({ team, selectedQuest: activeQuest }) => {
         </Box>
       ) : (
         displayRuns.map((run, i) => (
-          <RunCard key={run.id ?? i} run={run} servantMap={servantMap} />
+          <RunCard key={run.id ?? i} run={run} servantMap={servantMap} onLoad={handleLoad} />
         ))
       )}
     </Box>

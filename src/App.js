@@ -328,6 +328,11 @@ const App = () => {
             <SearchPage
               team={team}
               selectedQuest={selectedQuest}
+              setTeam={setTeam}
+              setCommands={setCommands}
+              setSelectedQuest={setSelectedQuest}
+              setSelectedMysticCode={setSelectedMysticCode}
+              setServantEffects={setServantEffects}
             />
           } />
           <Route path="/" element={<Instructions />} />
