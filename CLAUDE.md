@@ -334,18 +334,19 @@ svt.{className, attribute, traits[].id}}` (+ `enemyHash`/`availableEnemyHashes`)
 ~45× smaller. Runs after `extractEnemyMeta` (which reads full stages for the
 `enemy_*`/`wave_*` columns), so trimming is safe.
 
-> **90** class-vulnerability — `classAdvantageMod` (PARTIALLY WIRED):** the
+> **90** class-vulnerability — `classAdvantageMod` (WIRED end-to-end):** the
 > engine reads an optional per-enemy `classAdvantageMod` map
 > (`{ attackerClassName: multiplier }`) that **overrides** the normal
 > class-advantage multiplier — e.g. `{ saber: 5 }` makes Saber attackers deal 5×
 > instead of 2× (the "Anti-Saber Defense Vulnerability" 90** gimmick).
 > `Quest.js` → `Enemy.classAdvantageMod`, applied in
-> `BattleEngine._classMultiplier` (used by both NP-damage paths). **Pending:**
-> `stripQuestData` does NOT yet extract this from the Atlas enemy vulnerability
-> buff (enemy `skills`/buffs are trimmed away), so it only fires where a row
-> carries the field. The fixture `real/quests/94100501.json` is hand-annotated
-> (Great Dragon, Vritra → `{saber:5}`) to exercise the engine; production needs
-> the trim to parse the buff (blocked on the raw Atlas buff shape).
+> `BattleEngine._classMultiplier` (used by both NP-damage paths). The sync now
+> extracts it: `extractClassAdvantageMod` (`atlasSync.js`) reads the enemy's
+> `overwriteClassRelation` buff `script.relationId.defSide[attacker][thisClass]
+> .damageRate` (÷1000) before `stripQuestData` drops enemy buffs (verified
+> against Atlas 94100501 Great Dragon/Vritra → `{saber:5}`;
+> `classAdvantageModSync.test.js`). **A quest synced before this fix lacks the
+> field** until re-synced — 94100501 was hand-patched in the live DB.
 
 ### Field read-map traps (verified against `src/simulation/*`)
 - Engine-read servant fields: `collectionNo, name, className, classId, gender,
