@@ -63,6 +63,7 @@ export async function prepareSimInputs({ team, selectedQuest, selectedMysticCode
       quickUp:        Number(fx.quickUp        ?? 0),
       busterUp:       Number(fx.busterUp       ?? 0),
       npUp:           Number(fx.npUp           ?? 0),
+      npGenUp:        Number(fx.npGenUp        ?? 0),
       busterDamageUp: Number(fx.busterDamageUp ?? 0),
       quickDamageUp:  Number(fx.quickDamageUp  ?? 0),
       artsDamageUp:   Number(fx.artsDamageUp   ?? 0),

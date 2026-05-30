@@ -124,3 +124,16 @@
   box-shadow: 0 0 0 1px var(--color-gold) inset;
   background: var(--color-gold-dim);
 }
+
+/* ── Per-enemy projected NP damage (FR-12 observability) ───────────────────── */
+.enemy__nps { margin-top: 5px; border-top: 1px solid var(--color-border); padding-top: 4px; display: flex; flex-direction: column; gap: 2px; }
+.enemy__np-row {
+  display: flex; justify-content: space-between; gap: 6px;
+  font-size: 0.66rem; line-height: 1.4; cursor: help;
+  padding: 1px 4px; border-radius: 3px; background: var(--color-surface-2);
+}
+.enemy__np-row:hover { border: 1px solid var(--color-border-active); }
+.enemy__np-row--kill { background: color-mix(in srgb, var(--color-success) 16%, transparent); }
+.enemy__np-who { color: var(--color-text-dim); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.enemy__np-dmg { color: var(--color-text); white-space: nowrap; font-variant-numeric: tabular-nums; }
+.enemy__np-row--kill .enemy__np-dmg { color: var(--color-success); font-weight: bold; }

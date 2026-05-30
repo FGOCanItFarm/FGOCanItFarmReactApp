@@ -10,21 +10,28 @@ export class Buffs {
   processEndTurnSkills() {
     let addMagicBullets = false;
     for (const buff of this.buffs) {
-      // Per-turn NP charge (Lord Logres S1, etc.). svals.Value is in 0.01%
-      // units (a 50% battery = 5000), same scale as the gainNp handler — convert
-      // to gauge percent. Applied here (once per turn) NOT in processServantBuffs
-      // (a recompute that runs many times per turn and would compound it).
-      if (
-        buff.buff === 'NP Gain Each Turn' ||
-        buff.buff.includes('Triggers Each Turn (Increase NP)') ||
-        buff.buff.includes('Triggers Each Turn (NP Absorb)')
-      ) this.servant.setNpgauge(buff.value / 100);
       if (buff.buff === 'Delayed Effect (Death)') this.servant.kill = true;
       if (this.servant.name === 'Super Aoko') addMagicBullets = true;
     }
     if (addMagicBullets) {
       this.addBuff({ ...MAGIC_BULLET_BUFF });
       this.addBuff({ ...MAGIC_BULLET_BUFF });
+    }
+  }
+
+  // Per-turn NP charge (Lord Logres S1, etc.). svals.Value is in 0.01% units
+  // (a 50% battery = 5000), same scale as the gainNp handler. Applied at the
+  // START of each turn/wave (NOT at wave end, where it would inflate the
+  // captured "NP gauge at wave end") and NOT in processServantBuffs (a recompute
+  // that runs many times per turn and would compound it). A skill cast this turn
+  // therefore first pays out next turn — matching FGO and the displayed gauges.
+  processTurnStartNpGain() {
+    for (const buff of this.buffs) {
+      if (
+        buff.buff === 'NP Gain Each Turn' ||
+        buff.buff.includes('Triggers Each Turn (Increase NP)') ||
+        buff.buff.includes('Triggers Each Turn (NP Absorb)')
+      ) this.servant.setNpgauge(buff.value / 100);
     }
   }
 
@@ -79,7 +86,8 @@ export class Buffs {
     s.powerMod          = {};
     s.npDamageMod       = s.userNpDamageMod;
     s.ocLevel           = 1;
-    s.npGainMod         = 1;
+    s.npGainMod         = 1 + (s.userNpGainMod || 0); // user-input NP gen rate up
+
     s.busterCardDamageUp = s.userBusterDamageUp;
     s.artsCardDamageUp  = s.userArtsDamageUp;
     s.quickCardDamageUp = s.userQuickDamageUp;
