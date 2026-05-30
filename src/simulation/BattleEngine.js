@@ -118,6 +118,9 @@ export class BattleEngine {
     if (this.wave > this.totalWaves) return;
     this.enemies = this.quest.getWave(this.wave);
     this._recordInitialWaveHp();
+    // Per-turn NP charge pays out at the START of the new turn/wave, on the
+    // current frontline (captured wave-end gauge stays pre-regen).
+    for (const s of this.servants.slice(0, 3)) s?.buffs.processTurnStartNpGain();
   }
 
   getEnemies() { return this.enemies; }
@@ -298,8 +301,11 @@ export class BattleEngine {
         targets = tgt ? [tgt] : [];
         break;
       }
-      case 'ptOther':   targets = this.servants.filter(s => s !== servant); break;
-      case 'ptAll':     targets = this.servants;                      break;
+      // Party effects (buffs, NP charge) apply to the FRONTLINE only — backline
+      // servants don't benefit until swapped in, and shouldn't carry charge/
+      // buffs gained while benched.
+      case 'ptOther':   targets = this.servants.slice(0, 3).filter(s => s !== servant); break;
+      case 'ptAll':     targets = this.servants.slice(0, 3);          break;
       case 'ptOne':     targets = [allyTarget];                       break;
       default:          targets = [];                                  break;
     }
