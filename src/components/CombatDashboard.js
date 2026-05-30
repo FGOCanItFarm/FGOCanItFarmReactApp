@@ -102,6 +102,33 @@ const CombatDashboard = ({ team, selectedQuest, selectedMysticCode, servantEffec
   const deleteAt = (i) => { setCommands(commands.filter((_, j) => j !== i)); setCursor(null); setPending(null); };
   const trimToHere = () => { setCommands(commands.slice(0, step)); setCursor(null); };
 
+  // Project an NP's per-enemy damage WITHOUT committing it: rebuild the engine at
+  // (cursor prefix + the NP token) in a throwaway instance (memoised) and diff
+  // each enemy's HP against the live snapshot. Lets you compare AoE vs single-
+  // target before firing.
+  const previewNp = (npToken) => {
+    if (!engine) return [];
+    const after = buildEngineAt(simInputs, [...commands.slice(0, step), npToken]).engine;
+    return engine.enemies.map((e, i) => {
+      const hpAfter = after?.enemies[i]?.hp ?? e.hp;
+      return { idx: i + 1, name: e.name, dmg: Math.max(0, e.hp - hpAfter), killed: hpAfter <= 0 };
+    }).filter((p) => p.dmg > 0);
+  };
+  const npTooltip = (opt) => {
+    const rows = previewNp(resolveToken(opt, {}));
+    if (rows.length === 0) return humanizeToken(resolveToken(opt, {}), engine);
+    return (
+      <Box sx={{ fontSize: '0.72rem' }}>
+        <div>{humanizeToken(resolveToken(opt, {}), engine)} — projected:</div>
+        {rows.map((p) => (
+          <div key={p.idx} style={{ whiteSpace: 'nowrap' }}>
+            {p.idx}. {p.name}: {fmt(p.dmg)} {p.killed ? '✓ kill' : ''}
+          </div>
+        ))}
+      </Box>
+    );
+  };
+
   if (!selectedQuest?._fullData) return <Box className="dash dash--empty">Select a quest to open the combat dashboard.</Box>;
   if (loading && !snapshot) return <Box className="dash dash--empty"><CircularProgress size={20} /> Building battle state…</Box>;
   if (error) return <Box className="dash dash--empty dash--error">{error}</Box>;
@@ -164,7 +191,9 @@ const CombatDashboard = ({ team, selectedQuest, selectedMysticCode, servantEffec
           </Typography>
           <Box className="dash__palette">
             {options.map((opt) => (
-              <Tooltip key={opt.token} title={opt.available ? humanizeToken(resolveToken(opt, {}), engine) : (opt.reason || 'unavailable')} arrow>
+              <Tooltip key={opt.token}
+                title={!opt.available ? (opt.reason || 'unavailable') : (opt.kind === 'np' ? npTooltip(opt) : humanizeToken(resolveToken(opt, {}), engine))}
+                arrow>
                 <span>
                   <Button size="small"
                     variant={pending?.option?.token === opt.token ? 'contained' : 'outlined'}
