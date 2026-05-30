@@ -48,25 +48,37 @@ const Buffs = ({ buffs }) => {
   );
 };
 
-/** Net stat totals (config effects + live buffs) for a frontline servant.
- *  Renders only the stats that differ from their neutral baseline. */
+// Fixed, always-rendered set of net-stat rows so every ally's summary occupies
+// the same vertical slots (0% shown as a dim placeholder) — easy to scan across
+// units. OC is appended only when boosted (it has no meaningful "0").
+const STAT_ROWS = [
+  ['ATK', 'atkUp'], ['Buster', 'busterUp'], ['Arts', 'artsUp'], ['Quick', 'quickUp'],
+  ['NP DMG', 'npDmgUp'], ['NP Gen', 'npGen'],
+];
+
+/** Net stat totals (config effects + live buffs) for a frontline servant, as a
+ *  fixed vertical list with placeholders, rendered on the left of the card. */
 const StatTotals = ({ stats }) => {
-  if (!stats) return null;
-  const pct = (v) => `${v > 0 ? '+' : ''}${Math.round(v * 100)}%`;
-  const items = [
-    ['ATK', stats.atkUp], ['Buster', stats.busterUp], ['Arts', stats.artsUp], ['Quick', stats.quickUp],
-    ['B.DMG', stats.busterDmgUp], ['A.DMG', stats.artsDmgUp], ['Q.DMG', stats.quickDmgUp],
-    ['NP DMG', stats.npDmgUp], ['NP Gen', stats.npGen],
-  ].filter(([, v]) => Math.abs(v || 0) >= 0.005);
-  if (stats.oc > 1) items.push(['OC', stats.oc]);
-  if (!items.length) return null;
+  const s = stats || {};
+  const pct = (v) => `${v > 0 ? '+' : ''}${Math.round((v || 0) * 100)}%`;
   return (
     <div className="ally__stats">
-      {items.map(([label, v]) => (
-        <span key={label} className="stat-pill" title={`${label} net total`}>
-          {label} {label === 'OC' ? `×${v}` : pct(v)}
-        </span>
-      ))}
+      {STAT_ROWS.map(([label, key]) => {
+        const v = s[key] || 0;
+        const zero = Math.abs(v) < 0.005;
+        return (
+          <div key={key} className={`stat-row ${zero ? 'stat-row--zero' : ''}`} title={`${label} net total`}>
+            <span className="stat-row__label">{label}</span>
+            <span className="stat-row__val">{zero ? '0%' : pct(v)}</span>
+          </div>
+        );
+      })}
+      {s.oc > 1 && (
+        <div className="stat-row stat-row--oc" title="Overcharge level">
+          <span className="stat-row__label">OC</span>
+          <span className="stat-row__val">×{s.oc}</span>
+        </div>
+      )}
     </div>
   );
 };
@@ -326,23 +338,25 @@ const CombatDashboard = ({ team, selectedQuest, selectedMysticCode, servantEffec
               className={`ally ${!s ? 'ally--empty' : ''} ${pickingAlly && s ? 'ally--target' : ''}`}
               onClick={() => pickingAlly && s && onPickAlly(slot)}>
               {s ? (
-                <>
-                  <div className="ally__top">
-                    {s.faceUrl && <img className="ally__face" src={s.faceUrl} alt={s.name} loading="lazy" />}
-                    <span className="ally__name">{s.name}</span>
-                  </div>
-                  <div className="ally__np">
-                    <div className="ally__npfill" style={{ width: `${Math.min(100, s.npGauge)}%` }} />
-                    <span className="ally__nptext">{Math.floor(s.npGauge)}%</span>
-                  </div>
-                  <div className="ally__cds">
-                    {s.cooldowns.map((cd, k) => (
-                      <span key={k} className={`cd-pip ${cd === 0 ? 'cd-pip--ready' : ''}`}>{cd === 0 ? '✓' : cd}</span>
-                    ))}
-                  </div>
+                <div className="ally__body">
                   <StatTotals stats={s.stats} />
-                  <Buffs buffs={s.buffs} />
-                </>
+                  <div className="ally__main">
+                    <div className="ally__top">
+                      {s.faceUrl && <img className="ally__face" src={s.faceUrl} alt={s.name} loading="lazy" />}
+                      <span className="ally__name">{s.name}</span>
+                    </div>
+                    <div className="ally__np">
+                      <div className="ally__npfill" style={{ width: `${Math.min(100, s.npGauge)}%` }} />
+                      <span className="ally__nptext">{Math.floor(s.npGauge)}%</span>
+                    </div>
+                    <div className="ally__cds">
+                      {s.cooldowns.map((cd, k) => (
+                        <span key={k} className={`cd-pip ${cd === 0 ? 'cd-pip--ready' : ''}`}>{cd === 0 ? '✓' : cd}</span>
+                      ))}
+                    </div>
+                    <Buffs buffs={s.buffs} />
+                  </div>
+                </div>
               ) : <span className="ally__slot-empty">Empty</span>}
             </Box>
           ))}

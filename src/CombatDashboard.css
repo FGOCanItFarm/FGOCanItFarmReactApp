@@ -92,14 +92,22 @@
 .palette-btn { text-transform: none; }
 .palette-btn--np { border-color: var(--color-gold); }
 
-/* Net stat totals (config + live buffs) */
-.ally__stats { display: flex; flex-wrap: wrap; gap: 2px; margin-top: 4px; }
-.stat-pill {
-  font-size: 0.6rem; line-height: 1.3; padding: 0 4px; border-radius: 3px;
-  background: var(--color-gold-dim);
-  border: 1px solid color-mix(in srgb, var(--color-gold) 30%, transparent);
-  color: var(--color-text); white-space: nowrap; font-variant-numeric: tabular-nums;
+/* Net stat totals (config + live buffs) — fixed vertical list, left of card */
+.ally__body { display: flex; gap: var(--spacing-sm); align-items: flex-start; }
+.ally__main { flex: 1 1 auto; min-width: 0; }
+.ally__stats {
+  flex: 0 0 84px;
+  display: flex; flex-direction: column; gap: 1px;
+  padding-right: 6px; border-right: 1px solid var(--color-border);
 }
+.stat-row {
+  display: flex; justify-content: space-between; gap: 4px;
+  font-size: 0.6rem; line-height: 1.45; font-variant-numeric: tabular-nums;
+}
+.stat-row__label { color: var(--color-text-dim); }
+.stat-row__val { color: var(--color-gold); font-weight: 700; }
+.stat-row--zero .stat-row__val { color: var(--color-text-dim); font-weight: 400; opacity: 0.6; }
+.stat-row--oc .stat-row__val { color: var(--color-success); }
 
 /* Chips */
 .dash__chips { display: flex; flex-wrap: wrap; gap: var(--spacing-xs); min-height: 32px; }

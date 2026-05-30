@@ -226,3 +226,36 @@
   border-top: 1px solid var(--color-border);
 }
 
+/* Identity card — sits in the gap between the editor and the MC picker. */
+.team-panel-identity {
+  margin-top: var(--spacing-md);
+  padding-top: var(--spacing-sm);
+  border-top: 1px solid var(--color-border);
+}
+.ident-label {
+  display: block;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-text-dim);
+  margin-bottom: 4px;
+}
+.ident-rows { display: flex; flex-direction: column; gap: 2px; margin-bottom: 6px; }
+.ident-row {
+  display: flex; justify-content: space-between; font-size: 0.78rem;
+  color: var(--color-text);
+}
+.ident-row span { color: var(--color-text-dim); }
+.ident-traits { display: flex; flex-wrap: wrap; gap: 3px; }
+.ident-trait {
+  font-size: 0.62rem; line-height: 1.4; padding: 1px 5px; border-radius: 4px;
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-border);
+  color: var(--color-text);
+}
+.ident-forms { margin-top: 8px; }
+.ident-form { margin-top: 4px; }
+.ident-form-tag {
+  font-size: 0.6rem; font-weight: 700; color: var(--color-gold);
+  display: block; margin-bottom: 2px;
+}
+

@@ -1,9 +1,11 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Box, Button, Typography, TextField, Checkbox, InputAdornment, Select, MenuItem } from '@mui/material';
 import ServantAvatar from './ServantAvatar';
+import { supabase } from '../supabaseClient';
 import '../ui-vars.css';
 import '../team-sticky.css';
 
+// Fallback used only if the live mystic_codes fetch fails (offline / misconfig).
 const MYSTIC_CODE_NAMES = {
   410: 'Winter Casual',
   210: 'Chaldea Uniform - Decisive Battle',
@@ -11,6 +13,54 @@ const MYSTIC_CODE_NAMES = {
   40: 'Atlas Institute Uniform',
   20: 'Chaldea Combat Uniform',
 };
+
+const cap = (s) => (s ? s[0].toUpperCase() + s.slice(1) : '');
+
+// Structural/derived traits that just add noise to an identity card (class,
+// gender, attribute, alignment, rarity, plumbing). Everything else is a
+// "meaningful" trait worth showing (divine, dragon, fae, riding, king, …).
+const STRUCTURAL_TRAIT = (name) =>
+  !name ||
+  /^(class|attribute|alignment|gender)/.test(name) ||
+  /StarServant$/.test(name) ||
+  ['servant', 'unknown', 'canBeInBattle', 'hasCostume', 'standardClassServant',
+   'skyOrEarthServant', 'skyOrEarthExceptPseudoAndDemiServant', 'humanoid',
+   'hominidaeServant', 'weakToEnumaElish', 'genderUnknown'].includes(name);
+
+const traitNames = (arr) => (arr || []).map(t => (typeof t === 'string' ? t : t?.name)).filter(Boolean);
+const meaningful = (names) => names.filter(n => !STRUCTURAL_TRAIT(n));
+
+/**
+ * Read-only identity summary for the team panel. Derives attribute, alignment,
+ * and meaningful traits from the trimmed servant `data` blob, and collapses
+ * `ascensionAdd.individuality.ascension` into the DISTINCT trait sets a servant
+ * can present (its "forms"), so users can see what each ascension/form does.
+ * NOTE: purely informational today — the simulation engine does not yet switch
+ * servant traits/attribute by form (see Servant.js), so this educates the
+ * picker without claiming a damage effect.
+ */
+function describeIdentity(data, mode = 1) {
+  if (!data) return null;
+  const base = traitNames(data.traits);
+  const attribute = cap(data.attribute || base.find(n => /^attribute/.test(n))?.replace(/^attribute/, '') || '');
+  const alignment = base.filter(n => /^alignment/.test(n)).map(n => cap(n.replace(/^alignment/, ''))).join(' · ');
+
+  // Distinct, non-empty per-ascension trait sets → forms.
+  const ascMap = data.ascensionAdd?.individuality?.ascension || {};
+  const seen = new Set();
+  const forms = [];
+  for (const key of Object.keys(ascMap).sort((a, b) => Number(a) - Number(b))) {
+    const names = traitNames(ascMap[key]);
+    if (!names.length) continue;                       // [] = inherits base
+    const sig = names.slice().sort().join('|');
+    if (seen.has(sig)) continue;
+    seen.add(sig);
+    forms.push({ ascension: Number(key), traits: meaningful(names) });
+  }
+  const multiForm = forms.length > 1;
+
+  return { attribute, alignment, baseTraits: meaningful(base), forms, multiForm, mode };
+}
 
 const FLAT_FIELDS = [
   { key: 'initialCharge', label: 'Initial Charge', desc: 'Starting NP gauge (%)', max: 10000 },
@@ -52,6 +102,44 @@ const StickyTeamBar = ({
   const servant = slotServant(safeSlot);
   const effects = servantEffects[safeSlot] || {};
   const editable = !!servant;
+
+  // Mystic codes for the picker — loaded from the DB so any saved-run MC (incl.
+  // ones outside the hand-picked farming set) resolves to a real option when a
+  // run is loaded into the builder. Falls back to the static names on failure.
+  const [mcList, setMcList] = useState(
+    Object.entries(MYSTIC_CODE_NAMES).map(([id, name]) => ({ id: Number(id), name })),
+  );
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      const { data, error } = await supabase.from('mystic_codes').select('id, name').order('id');
+      if (error || cancelled || !data?.length) return;
+      setMcList(data.map(r => ({ id: r.id, name: r.name })));
+    })();
+    return () => { cancelled = true; };
+  }, []);
+  // Guarantee the current selection is always a present option (e.g. an MC the
+  // fetch didn't include), so the dropdown never renders blank for a loaded run.
+  const mcOptions = (selectedMysticCode != null && !mcList.some(m => m.id === selectedMysticCode))
+    ? [...mcList, { id: selectedMysticCode, name: `Mystic Code ${selectedMysticCode}` }]
+    : mcList;
+
+  // Selected servant's trait/attribute data (fetched on demand, cached by
+  // collectionNo) for the "Identity" panel — lets users see what each form is.
+  const [traitCache, setTraitCache] = useState({});
+  const cno = servant?.collectionNo != null ? String(servant.collectionNo) : null;
+  useEffect(() => {
+    if (!cno || traitCache[cno]) return;
+    let cancelled = false;
+    (async () => {
+      const { data, error } = await supabase
+        .from('servants').select('data').eq('collection_no', Number(cno)).maybeSingle();
+      if (error || cancelled) return;
+      setTraitCache(prev => ({ ...prev, [cno]: data?.data || {} }));
+    })();
+    return () => { cancelled = true; };
+  }, [cno, traitCache]);
+  const identity = describeIdentity(cno ? traitCache[cno] : null, effects.mode || effects.formMode || 1);
 
   // Keep the selection on a filled slot when possible.
   useEffect(() => {
@@ -175,6 +263,43 @@ const StickyTeamBar = ({
               </Button>
             ))}
           </Box>
+
+          {/* Identity — fills the gap above the Mystic Code picker so users can
+              eyeball attribute / alignment / traits (and per-form trait deltas)
+              without leaving the builder. */}
+          {editable && identity && (
+            <div className="team-panel-identity">
+              <Typography variant="caption" className="ident-label">Identity</Typography>
+              <div className="ident-rows">
+                {identity.attribute && (
+                  <div className="ident-row"><span>Attribute</span><b>{identity.attribute}</b></div>
+                )}
+                {identity.alignment && (
+                  <div className="ident-row"><span>Alignment</span><b>{identity.alignment}</b></div>
+                )}
+              </div>
+              {identity.baseTraits.length > 0 && (
+                <div className="ident-traits">
+                  {identity.baseTraits.map(t => <span key={t} className="ident-trait">{t}</span>)}
+                </div>
+              )}
+              {identity.multiForm && (
+                <div className="ident-forms">
+                  <Typography variant="caption" className="ident-label">
+                    Forms (trait sets by ascension)
+                  </Typography>
+                  {identity.forms.map((f) => (
+                    <div key={f.ascension} className="ident-form">
+                      <span className="ident-form-tag">Asc {f.ascension}+</span>
+                      <div className="ident-traits">
+                        {f.traits.map(t => <span key={t} className="ident-trait">{t}</span>)}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
         </div>
       </div>
 
@@ -191,8 +316,8 @@ const StickyTeamBar = ({
           sx={{ mb: 1, fontSize: '0.78rem' }}
         >
           <MenuItem value=""><em>None</em></MenuItem>
-          {Object.entries(MYSTIC_CODE_NAMES).map(([id, name]) => (
-            <MenuItem key={id} value={Number(id)} sx={{ fontSize: '0.78rem' }}>{name}</MenuItem>
+          {mcOptions.map((mc) => (
+            <MenuItem key={mc.id} value={mc.id} sx={{ fontSize: '0.78rem' }}>{mc.name}</MenuItem>
           ))}
         </Select>
         <Typography variant="caption" sx={{ display: 'block', color: 'var(--color-text-dim)' }} noWrap>
