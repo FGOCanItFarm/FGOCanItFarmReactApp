@@ -442,6 +442,13 @@ per enemy, `damage_taken / max_hp` + a kill ✓/✗ and a fill bar (from FR-8
 `per_enemy`, best-case roll). Pair with the FR-7 stepper (per-step enemy HP /
 NP gauges / buffs) for full observability.
 
+**Per-enemy NP preview in the dashboard (done):** each enemy box shows, for
+every currently-fireable NP, its projected damage to THAT enemy (+ ✓ kill) —
+computed by a throwaway `previewNpAt` rebuild (never committed). Hovering a row
+shows a contribution breakdown: labeled multipliers (`Class ×2`, `Buster card
+×2.8`, …) + a marginal bar (drop-if-removed) via `damageFactors` over the FR-8
+trace. Lets you plan AoE-then-single-target per enemy without firing.
+
 ### FR-13 (deferred) Quest enemy-spawn variations (hashes)
 A quest id has several **randomly-chosen** enemy layouts
 (`data.availableEnemyHashes`); e.g. 94095710 has 4 hashes — some give wave 2 six

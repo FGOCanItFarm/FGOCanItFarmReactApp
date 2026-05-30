@@ -6,9 +6,33 @@ import {
   buildEngineAt, engineSnapshot, legalNextTokens, validateSequence,
   resolveToken, needsTarget, humanizeToken,
 } from '../simulation/CommandState';
+import { damageFactors } from '../simulation/damageBreakdown';
 import '../CombatDashboard.css';
 
 const fmt = (n) => Math.round(n).toLocaleString();
+
+/** Per-enemy NP damage contribution: labeled multipliers + a marginal bar
+ *  (how much the final damage would drop if each factor were removed). */
+const NpBreakdown = ({ entry }) => {
+  const { factors, base, total } = damageFactors(entry);
+  if (!factors.length) return <Box sx={{ fontSize: '0.72rem' }}>{fmt(total)}</Box>;
+  const maxDrop = Math.max(...factors.map((f) => Math.abs(f.dropPct)), 0.01);
+  return (
+    <Box sx={{ fontSize: '0.72rem', minWidth: 220 }}>
+      <div style={{ marginBottom: 4 }}>Total <b>{fmt(total)}</b> · base {fmt(base)}</div>
+      {factors.map((f, i) => (
+        <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 2 }}>
+          <span style={{ width: 104, whiteSpace: 'nowrap' }}>{f.label} ×{f.mult.toFixed(2)}</span>
+          <span style={{ flex: 1, height: 6, background: 'rgba(255,255,255,0.12)', borderRadius: 3, overflow: 'hidden' }}>
+            <span style={{ display: 'block', height: '100%', width: `${Math.min(100, (Math.abs(f.dropPct) / maxDrop) * 100)}%`,
+              background: f.mult >= 1 ? 'var(--color-success)' : 'var(--color-error)' }} />
+          </span>
+          <span style={{ width: 40, textAlign: 'right' }}>{f.dropPct >= 0 ? '−' : '+'}{Math.abs(f.dropPct * 100).toFixed(0)}%</span>
+        </div>
+      ))}
+    </Box>
+  );
+};
 
 /** Compact buff pill list (name · value% · turns). */
 const Buffs = ({ buffs }) => {
@@ -102,31 +126,19 @@ const CombatDashboard = ({ team, selectedQuest, selectedMysticCode, servantEffec
   const deleteAt = (i) => { setCommands(commands.filter((_, j) => j !== i)); setCursor(null); setPending(null); };
   const trimToHere = () => { setCommands(commands.slice(0, step)); setCursor(null); };
 
-  // Project an NP's per-enemy damage WITHOUT committing it: rebuild the engine at
-  // (cursor prefix + the NP token) in a throwaway instance (memoised) and diff
-  // each enemy's HP against the live snapshot. Lets you compare AoE vs single-
-  // target before firing.
-  const previewNp = (npToken) => {
-    if (!engine) return [];
-    const after = buildEngineAt(simInputs, [...commands.slice(0, step), npToken]).engine;
-    return engine.enemies.map((e, i) => {
-      const hpAfter = after?.enemies[i]?.hp ?? e.hp;
-      return { idx: i + 1, name: e.name, dmg: Math.max(0, e.hp - hpAfter), killed: hpAfter <= 0 };
-    }).filter((p) => p.dmg > 0);
-  };
-  const npTooltip = (opt) => {
-    const rows = previewNp(resolveToken(opt, {}));
-    if (rows.length === 0) return humanizeToken(resolveToken(opt, {}), engine);
-    return (
-      <Box sx={{ fontSize: '0.72rem' }}>
-        <div>{humanizeToken(resolveToken(opt, {}), engine)} — projected:</div>
-        {rows.map((p) => (
-          <div key={p.idx} style={{ whiteSpace: 'nowrap' }}>
-            {p.idx}. {p.name}: {fmt(p.dmg)} {p.killed ? '✓ kill' : ''}
-          </div>
-        ))}
-      </Box>
-    );
+  // Project a ready NP's damage to ONE enemy WITHOUT committing it: rebuild the
+  // engine at (cursor prefix + that NP aimed at the enemy) in a throwaway memoised
+  // instance, diff the enemy's HP, and read its multiplier breakdown from the FR-8
+  // trace. AoE NPs ignore the per-enemy aim (resolveToken returns the bare token).
+  const previewNpAt = (npOpt, enemyIdx1) => {
+    if (!engine) return null;
+    const e = engine.enemies[enemyIdx1 - 1];
+    if (!e) return null;
+    const token = resolveToken(npOpt, { enemyIndex: enemyIdx1 });
+    const after = buildEngineAt(simInputs, [...commands.slice(0, step), token]).engine;
+    const hpAfter = after?.enemies[enemyIdx1 - 1]?.hp ?? e.hp;
+    const entry = (after?.trace || []).filter((t) => t.type === 'np' && t.target?.index === enemyIdx1 - 1).pop() || null;
+    return { dmg: Math.max(0, e.hp - hpAfter), killed: hpAfter <= 0, entry };
   };
 
   if (!selectedQuest?._fullData) return <Box className="dash dash--empty">Select a quest to open the combat dashboard.</Box>;
@@ -137,6 +149,8 @@ const CombatDashboard = ({ team, selectedQuest, selectedMysticCode, servantEffec
   const pickingAlly = pending?.option?.targetClass === 'ally';
   const pickingEnemy = pending?.option?.targetClass === 'enemyOne';
   const stepLabel = step === 0 ? 'Start (before any command)' : humanizeToken(commands[step - 1], engine);
+  // Currently-fireable frontline NPs — previewed in every enemy box.
+  const readyNps = options.filter((o) => o.kind === 'np' && o.available);
 
   return (
     <Box className="dash">
@@ -180,6 +194,25 @@ const CombatDashboard = ({ team, selectedQuest, selectedMysticCode, servantEffec
               </div>
               <div className="enemy__hptext">{fmt(Math.max(0, e.hp))} / {fmt(e.maxHp)}</div>
               <Buffs buffs={e.buffs} />
+              {/* Projected NP damage to THIS enemy, per ready NP. Hover a row for
+                  the multiplier breakdown. Clicks here don't focus the enemy. */}
+              {e.hp > 0 && readyNps.length > 0 && (
+                <div className="enemy__nps" onClick={(ev) => ev.stopPropagation()}>
+                  {readyNps.map((opt) => {
+                    const p = previewNpAt(opt, e.index);
+                    if (!p) return null;
+                    const who = snapshot.front[opt.servantSlot]?.name || `S${opt.servantSlot + 1}`;
+                    return (
+                      <Tooltip key={opt.token} arrow placement="right" title={<NpBreakdown entry={p.entry} />}>
+                        <div className={`enemy__np-row ${p.killed ? 'enemy__np-row--kill' : ''}`}>
+                          <span className="enemy__np-who">S{opt.servantSlot + 1} {who}</span>
+                          <span className="enemy__np-dmg">{p.dmg > 0 ? fmt(p.dmg) : '—'}{p.killed ? ' ✓' : ''}</span>
+                        </div>
+                      </Tooltip>
+                    );
+                  })}
+                </div>
+              )}
             </Box>
           ))}
         </Box>
@@ -192,7 +225,7 @@ const CombatDashboard = ({ team, selectedQuest, selectedMysticCode, servantEffec
           <Box className="dash__palette">
             {options.map((opt) => (
               <Tooltip key={opt.token}
-                title={!opt.available ? (opt.reason || 'unavailable') : (opt.kind === 'np' ? npTooltip(opt) : humanizeToken(resolveToken(opt, {}), engine))}
+                title={opt.available ? humanizeToken(resolveToken(opt, {}), engine) : (opt.reason || 'unavailable')}
                 arrow>
                 <span>
                   <Button size="small"
