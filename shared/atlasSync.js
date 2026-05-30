@@ -329,9 +329,15 @@ async function upsertQuest(supabase, data, warId, warName) {
   const questId = data.id;
   const stages  = data.stages ?? [];
   if (!questId || stages.length === 0 || !stages[0].enemies) { console.error(`Quest ${questId}: missing id or empty enemies`); return; }
+  // The nice quest carries its CANONICAL war (`warId`/`warLongName`). Prefer it
+  // over the war we happened to scan it under: comeback campaigns (CBC, etc.)
+  // re-run old quests, so the scan war's longName ("CBC 2025 …") mislabels them
+  // (and a quest in several wars would otherwise win non-deterministically).
+  const canonicalWarId   = data.warId ?? warId;
+  const canonicalWarName = data.warLongName ?? data.warName ?? warName;
   const enemyMeta = extractEnemyMeta(stages);
   const { error } = await supabase.from('quests').upsert({
-    id: questId, name: data.name ?? '', war_id: warId, war_name: warName,
+    id: questId, name: data.name ?? '', war_id: canonicalWarId, war_name: canonicalWarName,
     recommend_lv: data.recommendLv ?? '', consume: data.consume ?? 0,
     after_clear: data.afterClear ?? '', opened_at: data.openedAt,
     ...enemyMeta,
