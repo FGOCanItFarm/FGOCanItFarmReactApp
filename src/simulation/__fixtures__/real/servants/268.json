@@ -5805,5 +5805,107 @@
     ]
   },
   "instantDeathChance": 50,
-  "originalBattleName": "Sイシュタル"
+  "originalBattleName": "Sイシュタル",
+  "forms": [
+    {
+      "key": 0,
+      "asc": 2,
+      "label": null,
+      "attribute": "star",
+      "traitIds": [
+        2,
+        110,
+        203,
+        300,
+        304,
+        405,
+        1000,
+        2000,
+        2001,
+        2040,
+        2780,
+        2797,
+        2835,
+        2924,
+        5000,
+        1100900
+      ],
+      "traits": [
+        "genderFemale",
+        "classAvenger",
+        "attributeStar",
+        "alignmentLawful",
+        "alignmentEvil",
+        "fiveStarServant",
+        "servant",
+        "divine",
+        "humanoid",
+        "divineOrDemonOrUndead",
+        "hasCostume",
+        "divineSpirit",
+        "immuneToPigify",
+        "canFlyInSpace",
+        "canBeInBattle",
+        "unknown"
+      ],
+      "isBase": true,
+      "skillIds": {
+        "1": 686550,
+        "2": 687450
+      },
+      "npId": 1100998
+    },
+    {
+      "key": 3,
+      "asc": 4,
+      "label": null,
+      "attribute": "star",
+      "traitIds": [
+        2,
+        110,
+        203,
+        300,
+        304,
+        405,
+        1000,
+        2000,
+        2001,
+        2040,
+        2780,
+        2797,
+        2835,
+        2847,
+        2924,
+        5000,
+        1100900
+      ],
+      "traits": [
+        "genderFemale",
+        "classAvenger",
+        "attributeStar",
+        "alignmentLawful",
+        "alignmentEvil",
+        "fiveStarServant",
+        "servant",
+        "divine",
+        "humanoid",
+        "divineOrDemonOrUndead",
+        "hasCostume",
+        "divineSpirit",
+        "immuneToPigify",
+        "levitating",
+        "canFlyInSpace",
+        "canBeInBattle",
+        "unknown"
+      ],
+      "isBase": false,
+      "skillIds": {
+        "1": 686550,
+        "2": 687450,
+        "3": 688650
+      },
+      "npId": 1100998,
+      "final": true
+    }
+  ]
 }

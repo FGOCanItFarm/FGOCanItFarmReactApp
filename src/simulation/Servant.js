@@ -50,21 +50,33 @@ export class Servant {
       this.atkGrowth[89] = 10835; // 5★ ATK @ Lv90 (Stats reads index 89 for rarity 5)
     }
 
-    // Ascension/form override (declarative `forms[]` from the sync pipeline).
-    // When the player picks a form, swap to its trait ids + attribute BEFORE the
-    // baseline class/trait snapshot below, so trait-conditional damage and any
-    // overwriteBattleclass revert resolve against the chosen form. No formKey (or
-    // an unknown one) leaves base traits untouched → identical to pre-forms sims.
-    if (formKey != null && Array.isArray(rawData.forms) && rawData.forms.length) {
-      const form = rawData.forms.find(f => Number(f.key) === Number(formKey));
-      if (form) {
-        this.traits = (form.traitIds || []).slice();
-        if (form.attribute) this.attribute = form.attribute;
+    // Ascension/form selection (declarative `forms[]` from the sync pipeline).
+    // A form bundles trait ids + attribute + the active skill variant per slot +
+    // the active NP. The player's pick wins; otherwise the FINAL ascension is
+    // fielded (what a maxed unit actually runs). Traits/attribute are swapped
+    // BEFORE the baseline class/trait snapshot below so trait-conditional damage
+    // and overwriteBattleclass reverts resolve against the chosen form.
+    // Single-form servants (forms == []) keep base traits/skills/NP unchanged.
+    let activeForm = null;
+    if (Array.isArray(rawData.forms) && rawData.forms.length) {
+      activeForm =
+        (formKey != null && rawData.forms.find(f => Number(f.key) === Number(formKey))) ||
+        rawData.forms.find(f => f.final) ||
+        rawData.forms[rawData.forms.length - 1];
+      if (activeForm) {
+        this.traits = (activeForm.traitIds || []).slice();
+        if (activeForm.attribute) this.attribute = activeForm.attribute;
       }
     }
 
     this.skills  = new Skills(rawData.skills || [], append5);
     this.nps     = new NP(rawData.noblePhantasms || []);
+    // Apply the form's kit selection (no-op for the final form, whose variants
+    // already match the engine's defaults — last skill variant / highest-id NP).
+    if (activeForm) {
+      if (activeForm.skillIds) this.skills.setActiveVariants(activeForm.skillIds);
+      if (activeForm.npId != null) this.nps.setActiveByOriginalId(activeForm.npId);
+    }
     this.buffs   = new Buffs({ servant: this });
     this.stats   = new Stats(this);
 

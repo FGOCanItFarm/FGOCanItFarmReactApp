@@ -4088,5 +4088,105 @@
     ]
   },
   "instantDeathChance": 230,
-  "originalBattleName": "美遊"
+  "originalBattleName": "美遊",
+  "forms": [
+    {
+      "key": 0,
+      "asc": 2,
+      "label": null,
+      "attribute": "human",
+      "traitIds": [
+        2,
+        101,
+        202,
+        300,
+        303,
+        404,
+        1000,
+        2001,
+        2008,
+        2631,
+        2654,
+        2667,
+        2838,
+        2858,
+        5000,
+        306000
+      ],
+      "traits": [
+        "genderFemale",
+        "classLancer",
+        "attributeHuman",
+        "alignmentLawful",
+        "alignmentGood",
+        "fourStarServant",
+        "servant",
+        "humanoid",
+        "weakToEnumaElish",
+        "hominidaeServant",
+        "livingHuman",
+        "childServant",
+        "summerModeServant",
+        "standardClassServant",
+        "canBeInBattle",
+        "unknown"
+      ],
+      "isBase": false,
+      "skillIds": {
+        "1": 2538450,
+        "2": 2539551
+      },
+      "npId": 306001
+    },
+    {
+      "key": 3,
+      "asc": 4,
+      "label": "Miyu Sakatsuki",
+      "attribute": "human",
+      "traitIds": [
+        2,
+        101,
+        202,
+        300,
+        304,
+        404,
+        1000,
+        2001,
+        2008,
+        2631,
+        2654,
+        2667,
+        2838,
+        2858,
+        5000,
+        306000
+      ],
+      "traits": [
+        "genderFemale",
+        "classLancer",
+        "attributeHuman",
+        "alignmentLawful",
+        "alignmentEvil",
+        "fourStarServant",
+        "servant",
+        "humanoid",
+        "weakToEnumaElish",
+        "hominidaeServant",
+        "livingHuman",
+        "childServant",
+        "summerModeServant",
+        "standardClassServant",
+        "canBeInBattle",
+        "unknown"
+      ],
+      "isBase": false,
+      "skillIds": {
+        "1": 2538450,
+        "2": 2539551,
+        "3": 2540650
+      },
+      "npId": 306001,
+      "final": true
+    }
+  ]
 }

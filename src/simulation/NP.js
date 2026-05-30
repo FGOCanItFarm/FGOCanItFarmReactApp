@@ -8,6 +8,17 @@ export class NP {
   constructor(npsData) {
     this.nps = this.parseNoblePhantasms(npsData);
     this.card = this.nps.length > 0 ? this.nps[this.nps.length - 1].card : null;
+    this.defaultNewId = null; // form-selected base NP; null = highest-id (last)
+  }
+
+  // Pin the default active NP to a specific Atlas NP id (form selection). The
+  // tdTypeChange swap path is unaffected — it passes an explicit newId. No-op if
+  // the id isn't found. Updates `card` so the default card type matches.
+  setActiveByOriginalId(originalId) {
+    const np = this.nps.find(n => n.id === originalId);
+    if (!np) return;
+    this.defaultNewId = np.newId;
+    this.card = np.card;
   }
 
   parseNoblePhantasms(npsData) {
@@ -18,7 +29,13 @@ export class NP {
   }
 
   getNpById(newId = null) {
-    if (newId === null) return this.nps[this.nps.length - 1];
+    if (newId === null) {
+      if (this.defaultNewId != null) {
+        const def = this.nps.find(np => np.newId === this.defaultNewId);
+        if (def) return def;
+      }
+      return this.nps[this.nps.length - 1];
+    }
     const found = this.nps.find(np => np.newId === newId);
     if (!found) throw new Error(`No NP found with newId ${newId}`);
     return found;

@@ -7,6 +7,13 @@ export class Skills {
     this.mysticCode = mysticCode;
     this.melusineSkill = false;
     this.append5 = append5;
+    this.activeSkillIds = null; // { num: skillId } when a form selects variants
+  }
+
+  // Pin the active skill variant per num to a specific skill id (form selection).
+  // No-op for nums not in the map; falls back to default selection otherwise.
+  setActiveVariants(skillIdsMap) {
+    this.activeSkillIds = skillIdsMap || null;
   }
 
   static safeSval(svalsRaw, defaultVal = {}) {
@@ -83,6 +90,11 @@ export class Skills {
       if (!this.melusineSkill && this.skills[num][0]?.id === 888550) {
         this.melusineSkill = true;
         return this.skills[num][0];
+      }
+      // Form-selected variant (by skill id) when set; else the default (last).
+      if (this.activeSkillIds && this.activeSkillIds[num] != null) {
+        const pick = this.skills[num].find(s => s.id === this.activeSkillIds[num]);
+        if (pick) return pick;
       }
       return this.skills[num][this.skills[num].length - 1];
     }

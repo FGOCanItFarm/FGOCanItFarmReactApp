@@ -200,12 +200,21 @@ function trimSkillsToMaxLevel(skills) {
 }
 
 // Collapse the bloated `ascensionAdd` blob into a compact `forms[]` — the
-// DISTINCT trait/attribute sets a servant can present across its ascensions.
-// The engine indexes traits by id and the team-panel Identity card shows the
-// names, so each form carries both. `isBase` marks the form whose traits match
-// the servant's default top-level `traits` (i.e. the form used when the player
-// hasn't picked one — keeps sims byte-identical to the pre-forms behaviour).
-// Single-form servants return [] (no choice to offer; engine uses base traits).
+// DISTINCT trait/attribute sets a servant presents across its ascensions, each
+// enriched with the per-form skill variant and active NP so the engine can
+// switch a servant's whole kit by form (see Servant.js formKey).
+//
+// Model (see the servant-form-ascension-model memory): forms are keyed by
+// ascension. Traits come from individuality.ascension[N] (empty = inherit the
+// most recent non-empty, else base). Skill variants are duplicate `num`s gated
+// by `condLimitCount` — the active one at ascension A has the largest
+// `condLimitCount ≤ A`. NPs pair to forms by order when their counts match
+// (priority/id asc ↔ ascension asc), else every form uses the final NP.
+//
+// Each form carries the MAX ascension of its trait-run as `asc` (the level a
+// player actually fields for that look), and `final` marks the last ascension's
+// form — the default the engine uses when no form is picked. Single-form
+// servants return [] (nothing to switch; engine uses base traits/skills/NP).
 export function extractForms(data) {
   const ascInd  = data?.ascensionAdd?.individuality?.ascension || {};
   const ascAttr = data?.ascensionAdd?.attribute?.ascension || {};
@@ -214,26 +223,63 @@ export function extractForms(data) {
   const baseIds = (data?.traits || []).map((t) => t.id);
   const baseSig = sig(baseIds);
 
-  const seen = new Set();
-  const forms = [];
-  for (const key of Object.keys(ascInd).sort((a, b) => Number(a) - Number(b))) {
-    const arr = ascInd[key];
-    if (!Array.isArray(arr) || arr.length === 0) continue; // [] = inherits base
-    const ids = arr.map((t) => t.id);
+  // Active skill id per num at a given ascension: largest condLimitCount ≤ asc.
+  const skills = Array.isArray(data?.skills) ? data.skills : [];
+  const skillIdsAt = (asc) => {
+    const out = {};
+    for (const num of [1, 2, 3]) {
+      const variants = skills
+        .filter((s) => Number(s.num) === num && Number(s.condLimitCount ?? 0) <= asc)
+        .sort((a, b) => Number(a.condLimitCount ?? 0) - Number(b.condLimitCount ?? 0));
+      if (variants.length) out[num] = variants[variants.length - 1].id;
+    }
+    return out;
+  };
+
+  // Walk ascensions 0..4, inheriting empty individuality entries, and collapse
+  // consecutive same-trait ascensions into one form (keeping the max asc).
+  let lastIds = baseIds;
+  const bySig = new Map();
+  const order = [];
+  for (let asc = 0; asc <= 4; asc++) {
+    const arr = ascInd[String(asc)];
+    let ids = lastIds, names = null;
+    if (Array.isArray(arr) && arr.length > 0) {
+      ids = arr.map((t) => t.id);
+      names = arr.map((t) => t.name).filter(Boolean);
+      lastIds = ids;
+    }
     const s = sig(ids);
-    if (seen.has(s)) continue;
-    seen.add(s);
-    forms.push({
-      key: Number(key),
-      label: (ascName[key] && ascName[key] !== data.name) ? ascName[key] : null,
-      attribute: ascAttr[key] || data.attribute || null,
+    const form = bySig.get(s);
+    if (form) { form.asc = asc; continue; } // extend the run to this ascension
+    const f = {
+      key: asc, asc,
+      label: (ascName[String(asc)] && ascName[String(asc)] !== data.name) ? ascName[String(asc)] : null,
+      attribute: ascAttr[String(asc)] || data.attribute || null,
       traitIds: ids,
-      traits: arr.map((t) => t.name).filter(Boolean),
+      traits: names || (data?.traits || []).map((t) => t.name).filter(Boolean),
       isBase: s === baseSig,
-    });
+    };
+    bySig.set(s, f);
+    order.push(f);
   }
-  if (forms.length <= 1) return []; // no genuine choice
-  return forms;
+  if (order.length <= 1) return []; // no genuine choice
+
+  // Per-form active skill variants (computed at the form's fielded ascension).
+  for (const f of order) f.skillIds = skillIdsAt(f.asc);
+
+  // Pair NPs to forms by order when counts match; else all → final NP.
+  const nps = (Array.isArray(data?.noblePhantasms) ? data.noblePhantasms : [])
+    .slice().sort((a, b) => (a.id || 0) - (b.id || 0));
+  if (nps.length === order.length) {
+    order.forEach((f, i) => { f.npId = nps[i].id; });
+  } else if (nps.length) {
+    const finalNpId = nps[nps.length - 1].id;
+    for (const f of order) f.npId = finalNpId;
+  }
+
+  order[order.length - 1].final = true; // last ascension = engine default
+  return order;
 }
 
 export function stripServantData(data) {

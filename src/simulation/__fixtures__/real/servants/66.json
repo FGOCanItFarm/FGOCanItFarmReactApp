@@ -3414,5 +3414,99 @@
     ]
   },
   "instantDeathChance": 500,
-  "originalBattleName": "アン＆メアリー"
+  "originalBattleName": "アン＆メアリー",
+  "forms": [
+    {
+      "key": 0,
+      "asc": 2,
+      "label": null,
+      "attribute": "human",
+      "traitIds": [
+        2,
+        103,
+        202,
+        301,
+        304,
+        404,
+        1000,
+        2001,
+        2008,
+        2631,
+        2858,
+        2881,
+        5000,
+        400900
+      ],
+      "traits": [
+        "genderFemale",
+        "classRider",
+        "attributeHuman",
+        "alignmentChaotic",
+        "alignmentEvil",
+        "fourStarServant",
+        "servant",
+        "humanoid",
+        "weakToEnumaElish",
+        "hominidaeServant",
+        "standardClassServant",
+        "groupServant",
+        "canBeInBattle",
+        "unknown"
+      ],
+      "isBase": true,
+      "skillIds": {
+        "1": 912451,
+        "2": 2040451
+      },
+      "npId": 400901
+    },
+    {
+      "key": 3,
+      "asc": 4,
+      "label": null,
+      "attribute": "human",
+      "traitIds": [
+        2,
+        103,
+        202,
+        301,
+        304,
+        404,
+        1000,
+        2001,
+        2008,
+        2631,
+        2858,
+        2881,
+        2919,
+        5000,
+        400900
+      ],
+      "traits": [
+        "genderFemale",
+        "classRider",
+        "attributeHuman",
+        "alignmentChaotic",
+        "alignmentEvil",
+        "fourStarServant",
+        "servant",
+        "humanoid",
+        "weakToEnumaElish",
+        "hominidaeServant",
+        "standardClassServant",
+        "groupServant",
+        "bunnyServant",
+        "canBeInBattle",
+        "unknown"
+      ],
+      "isBase": false,
+      "skillIds": {
+        "1": 912451,
+        "2": 2040451,
+        "3": 115350
+      },
+      "npId": 400902,
+      "final": true
+    }
+  ]
 }

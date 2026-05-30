@@ -43,14 +43,21 @@ function describeIdentity(data, selectedFormKey) {
   if (!data) return null;
   const base = traitNames(data.traits);
   const forms = Array.isArray(data.forms) ? data.forms : [];
-  const baseForm = forms.find(f => f.isBase) || null;
-  const active = (selectedFormKey != null && forms.find(f => Number(f.key) === Number(selectedFormKey))) || baseForm;
+  // The engine defaults to the FINAL ascension when no form is picked.
+  const defaultForm = forms.find(f => f.final) || (forms.length ? forms[forms.length - 1] : null);
+  const active = (selectedFormKey != null && forms.find(f => Number(f.key) === Number(selectedFormKey))) || defaultForm;
 
   const attribute = cap(active?.attribute || data.attribute || '');
   const alignment = base.filter(n => /^alignment/.test(n)).map(n => cap(n.replace(/^alignment/, ''))).join(' · ');
   const shownTraits = meaningful(active ? (active.traits || []) : base);
 
-  return { attribute, alignment, traits: shownTraits, forms, multiForm: forms.length > 1, baseForm, active };
+  // Only offer a form CHOICE when it actually changes the kit — i.e. the forms
+  // fire different NPs. Servants whose traits merely shift at the final
+  // ascension (same NP) don't get a confusing picker; they just field final.
+  const distinctNps = new Set(forms.map(f => f.npId).filter(v => v != null));
+  const togglable = forms.length > 1 && distinctNps.size > 1;
+
+  return { attribute, alignment, traits: shownTraits, forms, multiForm: togglable, defaultForm, active };
 }
 
 const FLAT_FIELDS = [
@@ -250,7 +257,7 @@ const StickyTeamBar = ({
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mt: 0.75, flexWrap: 'wrap' }}>
               <Typography variant="body2">Form</Typography>
               {identity.forms.map((f, i) => {
-                const selectedKey = effects.formKey ?? identity.baseForm?.key;
+                const selectedKey = effects.formKey ?? identity.defaultForm?.key;
                 return (
                   <Button key={f.key} size="small"
                     variant={Number(selectedKey) === Number(f.key) ? 'contained' : 'outlined'}
