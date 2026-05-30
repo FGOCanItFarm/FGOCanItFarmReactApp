@@ -320,6 +320,16 @@ corruption).** Re-seed semantics differ: **quests** are re-upserted every sync
   `face_url` is also extracted into its own column.
 - **Keeps `ascensionAdd` + `svtChange`** — required by FR-5 (ascension-dependent
   attribute/skill effects; e.g. Mash reads as 4★ Shielder, Melusine 312).
+- **Derives `forms[]`** (`extractForms`) — the distinct per-ascension
+  trait/attribute sets a servant presents, each enriched with the active skill
+  variant (by `condLimitCount`) and active NP (paired to forms by order). Keyed
+  by the form's fielded ascension; `final` marks the last ascension. `Servant`
+  defaults to the **final** form (what a maxed unit runs — top-level `data.traits`
+  matches *no* real ascension for the 23 multi-form servants), or an explicit
+  `formKey`. `ascensionAdd` is still KEPT alongside `forms[]` for now (the engine
+  reads `forms[]`; ascensionAdd is the source + retained until trim is finalised).
+  Live rows were back-filled in place via `worker/migrateForms.mjs` (additive).
+  See the per-servant trait/skill/NP model in the agent memory.
 - **Skills collapsed to max level**: each active skill's `coolDown`, function
   `svals`, and buff `svals` are reduced to the single entry the engine selects
   (`Skills.safeSval` / coolDown picker read index 9, else last — `Skills.js:12-24`).
